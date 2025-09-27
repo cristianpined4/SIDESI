@@ -21,7 +21,7 @@ class HomeController extends Component
 
     public function paginationView()
     {
-        return 'vendor.livewire.bootstrap';
+        return 'vendor.livewire.tailwind';
     }
 
     public function render()
@@ -34,11 +34,17 @@ class HomeController extends Component
             }
         }
 
-        $records = $query->orderBy('id', 'desc')->paginate($this->paginate);
- */
+        $records = $query->orderBy('id', 'desc')->paginate($this->paginate); */
+
         return view('livewire.site.home'/* , compact('records') */)
             ->extends('layouts.site')
             ->section('content');
+    }
+
+    function abrirModal()
+    {
+        $this->resetUI();
+        $this->dispatch("abrir-modal", ['modal' => 'modal-home']);
     }
 
     public function store()

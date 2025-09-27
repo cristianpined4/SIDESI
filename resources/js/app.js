@@ -97,3 +97,93 @@ function generarGraficoBarras(selector, etiquetas, datos) {
 }
 
 window.chartJs = generarGraficoBarras;
+
+const openModal = (modal) => {
+    modal.style.display = "flex";
+};
+
+window.openModal = openModal;
+
+const closeModal = (modal) => {
+    modal.style.display = "none";
+    clearForm(modal);
+};
+
+window.closeModal = closeModal;
+
+const clearForm = (modal) => {
+    const inputs = modal.querySelectorAll("input, textarea, select");
+    inputs.forEach((input) => {
+        if (input.type === "checkbox" || input.type === "radio") {
+            input.checked = false;
+        } else {
+            input.value = "";
+        }
+        hideError(input);
+    });
+};
+
+window.clearForm = clearForm;
+
+const validateInput = (input) => {
+    if (input.type === "email") {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.value);
+    } else if (input.type === "checkbox") {
+        return input.checked;
+    } else if (input.type === "radio") {
+        const radios = document.getElementsByName(input.name);
+        return Array.from(radios).some((r) => r.checked);
+    } else if (input.type === "file") {
+        return input.files.length > 0;
+    } else {
+        return input.value.trim() !== "";
+    }
+};
+
+window.validateInput = validateInput;
+
+const showError = (input, message) => {
+    input.classList.add("is-invalid");
+    if (input.nextElementSibling) {
+        input.nextElementSibling.innerText = message;
+        input.nextElementSibling.style.display = "block";
+    }
+};
+
+window.showError = showError;
+
+const hideError = (input) => {
+    input.classList.remove("is-invalid");
+    if (input.nextElementSibling)
+        input.nextElementSibling.style.display = "none";
+};
+
+window.hideError = hideError;
+
+document.addEventListener("Livewire:initialized", () => {
+    // Abrir modal
+    const modalButtons = document.querySelectorAll("[data-modal-target]");
+    modalButtons.forEach((btn) => {
+        const target = document.querySelector(btn.dataset.modalTarget);
+        if (!target) return;
+        btn.addEventListener("click", () => openModal(target));
+    });
+
+    // Cerrar modal
+    const closeButtons = document.querySelectorAll(
+        ".modal .btn-close, .modal .btn-secondary"
+    );
+
+    closeButtons.forEach((btn) => {
+        const modal = btn.closest(".modal");
+        btn.addEventListener("click", () => closeModal(modal));
+    });
+
+    // Cerrar al hacer clic fuera
+    const modals = document.querySelectorAll(".modal");
+    modals.forEach((modal) => {
+        modal.addEventListener("click", (e) => {
+            if (e.target === modal) closeModal(modal);
+        });
+    });
+});
