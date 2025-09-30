@@ -12,6 +12,14 @@
   align-items: center;
 }
 
+.modal .modal-header h5,
+.modal label,
+.modal input,
+.modal textarea,
+.modal select {
+  color: #000;
+}
+
 .modal-dialog {
   background-color: #fff;
   padding: 1rem;
@@ -95,6 +103,42 @@
 
 .btn-secondary:hover {
   background-color: #5a6268;
+}
+
+.btn-danger {
+  background-color: #dc3545;
+  color: #fff;
+}
+
+.btn-danger:hover {
+  background-color: #c82333;
+}
+
+.btn-warning {
+  background-color: #ffc107;
+  color: #212529;
+}
+
+.btn-warning:hover {
+  background-color: #e0a800;
+}
+
+.btn-success {
+  background-color: #28a745;
+  color: #fff;
+}
+
+.btn-success:hover {
+  background-color: #218838;
+}
+
+.btn-info {
+  background-color: #17a2b8;
+  color: #fff;
+}
+
+.btn-info:hover {
+  background-color: #138496;
 }
 
 /* Inputs text, email, password, number, textarea */
