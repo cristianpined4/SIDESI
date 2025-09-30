@@ -16,7 +16,7 @@
   <title>{{ ($title = trim($__env->yieldContent('title'))) }}{{ $title && !str_contains($title, '-') &&
     !str_contains(strtoupper($title), 'SIDESI') ? ' - SIDESI' : '' }}</title>
   <meta name="description"
-    content="Plataforma oficial de SIDESI para gestión académica, eventos y desarrollo estudiantil" />
+    content="@yield('meta_description', 'Plataforma oficial de SIDESI para gestión académica, eventos y desarrollo estudiantil')" />
   <meta name="generator" content="v0.app" />
   <script src="_next/static/chunks/polyfills-42372ed130431b0a.js" noModule=""></script>
   @livewireStyles
@@ -24,7 +24,8 @@
   @vite(['resources/css/app.css', 'resources/css/app-site.css', 'resources/js/app.js', 'resources/js/app-site.js'])
 </head>
 
-<body class="font-sans"><!--$-->
+<body class="font-sans">
+  <!--$-->
   <div class="min-h-screen">
     <header class="sticky top-0 z-50 w-full border-b bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60">
       <div class="container mx-auto px-4">
