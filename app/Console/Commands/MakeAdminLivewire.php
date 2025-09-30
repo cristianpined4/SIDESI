@@ -95,10 +95,16 @@ class MakeAdminLivewire extends Command
                         ->section('content');
                 }
 
-                function abrirModal()
+                public function abrirModal(\$idModal = 'modal-home')
                 {
                     \$this->resetUI();
-                    \$this->dispatch("abrir-modal", ['modal' => 'modal-home']);
+                    \$this->dispatch("abrir-modal", ['modal' => \$idModal]);
+                }
+
+                public function cerrarModal(\$idModal = 'modal-home')
+                {
+                    \$this->resetUI();
+                    \$this->dispatch("cerrar-modal", ['modal' => \$idModal]);
                 }
 
                 public function store()
