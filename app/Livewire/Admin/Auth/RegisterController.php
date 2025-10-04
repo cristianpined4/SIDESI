@@ -170,8 +170,8 @@ class RegisterController extends Component
             'fields.name' => 'required|string|min:3|max:50|regex:/^[\pL\s]+$/u',
             'fields.lastname' => 'required|string|min:3|max:50|regex:/^[\pL\s]+$/u',
             'fields.email' => 'required|email|regex:/^.+@.+\..+$/|unique:users,email',
-            'fields.password' => 'required|min:6|regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/',
-            'fields.password_confirmation' => 'required|min:6|regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/',
+            'fields.password' => 'required|min:6|regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};:\'",.<>\/?]).+$/',
+            'fields.password_confirmation' => 'required|min:6|regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};:\'",.<>\/?]).+$/',
             'fields.role_id' => 'required|string|exists:roles,name|not_in:Administrador,Directivo',
             'fields.document_type' => 'required|string|in:DUI,Carnet Estudiantil,Pasaporte,Carnet de extranjería',
             'fields.document_number' => 'required|string|min:4|max:20|unique:users,document_number',
@@ -198,11 +198,11 @@ class RegisterController extends Component
 
             'fields.password.required' => 'La contraseña es obligatoria.',
             'fields.password.min' => 'La contraseña debe tener al menos 6 caracteres.',
-            'fields.password.regex' => 'La contraseña debe contener al menos una letra mayúscula, una letra minúscula y un número.',
+            'fields.password.regex' => 'La contraseña debe contener al menos una letra mayúscula, una letra minúscula, un número y un carácter especial.',
 
             'fields.password_confirmation.required' => 'La confirmación de la contraseña es obligatoria.',
             'fields.password_confirmation.min' => 'La confirmación de la contraseña debe tener al menos 6 caracteres.',
-            'fields.password_confirmation.regex' => 'La confirmación de la contraseña debe contener al menos una letra mayúscula, una letra minúscula y un número.',
+            'fields.password_confirmation.regex' => 'La confirmación de la contraseña debe contener al menos una letra mayúscula, una letra minúscula, un número y un carácter especial.',
 
             'fields.role_id.required' => 'El rol es obligatorio.',
             'fields.role_id.string' => 'El rol seleccionado no es válido.',
@@ -276,6 +276,7 @@ class RegisterController extends Component
             DB::commit();
 
             Auth::loginUsingId($userId);
+
             LogsSistema::create([
                 'action' => 'REGISTER',
                 'user_id' => $userId,
