@@ -3,9 +3,9 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -14,11 +14,23 @@ return new class extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->string('lastname');
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->string('username')->unique();
+            $table->unsignedBigInteger('role_id')->nullable();
+            $table->foreign('role_id')->references('id')->on('roles')->onDelete('set null');
+            $table->string('document_type')->nullable();
+            $table->string('document_number')->nullable();
+            $table->string('phone')->nullable();
+            $table->string('institution')->nullable();
+            $table->boolean('is_active')->default(true);
+            $table->jsonb('metadata')->nullable();
             $table->rememberToken();
             $table->timestamps();
+            $table->index(['email', 'is_active'], 'idx_usuarios_email_activo');
+            $table->index(['username', 'is_active'], 'idx_usuarios_nombre_usuario_activo');
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {
@@ -35,6 +47,18 @@ return new class extends Migration
             $table->longText('payload');
             $table->integer('last_activity')->index();
         });
+
+        $admin = [
+            'name' => 'Admin',
+            'lastname' => 'User',
+            'email' => 'admin@admin.com',
+            'username' => 'admin',
+            'password' => bcrypt('admin123'),
+            'role_id' => 1,
+            'is_active' => true,
+        ];
+
+        DB::table('users')->insert($admin);
     }
 
     /**

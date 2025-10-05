@@ -1,8 +1,12 @@
-<nav class="hidden md:flex items-center space-x-6">
-  <a href="{{route('home-site')}}" class="text-sm font-medium text-muted-foreground hover:text-primary transition-colors ...">Inicio</a>
-  <a href="noticias.html" class="..." class="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">Noticias</a>
-  <a href="eventos.html" class="..." class="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">Eventos</a>
-  <a href="documentos.html" class="..." class="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">Documentos</a>
-  <a href="egresados.html" class="..." class="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">Egresados</a>
-  <a href="contacto.html" class="..." class="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">Contacto</a>
-</nav>
+<a href="{{route('home-site')}}"
+  class="flex items-center px-3 py-2 text-sm font-medium text-muted-foreground hover:text-white hover:bg-accent rounded-md transition-colors">Inicio</a>
+<a href="noticias.html"
+  class="flex items-center px-3 py-2 text-sm font-medium text-muted-foreground hover:text-white hover:bg-accent rounded-md transition-colors">Noticias</a>
+<a href="eventos.html"
+  class="flex items-center px-3 py-2 text-sm font-medium text-muted-foreground hover:text-white hover:bg-accent rounded-md transition-colors">Eventos</a>
+<a href="documentos.html"
+  class="flex items-center px-3 py-2 text-sm font-medium text-muted-foreground hover:text-white hover:bg-accent rounded-md transition-colors">Documentos</a>
+<a href="egresados.html"
+  class="flex items-center px-3 py-2 text-sm font-medium text-muted-foreground hover:text-white hover:bg-accent rounded-md transition-colors">Egresados</a>
+<a href="contacto.html"
+  class="flex items-center px-3 py-2 text-sm font-medium text-muted-foreground hover:text-white hover:bg-accent rounded-md transition-colors">Contacto</a>

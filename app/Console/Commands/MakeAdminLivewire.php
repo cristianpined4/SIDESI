@@ -62,6 +62,9 @@ class MakeAdminLivewire extends Command
             use Livewire\WithFileUploads;
             use Illuminate\Support\Facades\DB;
             use Illuminate\Support\Facades\Storage;
+            use App\Models\LogsSistema;
+            use Illuminate\Support\Facades\Auth;
+            use Illuminate\Support\Facades\Validator;
 
             class {$name}Controller extends Component
             {
@@ -72,10 +75,20 @@ class MakeAdminLivewire extends Command
                 public \$file;          // archivo temporal
                 public \$search = '';
                 public \$paginate = 10;
+                public bool \$loading = false;
 
                 public function paginationView()
                 {
                     return 'vendor.livewire.tailwind';
+                }
+
+                public function mount()
+                {
+                    if (Auth::check()) {
+                        if (!in_array(Auth::user()->role_id, [1, 2])) {
+                            return redirect()->route('login');
+                        }
+                    }
                 }
 
                 public function render()
@@ -138,11 +151,29 @@ class MakeAdminLivewire extends Command
                         \$item->save();
                         DB::commit();
 
+                        LogsSistema::create([
+                            'action' => 'create {$name}',
+                            'user_id' => auth()->id(),
+                            'ip_address' => request()->ip(),
+                            'description' => 'Creación de un nuevo {$name} con ID ' . \$item->id,
+                            'target_table' => (new {$name}())->getTable(),
+                            'target_id' => \$item->id,
+                            'status' => 'success',
+                        ]);
                         \$this->resetUI();
                         \$this->dispatch("message-success", "{$name} creado correctamente");
                         \$this->dispatch("cerrar-modal");
                     } catch (\\Throwable \$th) {
                         DB::rollBack();
+                        LogsSistema::create([
+                            'action' => 'error al crear {$name}',
+                            'user_id' => auth()->id(),
+                            'ip_address' => request()->ip(),
+                            'description' => 'Error al crear un nuevo {$name}: ' . \$th->getMessage(),
+                            'target_table' => (new {$name}())->getTable(),
+                            'target_id' => null,
+                            'status' => 'error',
+                        ]);
                         \$this->dispatch("message-error", "Error al crear");
                     }
                 }
@@ -151,6 +182,15 @@ class MakeAdminLivewire extends Command
                 {
                     \$item = {$name}::find(\$id);
                     if (!\$item) {
+                        LogsSistema::create([
+                            'action' => 'error al editar {$name}',
+                            'user_id' => auth()->id(),
+                            'ip_address' => request()->ip(),
+                            'description' => 'Intento de edición de un {$name} inexistente con ID ' . \$id,
+                            'target_table' => (new {$name}())->getTable(),
+                            'target_id' => \$id,
+                            'status' => 'error',
+                        ]);
                         \$this->dispatch("message-error", "{$name} no encontrado");
                         return;
                     }
@@ -194,11 +234,30 @@ class MakeAdminLivewire extends Command
                         \$item->save();
                         DB::commit();
 
+                        LogsSistema::create([
+                            'action' => 'update {$name}',
+                            'user_id' => auth()->id(),
+                            'ip_address' => request()->ip(),
+                            'description' => 'Actualización del {$name} con ID ' . \$item->id,
+                            'target_table' => (new {$name}())->getTable(),
+                            'target_id' => \$item->id,
+                            'status' => 'success',
+                        ]);
+
                         \$this->resetUI();
                         \$this->dispatch("message-success", "{$name} actualizado correctamente");
                         \$this->dispatch("cerrar-modal");
                     } catch (\\Throwable \$th) {
                         DB::rollBack();
+                        LogsSistema::create([
+                            'action' => 'error al actualizar {$name}',
+                            'user_id' => auth()->id(),
+                            'ip_address' => request()->ip(),
+                            'description' => 'Error al actualizar el {$name} con ID ' . \$this->record_id . ': ' . \$th->getMessage(),
+                            'target_table' => (new {$name}())->getTable(),
+                            'target_id' => \$this->record_id,
+                            'status' => 'error',
+                        ]);
                         \$this->dispatch("message-error", "Error al actualizar");
                     }
                 }
@@ -217,9 +276,28 @@ class MakeAdminLivewire extends Command
                         \$item->delete();
                         DB::commit();
 
+                        LogsSistema::create([
+                            'action' => 'delete {$name}',
+                            'user_id' => auth()->id(),
+                            'ip_address' => request()->ip(),
+                            'description' => 'Eliminación del {$name} con ID ' . \$item->id,
+                            'target_table' => (new {$name}())->getTable(),
+                            'target_id' => \$item->id,
+                            'status' => 'success',
+                        ]);
+
                         \$this->dispatch("message-success", "{$name} eliminado correctamente");
                     } catch (\\Throwable \$th) {
                         DB::rollBack();
+                        LogsSistema::create([
+                            'action' => 'error al eliminar {$name}',
+                            'user_id' => auth()->id(),
+                            'ip_address' => request()->ip(),
+                            'description' => 'Error al eliminar el {$name} con ID ' . \$item->id . ': ' . \$th->getMessage(),
+                            'target_table' => (new {$name}())->getTable(),
+                            'target_id' => \$item->id,
+                            'status' => 'error',
+                        ]);
                         \$this->dispatch("message-error", "Error al eliminar");
                     }
                 }
@@ -244,7 +322,11 @@ class MakeAdminLivewire extends Command
         return <<<BLADE
             @section('title', "$name")
 
-            <main>
+            <main style="min-height: 100vh; width: 100vw;">
+            <div class="loading" wire:loading.attr="show" show="false">
+                <div class="loader"></div>
+                <p class="loading-text">Cargando...</p>
+            </div>
             <!-- modales -->
             <div id="modal-home" class="modal" wire:ignore.self>
                 <div class="modal-dialog">

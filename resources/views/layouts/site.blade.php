@@ -38,7 +38,9 @@
               <span class="font-bold text-xl text-foreground">SIDESI</span>
             </div>
           </div>
-          @include('layouts.Components.site-main-menu')
+          <nav class="hidden md:flex items-center space-x-6">
+            @include('layouts.Components.site-main-menu')
+          </nav>
           <div class="flex items-center space-x-4">
             <div class="hidden sm:flex items-center space-x-2">
               <div class="relative">
@@ -53,24 +55,149 @@
                   placeholder="Buscar..." />
               </div>
             </div>
-            <button data-slot="button"
-              class="items-center justify-center whitespace-nowrap text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg:not([class*=&#x27;size-&#x27;])]:size-4 shrink-0 [&amp;_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50 h-8 rounded-md gap-1.5 px-3 has-[&gt;svg]:px-2.5 hidden sm:flex">
+            @if (!Auth::check())
+            <a data-slot="button"
+              class="items-center justify-center whitespace-nowrap text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg:not([class*=&#x27;size-&#x27;])]:size-4 shrink-0 [&amp;_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50 h-8 rounded-md gap-1.5 px-3 has-[&gt;svg]:px-2.5 hidden sm:flex"
+              href="{{ route('login') }}">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                 class="lucide lucide-user h-4 w-4 mr-2">
                 <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2">
                 </path>
                 <circle cx="12" cy="7" r="4"></circle>
-              </svg>Acceder</button>
+              </svg>Acceder</a>
+            @else
+            <!-- Menú de usuario -->
+            <div class="relative hidden sm:flex" x-data="{ menuVisible: false }">
+              <button @click="menuVisible = !menuVisible" class="flex items-center space-x-2 focus:outline-none">
+                <img
+                  src="https://images.unsplash.com/photo-1499714608240-22fc6ad53fb2?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                  alt="Avatar" class="h-8 w-8 rounded-full object-cover">
+                <span class="text-sm font-medium text-gray-800" style="text-align: left !important;">
+                  {{ Auth::user()->name }} {{ Auth::user()->lastname}}<br>
+                  <span class="text-xs font-normal text-gray-500">{{ Auth::user()->role->name }}</span>
+                </span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                  class="h-4 w-4 text-gray-500">
+                  <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+              </button>
+
+              <!-- Dropdown -->
+              <div x-show="menuVisible" @click.away="menuVisible = false"
+                x-transition:enter="transition ease-out duration-100"
+                x-transition:enter-start="transform opacity-0 scale-95"
+                x-transition:enter-end="transform opacity-100 scale-100"
+                x-transition:leave="transition ease-in duration-75"
+                x-transition:leave-start="transform opacity-100 scale-100"
+                x-transition:leave-end="transform opacity-0 scale-95"
+                class="absolute right-0 mt-2 w-48 origin-top-right rounded-md bg-white shadow-lg z-50">
+
+                <div class="py-1">
+                  {{-- Perfil --}}
+                  <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md"
+                    style="cursor: pointer;">
+                    Perfil
+                  </a>
+
+                  {{-- Cerrar sesión --}}
+                  <form method="POST" action="{{ route('logout') }}" style="cursor: pointer;">
+                    @csrf
+                    <button type="submit"
+                      class="w-full text-left block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md">
+                      Cerrar sesión
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </div>
+            @endif
             <button data-slot="button"
-              class="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg:not([class*=&#x27;size-&#x27;])]:size-4 shrink-0 [&amp;_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50 h-8 rounded-md gap-1.5 px-3 has-[&gt;svg]:px-2.5 md:hidden"><svg
-                xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+              class="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg:not([class*=&#x27;size-&#x27;])]:size-4 shrink-0 [&amp;_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50 h-8 rounded-md gap-1.5 px-3 has-[&gt;svg]:px-2.5 md:hidden"
+              id="mobile-menu-button"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                 class="lucide lucide-menu h-5 w-5">
                 <line x1="4" x2="20" y1="12" y2="12"></line>
                 <line x1="4" x2="20" y1="6" y2="6"></line>
                 <line x1="4" x2="20" y1="18" y2="18"></line>
               </svg></button>
+          </div>
+        </div>
+        <div class="md:hidden border-t bg-card" id="mobile-menu" style="display: none;">
+          <div class="px-2 pt-2 pb-3 space-y-1">
+            @include('layouts.Components.site-main-menu')
+            <div class="px-3 py-2" bis_skin_checked="1">
+              <div class="relative" bis_skin_checked="1"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                  viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="lucide lucide-search absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <path d="m21 21-4.3-4.3"></path>
+                </svg><input data-slot="input"
+                  class="file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-input flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive pl-8"
+                  placeholder="Buscar..." type="search"></div>
+            </div>
+            <div class="px-3 py-2" bis_skin_checked="1">
+              @if(!Auth::check())
+              <a data-slot="button"
+                class="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg:not([class*='size-'])]:size-4 shrink-0 [&amp;_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive border shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50 h-8 rounded-md gap-1.5 px-3 has-[&gt;svg]:px-2.5 w-full bg-transparent"><svg
+                  xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                  class="lucide lucide-user h-4 w-4 mr-2">
+                  <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="12" cy="7" r="4"></circle>
+                </svg>Acceder</a>
+              @else
+              <div class="relative" style="display: flex;justify-content: flex-end;"
+                x-data="{ menuVisibleMobile: false }">
+                <button @click="menuVisibleMobile = !menuVisibleMobile"
+                  class="flex items-center space-x-2 focus:outline-none">
+                  <img
+                    src="https://images.unsplash.com/photo-1499714608240-22fc6ad53fb2?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                    alt="Avatar" class="h-8 w-8 rounded-full object-cover">
+                  <span class="text-sm font-medium text-gray-800" style="text-align: left !important;">
+                    {{ Auth::user()->name }} {{ Auth::user()->lastname}}<br>
+                    <span class="text-xs font-normal text-gray-500">{{ Auth::user()->role->name }}</span>
+                  </span>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    class="h-4 w-4 text-gray-500">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                  </svg>
+                </button>
+
+                <!-- Dropdown -->
+                <div x-show="menuVisibleMobile" @click.away="menuVisibleMobile = false"
+                  x-transition:enter="transition ease-out duration-100"
+                  x-transition:enter-start="transform opacity-0 scale-95"
+                  x-transition:enter-end="transform opacity-100 scale-100"
+                  x-transition:leave="transition ease-in duration-75"
+                  x-transition:leave-start="transform opacity-100 scale-100"
+                  x-transition:leave-end="transform opacity-0 scale-95"
+                  class="absolute right-0 mt-2 w-48 origin-top-right rounded-md bg-white shadow-lg z-50">
+
+                  <div class="py-1">
+                    {{-- Perfil --}}
+                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md"
+                      style="cursor: pointer;">
+                      Perfil
+                    </a>
+
+                    {{-- Cerrar sesión --}}
+                    <form method="POST" action="{{ route('logout') }}">
+                      @csrf
+                      <button type="submit"
+                        class="w-full text-left block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md"
+                        style="cursor: pointer;">
+                        Cerrar sesión
+                      </button>
+                    </form>
+                  </div>
+                </div>
+              </div>
+              @endif
+            </div>
           </div>
         </div>
       </div>
@@ -249,6 +376,42 @@
                   'error'
               );
           });
+
+          let mobile_menu_button = document.getElementById('mobile-menu-button');
+          if (mobile_menu_button != null) {
+              mobile_menu_button.addEventListener('click', function() {
+                  let mobile_menu = document.getElementById('mobile-menu');
+                  if (mobile_menu.style.display === 'none') {
+                      mobile_menu.style.display = 'block';
+                      mobile_menu_button.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x h-5 w-5">
+                        <path d="M18 6 6 18"></path>
+                        <path d="m6 6 12 12"></path>
+                      </svg>`;
+                  } else {
+                      mobile_menu.style.display = 'none';
+                      mobile_menu_button.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-menu h-5 w-5">
+                        <line x1="4" x2="20" y1="12" y2="12"></line>
+                        <line x1="4" x2="20" y1="6" y2="6"></line>
+                        <line x1="4" x2="20" y1="18" y2="18"></line>
+                      </svg>`;
+                  }
+              });
+
+              window.addEventListener('resize', function() {
+                  let mobile_menu = document.getElementById('mobile-menu');
+                  if (window.innerWidth >= 768) {
+                      mobile_menu.style.display = 'none';
+                      mobile_menu_button.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-menu h-5 w-5">
+                        <line x1="4" x2="20" y1="12" y2="12"></line>
+                        <line x1="4" x2="20" y1="6" y2="6"></line>
+                        <line x1="4" x2="20" y1="18" y2="18"></line>
+                      </svg>`;
+                  }
+              });
+          }
       });
   </script>
 </body>
