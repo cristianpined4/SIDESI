@@ -1,6 +1,6 @@
 <a href="{{route('home-site')}}"
   class="flex items-center px-3 py-2 text-sm font-medium text-muted-foreground hover:text-white hover:bg-accent rounded-md transition-colors">Inicio</a>
-<a href="noticias.html"
+<a href="{{ route('news-list') }}"
   class="flex items-center px-3 py-2 text-sm font-medium text-muted-foreground hover:text-white hover:bg-accent rounded-md transition-colors">Noticias</a>
 <a href="eventos.html"
   class="flex items-center px-3 py-2 text-sm font-medium text-muted-foreground hover:text-white hover:bg-accent rounded-md transition-colors">Eventos</a>
