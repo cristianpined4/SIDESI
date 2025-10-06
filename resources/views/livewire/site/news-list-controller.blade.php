@@ -43,6 +43,7 @@
                             <option value="evento">Eventos</option>
                             <option value="empleo">Empleo</option>
                             <option value="taller">Talleres</option>
+                            <option value="egresados">Egresados</option>
                         </select>
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" 
                              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" 

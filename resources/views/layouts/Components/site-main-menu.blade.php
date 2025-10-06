@@ -6,7 +6,5 @@
   class="flex items-center px-3 py-2 text-sm font-medium text-muted-foreground hover:text-white hover:bg-accent rounded-md transition-colors">Eventos</a>
 <a href="documentos.html"
   class="flex items-center px-3 py-2 text-sm font-medium text-muted-foreground hover:text-white hover:bg-accent rounded-md transition-colors">Documentos</a>
-<a href="egresados.html"
-  class="flex items-center px-3 py-2 text-sm font-medium text-muted-foreground hover:text-white hover:bg-accent rounded-md transition-colors">Egresados</a>
 <a href="contacto.html"
   class="flex items-center px-3 py-2 text-sm font-medium text-muted-foreground hover:text-white hover:bg-accent rounded-md transition-colors">Contacto</a>
