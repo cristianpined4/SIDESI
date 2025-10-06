@@ -8,6 +8,7 @@ use Livewire\Attributes\On;
 use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class NewsListController extends Component
 {
@@ -15,6 +16,7 @@ class NewsListController extends Component
 
     public $currentCategory = 'all';
     public $currentSearchTerm = '';
+    public $paginate = 20;
 
     protected $news = [
         [
@@ -88,48 +90,72 @@ class NewsListController extends Component
             'participants' => 'Estudiantes con promedio superior a 8.5'
         ],
         [
-        'id' => 6,
-        'category' => 'egresados',
-        'category_label' => 'Egresados',
-        'badge_class' => 'bg-blue-600 text-white',
-        'title' => 'Encuentro de Egresados de Ingeniería',
-        'description' => 'Reunión anual para fortalecer la red profesional y compartir experiencias entre egresados de ingeniería.',
-        'details' => 'Evento exclusivo para egresados donde se realizarán charlas, mesas de discusión y actividades de networking. Ideal para ampliar contactos profesionales y conocer nuevas oportunidades laborales.',
-        'image' => 'https://universae.com/wp-content/uploads/2023/06/que-es-el-networking-1200x900.webp',
-        'date' => '12 de Octubre, 2025',
-        'location' => 'Auditorio Central de Ingeniería',
-        'time' => '9:00 AM - 3:00 PM',
-        'participants' => 'Egresados de todas las generaciones'
-    ],
-    [
-        'id' => 7,
-        'category' => 'egresados',
-        'category_label' => 'Egresados',
-        'badge_class' => 'bg-green-600 text-white',
-        'title' => 'Premios a la Trayectoria Profesional',
-        'description' => 'Reconocimiento a egresados destacados por su aporte en el ámbito profesional y académico.',
-        'details' => 'Ceremonia de premiación para celebrar los logros de egresados que han sobresalido en sus carreras, investigación o emprendimiento. Incluye testimonios, fotos y cobertura mediática.',
-        'image' => 'https://media.istockphoto.com/id/2062707205/es/foto/estrella-dorada-sobre-fondo-azul-como-recompensa-premio-al-mejor-rendimiento-copa-de-campeones.jpg?s=612x612&w=0&k=20&c=Pplk9-RG88yIdCQDN0aIQ-LBW10TnmDVgRyjnISbSoI=',
-        'date' => '22 de Noviembre, 2025',
-        'location' => 'Salón de Eventos Universitario',
-        'time' => '6:00 PM - 9:00 PM',
-        'participants' => 'Egresados nominados y comunidad académica'
-    ],
+            'id' => 6,
+            'category' => 'egresados',
+            'category_label' => 'Egresados',
+            'badge_class' => 'bg-blue-600 text-white',
+            'title' => 'Encuentro de Egresados de Ingeniería',
+            'description' => 'Reunión anual para fortalecer la red profesional y compartir experiencias entre egresados de ingeniería.',
+            'details' => 'Evento exclusivo para egresados donde se realizarán charlas, mesas de discusión y actividades de networking. Ideal para ampliar contactos profesionales y conocer nuevas oportunidades laborales.',
+            'image' => 'https://universae.com/wp-content/uploads/2023/06/que-es-el-networking-1200x900.webp',
+            'date' => '12 de Octubre, 2025',
+            'location' => 'Auditorio Central de Ingeniería',
+            'time' => '9:00 AM - 3:00 PM',
+            'participants' => 'Egresados de todas las generaciones'
+        ],
+        [
+            'id' => 7,
+            'category' => 'egresados',
+            'category_label' => 'Egresados',
+            'badge_class' => 'bg-green-600 text-white',
+            'title' => 'Premios a la Trayectoria Profesional',
+            'description' => 'Reconocimiento a egresados destacados por su aporte en el ámbito profesional y académico.',
+            'details' => 'Ceremonia de premiación para celebrar los logros de egresados que han sobresalido en sus carreras, investigación o emprendimiento. Incluye testimonios, fotos y cobertura mediática.',
+            'image' => 'https://media.istockphoto.com/id/2062707205/es/foto/estrella-dorada-sobre-fondo-azul-como-recompensa-premio-al-mejor-rendimiento-copa-de-campeones.jpg?s=612x612&w=0&k=20&c=Pplk9-RG88yIdCQDN0aIQ-LBW10TnmDVgRyjnISbSoI=',
+            'date' => '22 de Noviembre, 2025',
+            'location' => 'Salón de Eventos Universitario',
+            'time' => '6:00 PM - 9:00 PM',
+            'participants' => 'Egresados nominados y comunidad académica'
+        ],
     ];
 
     public function getFilteredNews()
     {
-        return collect($this->news)
+        // Convertimos las noticias en colección
+        $filtered = collect($this->news)
             ->when($this->currentCategory !== 'all', function ($collection) {
                 return $collection->where('category', $this->currentCategory);
             })
             ->when($this->currentSearchTerm, function ($collection) {
                 return $collection->filter(function ($news) {
                     return str_contains(strtolower($news['title']), strtolower($this->currentSearchTerm)) ||
-                           str_contains(strtolower($news['description']), strtolower($this->currentSearchTerm));
+                        str_contains(strtolower($news['description']), strtolower($this->currentSearchTerm));
                 });
-            })
-            ->all();
+            });
+
+        // Obtenemos la página actual y el número de elementos por página
+        $page = request()->get('page', 1);
+        $perPage = $this->paginate;
+
+        // Hacemos el "slice" para obtener solo los elementos de la página actual
+        $currentPageItems = $filtered->slice(($page - 1) * $perPage, $perPage)->values();
+
+        // Creamos el paginador manual
+        return new LengthAwarePaginator(
+            $currentPageItems,
+            $filtered->count(), // Total de elementos
+            $perPage,
+            $page,
+            [
+                'path' => request()->url(),
+                'query' => request()->query(),
+            ]
+        );
+    }
+
+    public function paginationView()
+    {
+        return 'vendor.livewire.tailwind';
     }
 
     public function render()

@@ -29,7 +29,7 @@ class LoginController extends Component
     {
         if (Auth::check()) {
             if (in_array(Auth::user()->role_id, [1, 2])) {
-                return redirect()->route('dashboard-admin');
+                return redirect()->route('admin.dashboard');
             } else {
                 return redirect()->route('home-site');
             }
@@ -130,7 +130,7 @@ class LoginController extends Component
             ]);
 
             if (in_array($user->role_id, [1, 2])) {
-                return redirect()->route('dashboard-admin');
+                return redirect()->route('admin.dashboard');
             } else {
                 return redirect()->route('home-site');
             }
