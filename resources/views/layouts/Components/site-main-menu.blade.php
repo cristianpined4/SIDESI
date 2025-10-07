@@ -2,7 +2,7 @@
   class="flex items-center px-3 py-2 text-sm font-medium text-muted-foreground hover:text-white hover:bg-accent rounded-md transition-colors">Inicio</a>
 <a href="{{ route('news-list') }}"
   class="flex items-center px-3 py-2 text-sm font-medium text-muted-foreground hover:text-white hover:bg-accent rounded-md transition-colors">Noticias</a>
-<a href="eventos.html"
+<a href="{{ route('eventos') }}"
   class="flex items-center px-3 py-2 text-sm font-medium text-muted-foreground hover:text-white hover:bg-accent rounded-md transition-colors">Eventos</a>
 <a href="documentos.html"
   class="flex items-center px-3 py-2 text-sm font-medium text-muted-foreground hover:text-white hover:bg-accent rounded-md transition-colors">Documentos</a>
