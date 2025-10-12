@@ -72,11 +72,11 @@ relevantes para la comunidad estudiantil de ingeniería.')
                 <div class="text-sm text-gray-500 hidden sm:block">
                     <p class="text-sm text-gray-700 leading-5 dark:text-gray-400">
                         <span>Mostrando</span>
-                        <span class="font-medium">{{ $filteredNews->firstItem() }}</span>
+                        <span class="font-medium">{{ $filteredNews->firstItem() ?? 0 }}</span>
                         <span>de</span>
-                        <span class="font-medium">{{ $filteredNews->lastItem() }}</span>
+                        <span class="font-medium">{{ $filteredNews->lastItem() ?? 0 }}</span>
                         <span>de</span>
-                        <span class="font-medium">{{ $filteredNews->total() }}</span>
+                        <span class="font-medium">{{ $filteredNews->total() ?? 0 }}</span>
                         <span>resultados</span>
                     </p>
                 </div>
