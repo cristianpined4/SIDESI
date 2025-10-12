@@ -11,6 +11,7 @@ Route::get('/noticias', App\Livewire\Site\NewsListController::class)->name('news
 Route::get('/login', App\Livewire\Admin\Auth\LoginController::class)->name('login');
 Route::get('/register', App\Livewire\Admin\Auth\RegisterController::class)->name('register');
 Route::get('/contactos', App\Livewire\Site\ContactoController::class)->name('site.contactos');
+Route::get('/documentos', App\Livewire\Site\DocumentosController::class)->name('site.documentos');
 Route::get('/eventos', App\Livewire\Site\EventosController::class)->name('site.eventos');
 
 

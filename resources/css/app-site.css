@@ -299,3 +299,132 @@
         justify-content: center;
     }
 }
+
+/* ===== FIN ESTILOS ESPECÍFICOS PARA MODAL DE NOTICIAS ===== */
+
+/* ===== ESTILOS ESPECÍFICOS PARA DOCUMENTOS ===== */
+.encabezado {
+  background-color: #304a6e;
+  padding: 20px 30px;
+  border-radius: 12px;
+  margin-bottom: 40px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.encabezado-contenido {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logo-contenedor {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.logo {
+  width: 50px;
+  height: auto;
+}
+
+.titulo {
+  font-size: 26px;
+  color: #ffffff;
+}
+
+.contador {
+  font-size: 16px;
+  color: #c2c6ce;
+}
+
+
+.contenedor-tarjetas {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 24px;
+}
+
+
+.tarjeta-documento {
+  background-color: #e6e6fa;
+  border-radius: 12px;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+  width: 280px;
+  padding: 24px;
+  text-align: center;
+  transition: transform 0.3s;
+  border: 1px solid #c2c6ce;
+}
+
+.tarjeta-documento:hover {
+  transform: translateY(-5px);
+}
+
+.icono-pdf {
+  font-size: 40px;
+  margin-bottom: 12px;
+  color: #0285fc;
+}
+
+.titulo-doc {
+  font-size: 18px;
+  margin-bottom: 8px;
+  color: #304a6e;
+}
+
+.descripcion-doc {
+  font-size: 14px;
+  color: #4f657b;
+  margin-bottom: 20px;
+}
+
+.botones {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.boton {
+  text-decoration: none;
+  padding: 10px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+  color: white;
+}
+
+.boton.ver {
+  background-color: #0285fc;
+}
+
+.boton.ver:hover {
+  background-color: #668dc0;
+}
+
+.boton.descargar {
+  background-color: #4f657b;
+}
+
+.boton.descargar:hover {
+  background-color: #304a6e;
+}
+
+@media (max-width: 600px) {
+  .tarjeta-documento {
+    width: 100%;
+    max-width: 340px;
+  }
+
+  .encabezado-contenido {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 10px;
+  }
+}

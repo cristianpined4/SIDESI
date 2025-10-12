@@ -4,7 +4,7 @@
   class="flex items-center px-3 py-2 text-sm font-medium text-muted-foreground hover:text-white hover:bg-accent rounded-md transition-colors">Noticias</a>
 <a href="{{ route('site.eventos') }}"
   class="flex items-center px-3 py-2 text-sm font-medium text-muted-foreground hover:text-white hover:bg-accent rounded-md transition-colors">Eventos</a>
-<a href="documentos.html"
+<a href="{{ route('site.documentos') }}"
   class="flex items-center px-3 py-2 text-sm font-medium text-muted-foreground hover:text-white hover:bg-accent rounded-md transition-colors">Documentos</a>
 <a href="{{ route('site.contactos') }}"
   class="flex items-center px-3 py-2 text-sm font-medium text-muted-foreground hover:text-white hover:bg-accent rounded-md transition-colors">
