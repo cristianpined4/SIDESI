@@ -31,12 +31,14 @@
       <div class="container mx-auto px-4">
         <div class="flex h-16 items-center justify-between">
           <div class="flex items-center space-x-4">
-            <div class="flex items-center space-x-2">
-              <div class="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
-                <span class="text-primary-foreground font-bold text-sm">S</span>
-              </div>
-              <span class="font-bold text-xl text-foreground">SIDESI</span>
-            </div>
+            <a href="{{ url('/') }}" class="flex h-16 items-end leading-none">
+              <img
+                src="{{ asset('images/logosidesii.png') }}"
+                alt="Logo SIDESI"
+                style="max-height: 64px; width: auto; object-fit: contain;"
+                class="block self-end m-2l-0"
+              />
+            </a>
           </div>
           <nav class="hidden md:flex items-center space-x-6">
             @include('layouts.Components.site-main-menu')
@@ -285,10 +287,6 @@
                   class="text-sm text-muted-foreground hover:text-primary transition-colors">Docentes</a>
               </li>
               <li>
-                <a href="/egresados"
-                  class="text-sm text-muted-foreground hover:text-primary transition-colors">Egresados</a>
-              </li>
-              <li>
                 <a href="/empresas"
                   class="text-sm text-muted-foreground hover:text-primary transition-colors">Empresas</a>
               </li>
@@ -325,7 +323,7 @@
                 <rect width="20" height="16" x="2" y="4" rx="2"></rect>
                 <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
               </svg>
-              <span class="text-sm">contacto@sidesi.edu</span>
+              <span class="text-sm">contacto@sidesi.edu.sv</span>
             </div>
             <div class="flex items-center space-x-3">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
@@ -335,7 +333,7 @@
                   d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z">
                 </path>
               </svg>
-              <span class="text-sm">+52 (55) 1234-5678</span>
+              <span class="text-sm">+503 2011-2025</span>
             </div>
             <div class="flex items-center space-x-3"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -345,7 +343,9 @@
                 </path>
                 <circle cx="12" cy="10" r="3"></circle>
               </svg>
-              <span class="text-sm">Ciudad Universitaria, México</span>
+              <a href="https://www.ues.edu.sv" target="_blank" class="text-sm text-black-600 hover:underline">
+                Ciudad Universitaria, Facultad Multidisciplinaria Oriental (FMO)
+              </a>
             </div>
           </div>
         </div>
@@ -361,58 +361,58 @@
   @livewireScripts
   <script>
     document.addEventListener('livewire:initialized', function() {
-          Livewire.on('message-success', function(message) {
-              Alert(
-                  '¡Éxito!',
-                  message,
-                  'success'
-              );
-          });
+      Livewire.on('message-success', function(message) {
+        Alert(
+          '¡Éxito!',
+          message,
+          'success'
+        );
+      });
 
-          Livewire.on('message-error', function(message) {
-              Alert(
-                  '¡Error!',
-                  message,
-                  'error'
-              );
-          });
+      Livewire.on('message-error', function(message) {
+        Alert(
+          '¡Error!',
+          message,
+          'error'
+        );
+      });
 
-          let mobile_menu_button = document.getElementById('mobile-menu-button');
-          if (mobile_menu_button != null) {
-              mobile_menu_button.addEventListener('click', function() {
-                  let mobile_menu = document.getElementById('mobile-menu');
-                  if (mobile_menu.style.display === 'none') {
-                      mobile_menu.style.display = 'block';
-                      mobile_menu_button.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      let mobile_menu_button = document.getElementById('mobile-menu-button');
+      if (mobile_menu_button != null) {
+        mobile_menu_button.addEventListener('click', function() {
+          let mobile_menu = document.getElementById('mobile-menu');
+          if (mobile_menu.style.display === 'none') {
+            mobile_menu.style.display = 'block';
+            mobile_menu_button.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                         stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x h-5 w-5">
                         <path d="M18 6 6 18"></path>
                         <path d="m6 6 12 12"></path>
                       </svg>`;
-                  } else {
-                      mobile_menu.style.display = 'none';
-                      mobile_menu_button.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          } else {
+            mobile_menu.style.display = 'none';
+            mobile_menu_button.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                         stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-menu h-5 w-5">
                         <line x1="4" x2="20" y1="12" y2="12"></line>
                         <line x1="4" x2="20" y1="6" y2="6"></line>
                         <line x1="4" x2="20" y1="18" y2="18"></line>
                       </svg>`;
-                  }
-              });
-
-              window.addEventListener('resize', function() {
-                  let mobile_menu = document.getElementById('mobile-menu');
-                  if (window.innerWidth >= 768) {
-                      mobile_menu.style.display = 'none';
-                      mobile_menu_button.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-menu h-5 w-5">
-                        <line x1="4" x2="20" y1="12" y2="12"></line>
-                        <line x1="4" x2="20" y1="6" y2="6"></line>
-                        <line x1="4" x2="20" y1="18" y2="18"></line>
-                      </svg>`;
-                  }
-              });
           }
-      });
+        });
+
+        window.addEventListener('resize', function() {
+          let mobile_menu = document.getElementById('mobile-menu');
+          if (window.innerWidth >= 768) {
+            mobile_menu.style.display = 'none';
+            mobile_menu_button.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-menu h-5 w-5">
+                        <line x1="4" x2="20" y1="12" y2="12"></line>
+                        <line x1="4" x2="20" y1="6" y2="6"></line>
+                        <line x1="4" x2="20" y1="18" y2="18"></line>
+                      </svg>`;
+          }
+        });
+      }
+    });
   </script>
 </body>
 
