@@ -228,7 +228,7 @@
               </div>
               <span class="font-bold text-xl">SIDESI</span>
             </div>
-            <p class="text-sm leading-relaxed">Sistema de Desarrollo de Estudiantes de Ingeniería. Impulsando el
+            <p class="text-sm leading-relaxed">Sección de Ingeniería de Sistemas Informáticos. Impulsando el
               crecimiento académico y profesional de la comunidad estudiantil.</p>
             <div class="flex space-x-4">
               <a href="#" class="text-muted-foreground hover:text-primary transition-colors"><svg
