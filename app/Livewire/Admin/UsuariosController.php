@@ -186,7 +186,7 @@ class UsuariosController extends Component
                 'user_id' => auth()->id(),
                 'ip_address' => request()->ip(),
                 'description' => 'Intento de edición de un Usuario inexistente con ID ' . $id,
-                'target_table' => (new Usuario())->getTable(),
+                'target_table' => (new Usuarios())->getTable(),
                 'target_id' => $id,
                 'status' => 'error',
             ]);

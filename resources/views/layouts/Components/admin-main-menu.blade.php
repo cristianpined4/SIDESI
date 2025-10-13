@@ -3,7 +3,7 @@
     <a @if(Route::is('admin.dashboard')) class="active" @endif href="{{route('admin.dashboard')}}">Dashboard</a>
   </li>
   <li class="nav-tab">
-    <a href="#">Eventos</a>
+    <a @if(Route::is('admin.eventos')) class="active" @endif href="{{route('admin.eventos')}}">Eventos</a>
   </li>
   <li class="nav-tab">
     <a href="#">Noticias</a>
