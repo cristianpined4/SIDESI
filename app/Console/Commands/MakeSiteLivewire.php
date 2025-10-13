@@ -95,9 +95,14 @@ class MakeSiteLivewire extends Command
                         ->section('content');
                 }
 
-                public function abrirModal(\$idModal = 'modal-home')
+                public function abrirModal(\$idModal = 'modal-home', \$initVoid = true)
                 {
-                    \$this->resetUI();
+                    if (\$initVoid) {
+                        \$this->resetUI();
+                    } else{
+                        \$this->resetErrorBag();
+                        \$this->resetValidation();
+                    }
                     \$this->dispatch("abrir-modal", ['modal' => \$idModal]);
                 }
 
@@ -108,7 +113,10 @@ class MakeSiteLivewire extends Command
                 }
 
                 public function store()
-                {
+                {   
+                    \$this->resetErrorBag();
+                    \$this->resetValidation();
+
                     \$rules = [
                         'fields.name' => 'required|string|max:255',
                         'file' => 'nullable|file|max:2048',
@@ -138,30 +146,62 @@ class MakeSiteLivewire extends Command
                         \$item->save();
                         DB::commit();
 
+                        LogsSistema::create([
+                            'action' => 'create {$name}',
+                            'user_id' => auth()->id(),
+                            'ip_address' => request()->ip(),
+                            'description' => 'Creación de un nuevo {$name} con ID ' . \$item->id,
+                            'target_table' => (new {$name}())->getTable(),
+                            'target_id' => \$item->id,
+                            'status' => 'success',
+                        ]);
                         \$this->resetUI();
                         \$this->dispatch("message-success", "{$name} creado correctamente");
-                        \$this->dispatch("cerrar-modal");
+                        \$this->abrirModal('modal-home');
                     } catch (\\Throwable \$th) {
                         DB::rollBack();
+                        LogsSistema::create([
+                            'action' => 'error al crear {$name}',
+                            'user_id' => auth()->id(),
+                            'ip_address' => request()->ip(),
+                            'description' => 'Error al crear un nuevo {$name}: ' . \$th->getMessage(),
+                            'target_table' => (new {$name}())->getTable(),
+                            'target_id' => null,
+                            'status' => 'error',
+                        ]);
                         \$this->dispatch("message-error", "Error al crear");
                     }
                 }
 
                 public function edit(\$id)
                 {
+                    \$this->resetUI();
+                    
                     \$item = {$name}::find(\$id);
                     if (!\$item) {
+                        LogsSistema::create([
+                            'action' => 'error al editar {$name}',
+                            'user_id' => auth()->id(),
+                            'ip_address' => request()->ip(),
+                            'description' => 'Intento de edición de un {$name} inexistente con ID ' . \$id,
+                            'target_table' => (new {$name}())->getTable(),
+                            'target_id' => \$id,
+                            'status' => 'error',
+                        ]);
                         \$this->dispatch("message-error", "{$name} no encontrado");
                         return;
                     }
 
                     \$this->record_id = \$item->id;
                     \$this->fields = \$item->toArray();
-                    \$this->dispatch("abrir-modal");
+                    \$this->abrirModal('modal-home', false);
                 }
 
                 public function update()
                 {
+                    \$this->resetErrorBag();
+                    \$this->resetValidation();
+
                     \$rules = [
                         'fields.name' => 'required|string|max:255',
                         'file' => 'nullable|file|max:2048',
@@ -194,16 +234,35 @@ class MakeSiteLivewire extends Command
                         \$item->save();
                         DB::commit();
 
+                        LogsSistema::create([
+                            'action' => 'update {$name}',
+                            'user_id' => auth()->id(),
+                            'ip_address' => request()->ip(),
+                            'description' => 'Actualización del {$name} con ID ' . \$item->id,
+                            'target_table' => (new {$name}())->getTable(),
+                            'target_id' => \$item->id,
+                            'status' => 'success',
+                        ]);
+
                         \$this->resetUI();
                         \$this->dispatch("message-success", "{$name} actualizado correctamente");
-                        \$this->dispatch("cerrar-modal");
+                        \$this->cerrarModal('modal-home');
                     } catch (\\Throwable \$th) {
                         DB::rollBack();
+                        LogsSistema::create([
+                            'action' => 'error al actualizar {$name}',
+                            'user_id' => auth()->id(),
+                            'ip_address' => request()->ip(),
+                            'description' => 'Error al actualizar el {$name} con ID ' . \$this->record_id . ': ' . \$th->getMessage(),
+                            'target_table' => (new {$name}())->getTable(),
+                            'target_id' => \$this->record_id,
+                            'status' => 'error',
+                        ]);
                         \$this->dispatch("message-error", "Error al actualizar");
                     }
                 }
 
-                 #[On("delete")]
+                #[On("delete")]
                 public function destroy(\$id)
                 {
                     try {
@@ -217,23 +276,42 @@ class MakeSiteLivewire extends Command
                         \$item->delete();
                         DB::commit();
 
+                        LogsSistema::create([
+                            'action' => 'delete {$name}',
+                            'user_id' => auth()->id(),
+                            'ip_address' => request()->ip(),
+                            'description' => 'Eliminación del {$name} con ID ' . \$item->id,
+                            'target_table' => (new {$name}())->getTable(),
+                            'target_id' => \$item->id,
+                            'status' => 'success',
+                        ]);
+
                         \$this->dispatch("message-success", "{$name} eliminado correctamente");
                     } catch (\\Throwable \$th) {
                         DB::rollBack();
+                        LogsSistema::create([
+                            'action' => 'error al eliminar {$name}',
+                            'user_id' => auth()->id(),
+                            'ip_address' => request()->ip(),
+                            'description' => 'Error al eliminar el {$name} con ID ' . \$item->id . ': ' . \$th->getMessage(),
+                            'target_table' => (new {$name}())->getTable(),
+                            'target_id' => \$item->id,
+                            'status' => 'error',
+                        ]);
                         \$this->dispatch("message-error", "Error al eliminar");
                     }
                 }
 
                 public function resetUI()
                 {
+                    \$this->resetErrorBag();
+                    \$this->resetValidation();
                     \$this->record_id = null;
                     \$this->fields = [];
                     \$this->file = null;
-                    \$this->resetErrorBag();
-                    \$this->resetValidation();
                 }
             }
-            PHP;
+PHP;
     }
 
     /**
@@ -293,6 +371,10 @@ class MakeSiteLivewire extends Command
                         let modalElement = document.getElementById(modal[0].modal);
                         if (modalElement) {
                             openModal(modalElement);
+                            let modelDialog = modalElement.querySelector('.modal-dialog');
+                            if (modelDialog) {
+                                modelDialog.scrollTop = 0;
+                            }
                         }
                     });
                 });
@@ -320,4 +402,3 @@ class MakeSiteLivewire extends Command
         return strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', $string));
     }
 }
-

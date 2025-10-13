@@ -10,7 +10,7 @@ $scrollIntoViewJsSnippet = "(\$el.closest('{$scrollTo}') || document.querySelect
 @endphp
 
 <div>
-    @if ($paginator->hasPages())
+    {{-- @if ($paginator->hasPages()) --}}
     <nav role="navigation" aria-label="Paginacion Navegacion" class="flex items-center justify-between">
         {{-- Versión móvil --}}
         <div class="flex justify-between flex-1 sm:hidden">
@@ -52,11 +52,11 @@ $scrollIntoViewJsSnippet = "(\$el.closest('{$scrollTo}') || document.querySelect
             <div>
                 <p class="text-sm text-gray-700 leading-5">
                     Mostrando
-                    <span class="font-medium">{{ $paginator->firstItem() }}</span>
+                    <span class="font-medium">{{ $paginator->firstItem() ?? 0 }}</span>
                     a
-                    <span class="font-medium">{{ $paginator->lastItem() }}</span>
+                    <span class="font-medium">{{ $paginator->lastItem() ?? 0 }}</span>
                     de
-                    <span class="font-medium">{{ $paginator->total() }}</span>
+                    <span class="font-medium">{{ $paginator->total() ?? 0 }}</span>
                     resultados
                 </p>
             </div>
@@ -148,5 +148,5 @@ $scrollIntoViewJsSnippet = "(\$el.closest('{$scrollTo}') || document.querySelect
             </div>
         </div>
     </nav>
-    @endif
+    {{-- @endif --}}
 </div>

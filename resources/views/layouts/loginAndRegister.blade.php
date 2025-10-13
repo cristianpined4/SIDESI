@@ -11,7 +11,7 @@
   'resources/js/app-admin.js'])
 </head>
 
-<body>
+<body style="min-height: 100vh; display: flex; align-items: center; justify-content: center;">
   @yield('content')
   @livewireScripts
 </body>

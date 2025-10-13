@@ -26,5 +26,6 @@ Route::middleware(['auth'])->group(function () {
 
     // rutas del administrador /admin/...
     Route::get('/dashboard', App\Livewire\Admin\DashboardController::class)->name('dashboard');
+    Route::get('/usuarios', App\Livewire\Admin\UsuariosController::class)->name('usuarios');
   });
 });

@@ -175,10 +175,16 @@ class RegisterController extends Component
             'fields.role_id' => 'required|string|exists:roles,name|not_in:Administrador,Directivo',
             'fields.document_type' => 'required|string|in:DUI,Carnet Estudiantil,Pasaporte,Carnet de extranjería',
             'fields.document_number' => 'required|string|min:4|max:20|unique:users,document_number',
-            'fields.institution' => 'nullable|string|max:250|required_if:fields.name,Docente,Estudiante',
+            'fields.institution' => 'string|max:250',
             'fields.phone' => 'required|string|min:8|max:20|unique:users,phone',
             'fields.username' => 'required|string|min:3|max:50|regex:/^[a-zA-Z0-9._]+$/u|unique:users,username',
         ];
+
+        if (in_array($this->fields['role_id'], ['Docente', 'Estudiante'])) {
+            $rules['fields.institution'] = 'required|string|max:250';
+        } else {
+            $this->fields['institution'] = '';
+        }
 
         $messages = [
             'fields.name.required' => 'El nombre es obligatorio.',
@@ -218,7 +224,7 @@ class RegisterController extends Component
             'fields.document_number.unique' => 'El número de documento ya está registrado.',
 
             'fields.institution.max' => 'La institución no debe exceder los 250 caracteres.',
-            'fields.institution.required_if' => 'La institución es obligatoria para el tipo de usuario seleccionado.',
+            'fields.institution.required' => 'La institución es obligatoria para el tipo de usuario seleccionado.',
 
             'fields.phone.min' => 'El teléfono debe tener al menos 8 caracteres.',
             'fields.phone.max' => 'El teléfono no debe exceder los 20 caracteres.',
@@ -237,15 +243,6 @@ class RegisterController extends Component
         if ($this->fields['password'] !== $this->fields['password_confirmation']) {
             $this->addError('fields.password_confirmation', 'Las contraseñas no coinciden.');
             return;
-        }
-
-        if (in_array($this->fields['role_id'], ['Docente', 'Estudiante'])) {
-            if (is_null($this->fields['institution']) || empty(trim($this->fields['institution']))) {
-                $this->addError('fields.institution', 'La institución es obligatoria para el tipo de usuario seleccionado.');
-                return;
-            }
-        } else {
-            $this->fields['institution'] = null;
         }
 
         $role = DB::table('roles')->where('name', $this->fields['role_id'])->first();

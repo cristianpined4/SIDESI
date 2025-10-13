@@ -12,19 +12,10 @@
   --white: #ffffff;
 }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background: linear-gradient(135deg, var(--light-blue) 0%, var(--cyan) 100%);
   min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 .container {
@@ -64,7 +55,7 @@ body {
 }
 
 .form-group {
-  margin-bottom: 1.5rem;
+  margin-bottom: 0.5rem;
 }
 
 label {
@@ -121,7 +112,6 @@ select:focus {
 .btn-secondary {
   background: var(--gray);
   color: var(--dark-blue);
-  margin-top: 0.5rem;
 }
 
 .btn-secondary:hover {
@@ -145,16 +135,12 @@ select:focus {
   color: var(--bright-blue);
 }
 
-.hidden {
-  display: none;
-}
-
 /* Panel de Administrador */
 .admin-panel {
   width: 100%;
   background: var(--white);
   overflow: hidden;
-  box-shadow: 0 20px 40px rgba(48, 74, 110, 0.1);
+  /* box-shadow: 0 20px 40px rgba(48, 74, 110, 0.1); */
 }
 
 .admin-header {

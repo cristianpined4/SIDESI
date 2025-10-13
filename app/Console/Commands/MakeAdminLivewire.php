@@ -108,9 +108,14 @@ class MakeAdminLivewire extends Command
                         ->section('content');
                 }
 
-                public function abrirModal(\$idModal = 'modal-home')
+                public function abrirModal(\$idModal = 'modal-home', \$initVoid = true)
                 {
-                    \$this->resetUI();
+                    if (\$initVoid) {
+                        \$this->resetUI();
+                    } else{
+                        \$this->resetErrorBag();
+                        \$this->resetValidation();
+                    }
                     \$this->dispatch("abrir-modal", ['modal' => \$idModal]);
                 }
 
@@ -121,7 +126,10 @@ class MakeAdminLivewire extends Command
                 }
 
                 public function store()
-                {
+                {   
+                    \$this->resetErrorBag();
+                    \$this->resetValidation();
+
                     \$rules = [
                         'fields.name' => 'required|string|max:255',
                         'file' => 'nullable|file|max:2048',
@@ -162,7 +170,7 @@ class MakeAdminLivewire extends Command
                         ]);
                         \$this->resetUI();
                         \$this->dispatch("message-success", "{$name} creado correctamente");
-                        \$this->dispatch("cerrar-modal");
+                        \$this->abrirModal('modal-home');
                     } catch (\\Throwable \$th) {
                         DB::rollBack();
                         LogsSistema::create([
@@ -180,6 +188,8 @@ class MakeAdminLivewire extends Command
 
                 public function edit(\$id)
                 {
+                    \$this->resetUI();
+                    
                     \$item = {$name}::find(\$id);
                     if (!\$item) {
                         LogsSistema::create([
@@ -197,11 +207,14 @@ class MakeAdminLivewire extends Command
 
                     \$this->record_id = \$item->id;
                     \$this->fields = \$item->toArray();
-                    \$this->dispatch("abrir-modal");
+                    \$this->abrirModal('modal-home', false);
                 }
 
                 public function update()
                 {
+                    \$this->resetErrorBag();
+                    \$this->resetValidation();
+
                     \$rules = [
                         'fields.name' => 'required|string|max:255',
                         'file' => 'nullable|file|max:2048',
@@ -246,7 +259,7 @@ class MakeAdminLivewire extends Command
 
                         \$this->resetUI();
                         \$this->dispatch("message-success", "{$name} actualizado correctamente");
-                        \$this->dispatch("cerrar-modal");
+                        \$this->cerrarModal('modal-home');
                     } catch (\\Throwable \$th) {
                         DB::rollBack();
                         LogsSistema::create([
@@ -304,11 +317,11 @@ class MakeAdminLivewire extends Command
 
                 public function resetUI()
                 {
+                    \$this->resetErrorBag();
+                    \$this->resetValidation();
                     \$this->record_id = null;
                     \$this->fields = [];
                     \$this->file = null;
-                    \$this->resetErrorBag();
-                    \$this->resetValidation();
                 }
             }
             PHP;
@@ -322,7 +335,7 @@ class MakeAdminLivewire extends Command
         return <<<BLADE
             @section('title', "$name")
 
-            <main style="min-height: 100vh; width: 100vw;">
+            <main style="width: 100%;">
             <div class="loading" wire:loading.attr="show" show="false">
                 <div class="loader"></div>
                 <p class="loading-text">Cargando...</p>
@@ -358,7 +371,23 @@ class MakeAdminLivewire extends Command
             <!-- fin modales -->
 
             <!-- Contenido - inicio -->
-            <h2>Módulo $name</h2>
+            <div class="flex justify-between items-end flex-wrap gap-4">
+                <div class="flex items-start gap-4 flex-col" style="max-width: 800px;width: 100%;">
+                    <h2 class="text-xl font-semibold">Módulo $name</h2>
+                    <input type="text" placeholder="Buscar..." class="form-input" wire:model.live.debounce.500ms="search">
+                </div>
+                <button class="btn btn-primary" style="max-width: 200px;" wire:click="abrirModal('modal-home')">
+                    Nuevo $name
+                </button>
+            </div>
+            <hr style="margin-top: 20px; margin-bottom: 10px;">
+            <div class="overflow-x-auto">
+                <table class="table-auto w-full">
+                </table>
+                <div class="mt-4">
+                    {{ \$records->links() }}
+                </div>
+            </div>
             <!-- Contenido - fin -->
             </main>
 
@@ -375,6 +404,10 @@ class MakeAdminLivewire extends Command
                         let modalElement = document.getElementById(modal[0].modal);
                         if (modalElement) {
                             openModal(modalElement);
+                            let modelDialog = modalElement.querySelector('.modal-dialog');
+                            if (modelDialog) {
+                                modelDialog.scrollTop = 0;
+                            }
                         }
                     });
                 });
@@ -402,4 +435,3 @@ class MakeAdminLivewire extends Command
         return strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', $string));
     }
 }
-

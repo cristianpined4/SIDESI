@@ -23,12 +23,12 @@ class User extends Authenticatable
         'password',
         'username',
         'lastname',
+        'is_active',
         'role_id',
         'document_type',
         'document_number',
         'phone',
         'institution',
-        'is_active',
         'metadata',
     ];
 

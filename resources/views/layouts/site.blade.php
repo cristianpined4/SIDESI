@@ -32,12 +32,8 @@
         <div class="flex h-16 items-center justify-between">
           <div class="flex items-center space-x-4">
             <a href="{{ url('/') }}" class="flex h-16 items-end leading-none">
-              <img
-                src="{{ asset('images/logosidesii.png') }}"
-                alt="Logo SIDESI"
-                style="max-height: 64px; width: auto; object-fit: contain;"
-                class="block self-end m-2l-0"
-              />
+              <img src="{{ asset('images/logosidesii.png') }}" alt="Logo SIDESI"
+                style="max-height: 64px; width: auto; object-fit: contain;" class="block self-end m-2l-0" />
             </a>
           </div>
           <nav class="hidden md:flex items-center space-x-6">
@@ -102,6 +98,14 @@
                     style="cursor: pointer;">
                     Perfil
                   </a>
+
+                  @if (in_array(Auth::user()->role_id, [1, 2]))
+                  {{-- Panel de Administración --}}
+                  <a href="{{ route('admin.dashboard') }}"
+                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md" style="cursor: pointer;">
+                    Panel de Administración
+                  </a>
+                  @endif
 
                   {{-- Cerrar sesión --}}
                   <form method="POST" action="{{ route('logout') }}" style="cursor: pointer;">
@@ -185,6 +189,15 @@
                       style="cursor: pointer;">
                       Perfil
                     </a>
+
+                    @if (in_array(Auth::user()->role_id, [1, 2]))
+                    {{-- Panel de Administración --}}
+                    <a href="{{ route('admin.dashboard') }}"
+                      class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md"
+                      style="cursor: pointer;">
+                      Panel de Administración
+                    </a>
+                    @endif
 
                     {{-- Cerrar sesión --}}
                     <form method="POST" action="{{ route('logout') }}">
@@ -350,7 +363,7 @@
           </div>
         </div>
         <div class="border-t border-border mt-8 pt-8 text-center">
-          <p class="text-sm text-muted-foreground">© 2025 SIDESI. Todos los derechos reservados. |
+          <p class="text-sm text-muted-foreground">© {{ date('Y') }} SIDESI. Todos los derechos reservados. |
             <a href="/privacidad" class="hover:text-primary transition-colors ml-1">Política de Privacidad</a>
             <a href="/terminos" class="hover:text-primary transition-colors ml-1">Términos de Uso</a>
           </p>

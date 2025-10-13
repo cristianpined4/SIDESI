@@ -79,6 +79,7 @@
                     <input wire:model="fields.institution" type="text" placeholder="Institución" id="institution"
                         list="universidades"
                         class="form-control @error('fields.institution') was-validated is-invalid @enderror">
+                    <div class="invalid-feedback">@error('fields.institution') {{$message}} @enderror</div>
 
                     {{-- Datalist para autocompletar --}}
                     <datalist id="universidades">
@@ -89,7 +90,6 @@
                         @endforeach
                     </datalist>
 
-                    <div class="invalid-feedback">@error('fields.institution') {{$message}} @enderror</div>
                 </div>
                 <div style="display: flex; gap: 1rem; flex-wrap: wrap;width: 100%;justify-content: space-between;">
                     <div class="form-group" style="flex: 1;">

@@ -11,15 +11,21 @@
   'resources/js/app-admin.js'])
 </head>
 
-<body>
+<body style="background: white;">
   <div class="admin-panel" id="adminPanel">
     <div class="admin-header">
-      <div>
+      <div style="display: flex; align-items: center;">
         <div class="logo"
-          style="width: 50px; height: 50px; font-size: 0.875rem; display: inline-flex; margin-right: 1rem;">
+          style="width: 50px; height: 50px; font-size: 0.875rem; display: inline-flex; margin-right: 1rem;margin-bottom: 0;">
           SIDESI
         </div>
-        <span style="font-size: 1.5rem; font-weight: bold;">Panel de Administración</span>
+        <div style="font-size: 1.5rem; font-weight: bold;">
+          Panel de Administración<br>
+          <a href="{{ route('home-site') }}"
+            style="font-size: 0.75rem; font-weight: normal; color: #e3dada; margin-top: 0.25rem;display: block;">
+            Volver al Sitio
+          </a>
+        </div>
       </div>
       <div style="display: flex; align-items: flex-end; justify-content: center;">
         <div style="display: flex; align-items: center; margin-right: 1rem;">
@@ -51,6 +57,25 @@
     </div>
   </div>
   @livewireScripts
+  <script>
+    document.addEventListener('livewire:initialized', function() {
+    Livewire.on('message-success', function(message) {
+    Alert(
+    '¡Éxito!',
+    message,
+    'success'
+    );
+    });
+    
+    Livewire.on('message-error', function(message) {
+    Alert(
+    '¡Error!',
+    message,
+    'error'
+    );
+    });
+    });
+  </script>
 </body>
 
 </html>

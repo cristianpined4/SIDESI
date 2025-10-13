@@ -1,6 +1,6 @@
 @section('title', "Dashboard")
 
-<main style="min-height: 100vh; width: 100vw;">
+<main style="width: 100%;">
     <div class="loading" wire:loading.attr="show" show="false">
         <div class="loader"></div>
         <p class="loading-text">Cargando...</p>
