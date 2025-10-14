@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Eventos;
 use App\Models\User;
+use App\Models\SessionesEvento;
 
 class EventosController extends Component
 {
@@ -34,7 +35,20 @@ class EventosController extends Component
         'is_paid' => '',
         'price' => '',
         'organizer_id' => '',
-];   // inputs normales
+    ];   // inputs normales
+    public $record_sesion_id;
+    public $fieldsSesiones = [
+        'evento_id' => '',           
+        'title' => '',
+        'description' => '',
+        'start_time' => '',
+        'end_time' => '',
+        'ponente_id' => '',          
+        'mode' => '',            
+        'max_participants' => '',
+        'require_approval' => '', 
+    ];
+    public $records_sesiones;
     public $file;          // archivo temporal
     public $search = '';
     public $paginate = 10;
@@ -52,6 +66,7 @@ class EventosController extends Component
                 return redirect()->route('login');
             }
         }
+        $this->records_sesiones = collect();
     }
 
     public function render()
@@ -359,6 +374,19 @@ class EventosController extends Component
         }
     }
 
+    public function sesiones($id){
+        
+        $this->resetUi();
+
+        $items = SessionesEvento::where('evento_id', $id)
+            ->orderBy('id', 'asc')
+            ->get();
+
+        $this->records_sesiones = $items;
+        
+        $this->abrirModal('Sesion-modal', false);
+    }
+
     #[On("delete")]
     public function destroy($id)
     {
@@ -404,6 +432,8 @@ class EventosController extends Component
         $this->resetErrorBag();
         $this->resetValidation();
         $this->record_id = null;
+        $this->record_sesion_id = null;
+        $this->records_sesiones = collect();
         $this->fields = [];
         $this->file = null;
     }

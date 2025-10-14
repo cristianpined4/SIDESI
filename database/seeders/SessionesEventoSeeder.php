@@ -36,7 +36,7 @@ class SessionesEventoSeeder extends Seeder
                 'ponente_id' => 1,
             ],
             [
-                'evento_id' => 1,
+                'evento_id' => 2,
                 'title' => 'Conferencia sobre IA Aplicada',
                 'description' => 'Exploración del uso de la inteligencia artificial en procesos industriales.',
                 'start_time' => Carbon::create(2025, 12, 5, 8, 30, 0),
@@ -48,7 +48,7 @@ class SessionesEventoSeeder extends Seeder
                 'ponente_id' => 1,
             ],
             [
-                'evento_id' => 1,
+                'evento_id' => 2,
                 'title' => 'Mesa Redonda de Emprendimiento',
                 'description' => 'Conversatorio con invitados sobre cómo lanzar startups tecnológicas en El Salvador.',
                 'start_time' => Carbon::create(2025, 10, 13, 2, 30, 0),

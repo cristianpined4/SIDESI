@@ -198,14 +198,45 @@
                                         <th class="px-4 py-3 text-left">Hora de comienzo</th>
                                         <th class="px-4 py-3 text-left">Hora fin</th>
                                         <th class="px-4 py-3 text-left">Localización</th>
-                                        <th class="px-4 py-3 text-left">Email</th>
-                                        <th class="px-4 py-3 text-left">Teléfono</th>
                                         <th class="px-4 py-3 text-left">Estado</th>
                                         <th class="px-4 py-3 text-left">Acciones</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y">
-                                    <!-- filas dinámicas -->
+                                    @foreach ($records_sesiones as $sesion)
+                                        <tr class="border-b hover:bg-gray-50">
+                                            <td class="px-4 py-3">{{ $sesion->id }}</td>
+                                            <td class="px-4 py-3">{{ $sesion->title }}</td>
+                                            <td class="px-4 py-3">{{ $sesion->description }}</td>
+                                            <td class="px-4 py-3">{{ $sesion->start_time }}</td>
+                                            <td class="px-4 py-3">{{ $sesion->end_time }}</td>
+                                            <td class="px-4 py-3">{{ $sesion->location }}</td>
+                                            <td class="px-4 py-3">
+                                                @if ($sesion->is_active)
+                                                <span
+                                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                                    Activo
+                                                </span>
+                                                @else
+                                                <span
+                                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                                                    Inactivo
+                                                </span>
+                                                @endif
+                                            </td>
+                                            <td class="px-4 py-3 flex space-x-2 items-center">
+                                                <button
+                                                    class="bg-yellow-500 text-white px-3 py-1 rounded-md hover:bg-yellow-600 transition text-sm cursor-pointer"
+                                                    wire:click="edit('{{ $sesion->id }}')">
+                                                    Editar
+                                                </button>
+                                                <button class="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600 transition text-sm cursor-pointer"
+                                                    onclick="confirmarEliminar({{ $sesion->id }})">
+                                                    Eliminar
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    @endforeach
                                 </tbody>
                             </table>
                         </div>
@@ -286,7 +317,7 @@
                                 onclick="confirmarEliminar({{ $evento->id }})">
                                 Eliminar
                             </button>
-                            <button class="bg-green-500 text-white px-3 py-1 rounded-md hover:bg-green-600 transition text-sm cursor-pointer" style="max-width: 200px;" wire:click="abrirModal('Sesion-modal')">
+                            <button class="bg-green-500 text-white px-3 py-1 rounded-md hover:bg-green-600 transition text-sm cursor-pointer" style="max-width: 200px;" wire:click="sesiones('{{$evento->id}}')">
                                 Sesiones
                             </button>
                         </td>
