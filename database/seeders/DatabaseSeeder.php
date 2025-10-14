@@ -23,6 +23,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             EventoSeeder::class,
             UserSeeder::class,
+            SessionesEventoSeeder::class,
         ]);
     }
 }

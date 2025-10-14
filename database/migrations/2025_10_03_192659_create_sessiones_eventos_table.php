@@ -18,6 +18,7 @@ return new class extends Migration {
             $table->text('description')->nullable();
             $table->dateTime('start_time');
             $table->dateTime('end_time')->nullable();
+            $table->string('location')->nullable();
             $table->unsignedBigInteger('ponente_id')->nullable();
             $table->foreign('ponente_id')->references('id')->on('users')->onDelete('set null');
             $table->enum('mode', ['taller', 'ponencia', 'panel', 'otro'])->default('otro');
