@@ -103,13 +103,13 @@ class EventosController extends Component
             'fields.start_time' => 'required|date',
             'fields.end_time' => 'required|date|after:fields.start_time',
             'fields.location' => 'required|string|max:255',
-            'fields.inscriptions_enabled' => 'required|boolean',
+            'fields.inscriptions_enabled' => 'required|in:0,1',
             'fields.max_participants' => 'required|integer|min:1',
             'fields.contact_email' => 'required|email|max:250',
             'fields.contact_phone' => 'required|string|max:15',
-            'fields.is_active' => 'required|boolean',
+            'fields.is_active' => 'required|in:0,1',
             'fields.mode' => 'required|string|max:50',
-            'fields.is_paid' => 'required|boolean',
+            'fields.is_paid' => 'required|in:0,1',
             'fields.price' => 'numeric|min:0',
             'fields.organizer_id' => 'required|exists:users,id',
             'file' => 'nullable|file|max:2048',
@@ -162,6 +162,9 @@ class EventosController extends Component
         try {
             DB::beginTransaction();
             $item = new Eventos();
+            $this->fields['inscriptions_enabled'] = (bool) $this->fields['inscriptions_enabled'];
+            $this->fields['is_active'] = (bool) $this->fields['is_active'];
+            $this->fields['is_paid'] = (bool) $this->fields['is_paid'];
             $item->fill($this->fields);
 
             if ($this->file) {
@@ -219,7 +222,24 @@ class EventosController extends Component
         }
 
         $this->record_id = $item->id;
-        $this->fields = $item->toArray();
+        $this->fields = [
+            'title' => $item->title,
+            'description' => $item->description,
+            'start_time' => $item->start_time,
+            'end_time' => $item->end_time,
+            'location' => $item->location,
+            'inscriptions_enabled' => $item->inscriptions_enabled ? '1' : '0',
+            'max_participants' => $item->max_participants,
+            'contact_email' => $item->contact_email,
+            'contact_phone' => $item->contact_phone,
+            'is_active' => $item->is_active ? '1' : '0',
+            'mode' => $item->mode,
+            'is_paid' => $item->is_paid ? '1' : '0',
+            'price' => $item->price,
+            'organizer_id' => $item->organizer_id,
+        ];
+
+        // $this->fields = $item->toArray();
         $this->abrirModal('modal-home', false);
     }
 
@@ -234,13 +254,13 @@ class EventosController extends Component
             'fields.start_time' => 'required|date',
             'fields.end_time' => 'required|date|after:fields.start_time',
             'fields.location' => 'required|string|max:255',
-            'fields.inscriptions_enabled' => 'required|boolean',
+            'fields.inscriptions_enabled' => 'required|in:0,1',
             'fields.max_participants' => 'required|integer|min:1',
             'fields.contact_email' => 'required|email|max:250',
             'fields.contact_phone' => 'required|string|max:15',
-            'fields.is_active' => 'required|boolean',
+            'fields.is_active' => 'required|in:0,1',
             'fields.mode' => 'required|string|max:50',
-            'fields.is_paid' => 'required|boolean',
+            'fields.is_paid' => 'required|in:0,1',
             'fields.price' => 'numeric|min:0',
             'fields.organizer_id' => 'required|exists:users,id',
             'file' => 'nullable|file|max:2048',
@@ -293,6 +313,11 @@ class EventosController extends Component
         try {
             DB::beginTransaction();
             $item = Eventos::find($this->record_id);
+
+            $this->fields['inscriptions_enabled'] = (bool) $this->fields['inscriptions_enabled'];
+            $this->fields['is_active'] = (bool) $this->fields['is_active'];
+            $this->fields['is_paid'] = (bool) $this->fields['is_paid'];
+
             $item->fill($this->fields);
 
             if ($this->file) {

@@ -56,8 +56,8 @@
                         <select wire:model="fields.inscriptions_enabled"
                             class="form-control @error('fields.inscriptions_enabled') was-validated is-invalid @enderror">
                             <option value="">Seleccione...</option>
-                            <option value=true>Sí</option>
-                            <option value=false>No</option>
+                            <option value="1">Sí</option>
+                            <option value="0">No</option>
                         </select>
                         <div class="invalid-feedback">@error('fields.inscriptions_enabled') {{$message}} @enderror</div>
                     </div>
@@ -88,8 +88,8 @@
                         <select wire:model="fields.is_active"
                             class="form-control @error('fields.is_active') was-validated is-invalid @enderror">
                             <option value="">Seleccione...</option>
-                            <option value=true>Activo</option>
-                            <option value=false>Inactivo</option>
+                            <option value="1">Activo</option>
+                            <option value="0">Inactivo</option>
                         </select>
                         <div class="invalid-feedback">@error('fields.is_active') {{$message}} @enderror</div>
                     </div>
@@ -110,8 +110,8 @@
                         <select wire:model="fields.is_paid"
                             class="form-control @error('fields.is_paid') was-validated is-invalid @enderror">
                             <option value="">Seleccione...</option>
-                            <option value=true>Sí</option>
-                            <option value=false>No</option>
+                            <option value="1">Sí</option>
+                            <option value="0">No</option>
                         </select>
                         <div class="invalid-feedback">@error('fields.is_paid') {{$message}} @enderror</div>
                     </div>
