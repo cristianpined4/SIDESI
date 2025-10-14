@@ -6,6 +6,8 @@
         <p class="loading-text">Cargando...</p>
     </div>
     <!-- modales -->
+
+    <!-- modal de eventos -->
     <div id="modal-home" class="modal" wire:ignore.self>
         <div class="modal-dialog">
             <div class="modal-content">
@@ -147,6 +149,54 @@
             </div>
         </div>
     </div>
+    <!-- Fin modal de eventos -->
+
+    <!-- Modal de Sesion -->
+    <div id="Sesion-modal" class="modal" wire:ignore.self>
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Gestión de Sesiones</h5>
+                    <button type="button" class="btn-close" aria-label="Cerrar" onclick="closeModal(this.closest('.modal'))">&times;</button>
+                </div>
+
+                <div class="flex justify-between items-end flex-wrap gap-6">
+                    <div class="flex items-start gap-4 flex-col" style="max-width: 800px;width: 50%;">  
+                        <input type="text" placeholder="Buscar..." class="fo    rm-input" wire:model.live.debounce.500ms="search">
+                    </div>
+                    <button class="btn btn-primary" style="max-width: 200px;"  wire:click="abrirModal('modal-home')" >
+                        Nueva Sesion
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="w-full overflow-x-auto">
+                        <table class="table w-full border border-gray-200 rounded-lg shadow-sm bg-white">
+                            <thead class="bg-gray-100 text-gray-600 uppercase text-xs font-semibold">
+                                <tr>
+                                    <th class="px-4 py-3 text-left">ID</th>
+                                    <th class="px-4 py-3 text-left">Título</th>
+                                    <th class="px-4 py-3 text-left">Descripción</th>
+                                    <th class="px-4 py-3 text-left">Hora de comienzo</th>
+                                    <th class="px-4 py-3 text-left">Hora fin</th>
+                                    <th class="px-4 py-3 text-left">Localización</th>
+                                    <th class="px-4 py-3 text-left">Email</th>
+                                    <th class="px-4 py-3 text-left">Teléfono</th>
+                                    <th class="px-4 py-3 text-left">Estado</th>
+                                    <th class="px-4 py-3 text-left">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- filas -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Fin Modal Sesion -->
+
     <!-- fin modales -->
 
     <!-- Contenido - inicio -->
@@ -156,7 +206,7 @@
             <input type="text" placeholder="Buscar..." class="form-input" wire:model.live.debounce.500ms="search">
         </div>
         <button class="btn btn-primary" style="max-width: 200px;" wire:click="abrirModal('modal-home')">
-            Nuevo Eventos
+            Nuevo Evento
         </button>
     </div>
     <hr style="margin-top: 20px; margin-bottom: 10px;">
@@ -203,9 +253,16 @@
                     <td class="px-4 py-3 flex space-x-2 items-center">
                         <button
                             class="bg-yellow-500 text-white px-3 py-1 rounded-md hover:bg-yellow-600 transition text-sm cursor-pointer"
-                            wire:click="edit('{{ $evento->id }}')">Editar</button>
+                            wire:click="edit('{{ $evento->id }}')">
+                            Editar
+                        </button>
                         <button class="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600 transition text-sm cursor-pointer"
-                            onclick="confirmarEliminar({{ $evento->id }})">Eliminar</button>
+                            onclick="confirmarEliminar({{ $evento->id }})">
+                            Eliminar
+                        </button>
+                        <button class="bg-green-500 text-white px-3 py-1 rounded-md hover:bg-red-600 transition text-sm cursor-pointer" style="max-width: 200px;" wire:click="abrirModal('Sesion-modal')">
+                            Sesiones
+                        </button>
                     </td>
                 </tr>
                 @endforeach

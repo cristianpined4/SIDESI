@@ -61,6 +61,12 @@ class EventosController extends Component
         if (!empty($this->search)) {
             foreach ((new Eventos())->getFillable() as $field) {
                 $query->orWhere($field, 'like', '%' . $this->search . '%');
+
+                //solo buscar por id y titulo
+                // $query->where(function($q){
+                //         $q->where('id', 'like', '%' . $this->search . '%')
+                //         ->orWhere('title', 'like', '%' . $this->search . '%');
+                // });
             }
         }
 
@@ -73,7 +79,7 @@ class EventosController extends Component
         return view('livewire.admin.eventos', compact('records', 'recordsUsers'))
             ->extends('layouts.admin')
             ->section('content');
-    }
+    }  
 
     public function abrirModal($idModal = 'modal-home', $initVoid = true)
     {
