@@ -12,6 +12,7 @@ use App\Models\LogsSistema;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Eventos;
+use App\Models\User;
 
 class EventosController extends Component
 {
@@ -63,9 +64,13 @@ class EventosController extends Component
             }
         }
 
-        $records = $query->orderBy('id', 'desc')->paginate($this->paginate);
+        $records = $query->orderBy('id', 'asc')->paginate($this->paginate);
+        $recordsUsers = User::whereIn('role_id', [1, 2])
+                ->where('is_active', true)
+                ->orderBy('name')
+                ->get();
 
-        return view('livewire.admin.eventos', compact('records'))
+        return view('livewire.admin.eventos', compact('records', 'recordsUsers'))
             ->extends('layouts.admin')
             ->section('content');
     }

@@ -10,18 +10,132 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="userLabel">{{ $record_id ? 'Editar usuario' : 'Nuevo usuario' }}</h5>
+                    <h5 class="modal-title" id="userLabel">{{ $record_id ? 'Editar evento' : 'Nuevo evento' }}</h5>
                     <button type="button" class="btn-close" aria-label="Cerrar" onclick="closeModal(this.closest('.modal'))">&times;</button>
                 </div>
                 <div class="modal-body">
-                    <div class="form-group">
-                        <label class="form-label">Nombre Completo</label>
-                        <input wire:model="fields.name" type="text" placeholder="Nombre" id="nombre"
-                            class="form-control @error('fields.name') was-validated is-invalid @enderror"
+                    <div class="form-group mb-2">
+                        <label class="form-label">Título</label>
+                        <input wire:model="fields.title" type="text" placeholder="Título del evento"
+                            class="form-control @error('fields.title') was-validated is-invalid @enderror">
+                        <div class="invalid-feedback">@error('fields.title') {{$message}} @enderror</div>
+                    </div>
+
+                    <div class="form-group mb-2">
+                        <label class="form-label">Descripción</label>
+                        <textarea wire:model="fields.description" placeholder="Descripción del evento"
+                            class="form-control @error('fields.description') was-validated is-invalid @enderror"
+                            rows="3"></textarea>
+                        <div class="invalid-feedback">@error('fields.description') {{$message}} @enderror</div>
+                    </div>
+
+                    <div class="form-group mb-2">
+                        <label class="form-label">Inicio</label>
+                        <input wire:model="fields.start_time" type="datetime-local"
+                            class="form-control @error('fields.start_time') was-validated is-invalid @enderror">
+                        <div class="invalid-feedback">@error('fields.start_time') {{$message}} @enderror</div>
+                    </div>
+
+                    <div class="form-group mb-2">
+                        <label class="form-label">Fin</label>
+                        <input wire:model="fields.end_time" type="datetime-local"
+                            class="form-control @error('fields.end_time') was-validated is-invalid @enderror">
+                        <div class="invalid-feedback">@error('fields.end_time') {{$message}} @enderror</div>
+                    </div>
+
+                    <div class="form-group mb-2">
+                        <label class="form-label">Localización</label>
+                        <input wire:model="fields.location" type="text" placeholder="Lugar del evento"
+                            class="form-control @error('fields.location') was-validated is-invalid @enderror"
                             oninput="this.value = this.value.toUpperCase();">
-                        <div class="invalid-feedback">@error('fields.name') {{$message}} @enderror</div>
+                        <div class="invalid-feedback">@error('fields.location') {{$message}} @enderror</div>
+                    </div>
+
+                    <div class="form-group mb-2">
+                        <label class="form-label">Habilitar Inscripciones</label>
+                        <select wire:model="fields.inscriptions_enabled"
+                            class="form-control @error('fields.inscriptions_enabled') was-validated is-invalid @enderror">
+                            <option value="">Seleccione...</option>
+                            <option value=true>Sí</option>
+                            <option value=false>No</option>
+                        </select>
+                        <div class="invalid-feedback">@error('fields.inscriptions_enabled') {{$message}} @enderror</div>
+                    </div>
+
+                    <div class="form-group mb-2">
+                        <label class="form-label">Máximo de Participantes</label>
+                        <input wire:model="fields.max_participants" type="number" min="1" placeholder="Cantidad"
+                            class="form-control @error('fields.max_participants') was-validated is-invalid @enderror">
+                        <div class="invalid-feedback">@error('fields.max_participants') {{$message}} @enderror</div>
+                    </div>
+
+                    <div class="form-group mb-2">
+                        <label class="form-label">Correo de Contacto</label>
+                        <input wire:model="fields.contact_email" type="email" placeholder="correo@ejemplo.com"
+                            class="form-control @error('fields.contact_email') was-validated is-invalid @enderror">
+                        <div class="invalid-feedback">@error('fields.contact_email') {{$message}} @enderror</div>
+                    </div>
+
+                    <div class="form-group mb-2">
+                        <label class="form-label">Teléfono de Contacto</label>
+                        <input wire:model="fields.contact_phone" type="text" placeholder="0000-0000"
+                            class="form-control @error('fields.contact_phone') was-validated is-invalid @enderror">
+                        <div class="invalid-feedback">@error('fields.contact_phone') {{$message}} @enderror</div>
+                    </div>
+
+                    <div class="form-group mb-2">
+                        <label class="form-label">Activo</label>
+                        <select wire:model="fields.is_active"
+                            class="form-control @error('fields.is_active') was-validated is-invalid @enderror">
+                            <option value="">Seleccione...</option>
+                            <option value=true>Activo</option>
+                            <option value=false>Inactivo</option>
+                        </select>
+                        <div class="invalid-feedback">@error('fields.is_active') {{$message}} @enderror</div>
+                    </div>
+
+                    <div class="form-group mb-2">
+                        <label class="form-label">Modalidad</label>
+                        <select wire:model="fields.mode"
+                            class="form-control @error('fields.mode') was-validated is-invalid @enderror">
+                            <option value="">Seleccione...</option>
+                            <option value="presencial">Presencial</option>
+                            <option value="virtual">Virtual</option>
+                        </select>
+                        <div class="invalid-feedback">@error('fields.mode') {{$message}} @enderror</div>
+                    </div>
+
+                    <div class="form-group mb-2">
+                        <label class="form-label">¿Evento Pagado?</label>
+                        <select wire:model="fields.is_paid"
+                            class="form-control @error('fields.is_paid') was-validated is-invalid @enderror">
+                            <option value="">Seleccione...</option>
+                            <option value=true>Sí</option>
+                            <option value=false>No</option>
+                        </select>
+                        <div class="invalid-feedback">@error('fields.is_paid') {{$message}} @enderror</div>
+                    </div>
+
+                    <div class="form-group mb-2">
+                        <label class="form-label">Precio ($)</label>
+                        <input wire:model="fields.price" type="number" min="0" step="0.01" placeholder="0.00"
+                            class="form-control @error('fields.price') was-validated is-invalid @enderror">
+                        <div class="invalid-feedback">@error('fields.price') {{$message}} @enderror</div>
+                    </div>
+
+                <div class="form-group mb-2">
+                        <label class="form-label">ID del Organizador</label>
+                        <select wire:model="fields.organizer_id"
+                            class="form-control @error('fields.organizer_id') was-validated is-invalid @enderror">
+                            <option value="">Seleccione un organizador...</option>
+                            @foreach ($recordsUsers as $organizador)
+                                <option value="{{ $organizador->id }}">{{ $organizador->name }} {{ $organizador->lastname }}</option>
+                            @endforeach
+                        </select>
+                        <div class="invalid-feedback">@error('fields.organizer_id') {{$message}} @enderror</div>
                     </div>
                 </div>
+                
                 <div class="modal-footer">
                     @if ($record_id)
                     <button type="button" class="btn btn-warning" wire:click="update">Actualizar</button>
@@ -47,7 +161,55 @@
     </div>
     <hr style="margin-top: 20px; margin-bottom: 10px;">
     <div class="overflow-x-auto">
-        <table class="table-auto w-full">
+        <table class="table min-w-full bg-white border border-gray-200 rounded-lg shadow-sm">
+            <thead class="bg-gray-100 text-gray-600 uppercase text-xs font-semibold">
+                <tr>
+                    <th class="px-4 py-3 text-left">ID</th>
+                    <th class="px-4 py-3 text-left">Titulo</th>
+                    <th class="px-4 py-3 text-left">Descripcion</th>
+                    <th class="px-4 py-3 text-left">Hora de comienzo</th>
+                    <th class="px-4 py-3 text-left">Hora Fin</th>
+                    <th class="px-4 py-3 text-left">Localización</th>
+                    <th class="px-4 py-3 text-left">Email</th>
+                    <th class="px-4 py-3 text-left">Telefono</th>
+                    <th class="px-4 py-3 text-left">Estado</th>
+                    <th class="px-4 py-3 text-left">Acciones</th>
+                </tr>
+            </thead>
+            <tbody class="text-gray-700 text-sm">
+                @foreach ($records as $evento)
+                <tr class="border-b hover:bg-gray-50">
+                    <td class="px-4 py-3">{{ $evento->id }}</td>
+                    <td class="px-4 py-3">{{ $evento->title }}</td>
+                    <td class="px-4 py-3">{{ $evento->description }}</td>
+                    <td class="px-4 py-3">{{ $evento->start_time }}</td>
+                    <td class="px-4 py-3">{{ $evento->end_time }}</td>
+                    <td class="px-4 py-3">{{ $evento->location }}</td>
+                    <td class="px-4 py-3">{{ $evento->contact_email }}</td>
+                    <td class="px-4 py-3">{{ $evento->contact_phone }}</td>
+                    <td class="px-4 py-3">
+                        @if ($evento->is_active)
+                        <span
+                            class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                            Activo
+                        </span>
+                        @else
+                        <span
+                            class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                            Inactivo
+                        </span>
+                        @endif
+                    </td>
+                    <td class="px-4 py-3 flex space-x-2 items-center">
+                        <button
+                            class="bg-yellow-500 text-white px-3 py-1 rounded-md hover:bg-yellow-600 transition text-sm cursor-pointer"
+                            wire:click="edit('{{ $evento->id }}')">Editar</button>
+                        <button class="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600 transition text-sm cursor-pointer"
+                            onclick="confirmarEliminar({{ $evento->id }})">Eliminar</button>
+                    </td>
+                </tr>
+                @endforeach
+            </tbody>
         </table>
         <div class="mt-4">
             {{ $records->links() }}
