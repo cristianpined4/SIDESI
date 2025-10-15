@@ -96,13 +96,16 @@ class EventosController extends Component
             ->section('content');
     }
 
-    public function abrirModal($idModal = 'modal-home', $initVoid = true)
+    public function abrirModal($idModal = 'modal-home', $initVoid = true, $newSession = false)
     {
         if ($initVoid) {
             $this->resetUI();
         } else {
             $this->resetErrorBag();
             $this->resetValidation();
+        }
+        if ($newSession) {
+            $this->record_sesion_id = null;
         }
         $this->dispatch("abrir-modal", ['modal' => $idModal]);
     }
@@ -567,7 +570,7 @@ class EventosController extends Component
             $this->resetUI();
             $this->dispatch("message-success", "Sesión creada correctamente");
             $this->cerrarModal('Sesion-modal-form');
-            $this->sesiones($this->record_id);
+            $this->sesiones($item->evento_id);
         } catch (\Throwable $th) {
             DB::rollBack();
             LogsSistema::create([

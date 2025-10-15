@@ -178,7 +178,7 @@
                     </div>
                     <button
                         class="btn btn-primary bg-blue-600 hover:bg-blue-700 text-white font-medium px-3 py-1.5 text-sm rounded-md shadow-sm transition"
-                        wire:click="abrirModal('Sesion-modal-form',false)">
+                        wire:click="abrirModal('Sesion-modal-form',false,true)">
                         + Nueva Sesión
                     </button>
                 </div>
