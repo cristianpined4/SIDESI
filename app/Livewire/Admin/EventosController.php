@@ -385,32 +385,36 @@ class EventosController extends Component
 
     public function sesiones($id)
     {
-
         $this->resetUI();
 
-        $items = SessionesEvento::where('evento_id', $id)
+        $query = SessionesEvento::query()
+            ->where('evento_id', $id)
             ->with('ponente')
-            ->where(function ($query) {
-                if (!empty($this->search_sesiones)) {
-                    $query->where('title', 'like', '%' . $this->search_sesiones . '%')
-                        ->orWhere('description', 'like', '%' . $this->search_sesiones . '%')
-                        ->orWhere('location', 'like', '%' . $this->search_sesiones . '%')
-                        ->orWhereHas('ponente', function ($q) {
-                            $q->whereRaw("CONCAT(name, ' ', lastname) LIKE ?", ['%' . $this->search_sesiones . '%']);
-                        });
-                }
-            })
-            ->orderBy('id', 'asc')
-            ->get();
+            ->orderBy('id', 'asc');
 
+        if (!empty($this->search_sesiones)) {
+            $query->where(function ($q) {
+                $q->where('title', 'like', '%' . $this->search_sesiones . '%')
+                    ->orWhere('description', 'like', '%' . $this->search_sesiones . '%')
+                    ->orWhereHas('ponente', function ($q2) {
+                        $q2->whereRaw("CONCAT(name, ' ', lastname) LIKE ?", ['%' . $this->search_sesiones . '%']);
+                    });
+            });
+        }
 
-        $this->abrirModal('Sesion-modal');
+        $items = $query->get();
+
         $this->records_sesiones = $items;
         $this->record_id = $id;
         $this->fieldsSesiones['evento_id'] = $id;
+
         $evento = Eventos::find($id);
-        $this->fields['start_time'] = $evento->start_time;
-        $this->fields['end_time'] = $evento->end_time;
+        if ($evento) {
+            $this->fields['start_time'] = $evento->start_time;
+            $this->fields['end_time'] = $evento->end_time;
+        }
+
+        $this->abrirModal('Sesion-modal', false, true);
     }
 
     #[On("delete")]
@@ -450,6 +454,15 @@ class EventosController extends Component
                 'status' => 'error',
             ]);
             $this->dispatch("message-error", "Error al eliminar");
+        }
+    }
+
+    protected $updatesQueryString = ['search_sesiones'];
+
+    public function updatedSearchSesiones()
+    {
+        if ($this->record_id) {
+            $this->sesiones($this->record_id);
         }
     }
 
@@ -571,6 +584,8 @@ class EventosController extends Component
             $this->dispatch("message-success", "Sesión creada correctamente");
             $this->cerrarModal('Sesion-modal-form');
             $this->sesiones($item->evento_id);
+            $this->fieldsSesiones['evento_id'] = $item->evento_id;
+            $this->record_id = $item->evento_id;
         } catch (\Throwable $th) {
             DB::rollBack();
             LogsSistema::create([
@@ -651,6 +666,8 @@ class EventosController extends Component
             $this->cerrarModal('Sesion-modal-form');
 
             $this->sesiones($item->evento_id);
+            $this->fieldsSesiones['evento_id'] = $item->evento_id;
+            $this->record_id = $item->evento_id;
         } catch (\Throwable $th) {
             DB::rollBack();
 
@@ -701,6 +718,7 @@ class EventosController extends Component
         }
 
         $this->record_sesion_id = $item->id;
+        $this->record_id = $item->evento_id;
         $this->fieldsSesiones = [
             'id' => $item->id,
             'evento_id' => $item->evento_id,
