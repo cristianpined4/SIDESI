@@ -12,8 +12,10 @@ use App\Models\LogsSistema;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Eventos;
+use App\Models\Imagenes;
 use App\Models\User;
 use App\Models\SessionesEvento;
+use Illuminate\Support\Str;
 
 class EventosController extends Component
 {
@@ -50,6 +52,7 @@ class EventosController extends Component
     ];
     public $records_sesiones;
     public $file;          // archivo temporal
+    public $file2;          // archivo temporal
     public $search = '';
     public $search_sesiones = '';
     public $paginate = 10;
@@ -147,7 +150,7 @@ class EventosController extends Component
             'fields.is_paid' => 'required|in:0,1',
             'fields.price' => 'numeric|min:0',
             'fields.organizer_id' => 'required|exists:users,id',
-            'file' => 'nullable|file|max:2048',
+            'file' => 'nullable|image|mimes:jpeg,jpg,png|max:10240',
         ];
 
         $messages = [
@@ -188,11 +191,13 @@ class EventosController extends Component
             'fields.organizer_id.required' => 'El organizador es obligatorio.',
             'fields.organizer_id.exists' => 'El organizador seleccionado no es válido.',
 
-            'file.file' => 'El archivo debe ser válido.',
-            'file.max' => 'El archivo no puede superar los 2 MB.',
+            'file.image' => 'El archivo debe ser una imagen (jpeg, png).',
+            'file.mimes' => 'El archivo debe ser una imagen (jpeg, png).',
+            'file.max' => 'El archivo no puede tener más de 10MB.',
         ];
 
         $this->validate($rules, $messages);
+        $path = null;
 
         try {
             DB::beginTransaction();
@@ -201,13 +206,30 @@ class EventosController extends Component
             $this->fields['is_active'] = (bool) $this->fields['is_active'];
             $this->fields['is_paid'] = (bool) $this->fields['is_paid'];
             $item->fill($this->fields);
+            $item->save();
 
             if ($this->file) {
-                $path = $this->file->store('uploads', 'public');
-                $item->file_path = $path;
-            }
+                // Crear nombre de archivo: slug_del_titulo + random + extensión
+                $extension = $this->file->getClientOriginalExtension();
+                $slugTitle = Str::slug($item->title, '-');
+                $randomCode = Str::random(8);
+                $filename = "{$slugTitle}-{$randomCode}.{$extension}";
 
-            $item->save();
+                // Guardar en el disco configurado ("images")
+                $path = $this->file->storeAs('eventos', $filename, 'images');
+
+                // Crear nuevo registro en la tabla de imágenes
+                Imagenes::create([
+                    'related_table' => (new Eventos())->getTable(),
+                    'related_id' => $item->id,
+                    'url' => Storage::disk('images')->url($path),
+                    'path' => $path,
+                    'alt_text' => $item->title,
+                    'size' => $this->file->getSize(),
+                    'mime_type' => $this->file->getMimeType(),
+                    'is_main' => true,
+                ]);
+            }
             DB::commit();
 
             LogsSistema::create([
@@ -224,6 +246,13 @@ class EventosController extends Component
             $this->dispatch("message-success", "Eventos creado correctamente");
         } catch (\Throwable $th) {
             DB::rollBack();
+            /* borrar el archivo */
+            if ($path && Storage::disk('images')->exists($path)) {
+                Storage::disk('images')->delete($path);
+                if (file_exists($path)) {
+                    unlink($path);
+                }
+            }
             LogsSistema::create([
                 'action' => 'error al crear Eventos',
                 'user_id' => auth()->id(),
@@ -235,6 +264,7 @@ class EventosController extends Component
             ]);
             $this->dispatch("message-error", "Error al crear");
         }
+        $this->file = null;
     }
 
     public function edit($id)
@@ -272,6 +302,7 @@ class EventosController extends Component
             'is_paid' => $item->is_paid ? '1' : '0',
             'price' => $item->price,
             'organizer_id' => $item->organizer_id,
+            'main_image' => $item->main_image,
         ];
 
         // $this->fields = $item->toArray();
@@ -298,7 +329,7 @@ class EventosController extends Component
             'fields.is_paid' => 'required|in:0,1',
             'fields.price' => 'numeric|min:0',
             'fields.organizer_id' => 'required|exists:users,id',
-            'file' => 'nullable|file|max:2048',
+            'file' => 'nullable|image|mimes:jpeg,jpg,png|max:10240',
         ];
 
         $messages = [
@@ -339,11 +370,12 @@ class EventosController extends Component
             'fields.organizer_id.required' => 'El organizador es obligatorio.',
             'fields.organizer_id.exists' => 'El organizador seleccionado no es válido.',
 
-            'file.file' => 'El archivo debe ser válido.',
-            'file.max' => 'El archivo no puede superar los 2 MB.',
+            'file.image' => 'El archivo debe ser una imagen (jpeg, png).',
+            'file.max' => 'El archivo no puede tener más de 10MB.',
         ];
 
         $this->validate($rules, $messages);
+        $path = null;
 
         try {
             DB::beginTransaction();
@@ -352,18 +384,43 @@ class EventosController extends Component
             $this->fields['inscriptions_enabled'] = (bool) $this->fields['inscriptions_enabled'];
             $this->fields['is_active'] = (bool) $this->fields['is_active'];
             $this->fields['is_paid'] = (bool) $this->fields['is_paid'];
-
             $item->fill($this->fields);
+            $item->save();
 
             if ($this->file) {
-                if ($item->file_path && Storage::disk('public')->exists($item->file_path)) {
-                    Storage::disk('public')->delete($item->file_path);
-                }
-                $path = $this->file->store('uploads', 'public');
-                $item->file_path = $path;
-            }
+                // Eliminar imagen anterior si existe
+                $currentImage = Imagenes::where('related_id', $item->id)
+                    ->where('related_table', (new Eventos())->getTable())
+                    ->first();
 
-            $item->save();
+                if ($currentImage) {
+                    if (Storage::disk('images')->exists($currentImage->path)) {
+                        Storage::disk('images')->delete($currentImage->path);
+                    }
+                    $currentImage->delete();
+                }
+
+                // Crear nombre de archivo: slug_del_titulo + random + extensión
+                $extension = $this->file->getClientOriginalExtension();
+                $slugTitle = Str::slug($item->title, '-');
+                $randomCode = Str::random(8);
+                $filename = "{$slugTitle}-{$randomCode}.{$extension}";
+
+                // Guardar en el disco configurado ("images")
+                $path = $this->file->storeAs('eventos', $filename, 'images');
+
+                // Crear nuevo registro en la tabla de imágenes
+                Imagenes::create([
+                    'related_table' => (new Eventos())->getTable(),
+                    'related_id' => $item->id,
+                    'url' => Storage::disk('images')->url($path),
+                    'path' => $path,
+                    'alt_text' => $item->title,
+                    'size' => $this->file->getSize(),
+                    'mime_type' => $this->file->getMimeType(),
+                    'is_main' => true,
+                ]);
+            }
             DB::commit();
 
             LogsSistema::create([
@@ -381,6 +438,13 @@ class EventosController extends Component
             $this->cerrarModal('modal-home');
         } catch (\Throwable $th) {
             DB::rollBack();
+            /* borrar el archivo */
+            if ($path) {
+                Storage::disk('images')->delete($path);
+                if (file_exists($path)) {
+                    unlink($path);
+                }
+            }
             LogsSistema::create([
                 'action' => 'error al actualizar Eventos',
                 'user_id' => auth()->id(),
@@ -392,6 +456,8 @@ class EventosController extends Component
             ]);
             $this->dispatch("message-error", "Error al actualizar");
         }
+
+        $this->file = null;
     }
 
     public function sesiones($id)
@@ -435,8 +501,32 @@ class EventosController extends Component
             DB::beginTransaction();
             $item = Eventos::find($id);
 
-            if ($item->file_path && Storage::disk('public')->exists($item->file_path)) {
-                Storage::disk('public')->delete($item->file_path);
+            $images = Imagenes::where('related_id', $item->id)
+                ->where('related_table', (new Eventos())->getTable())
+                ->get();
+
+            foreach ($images as $image) {
+                Storage::disk('images')->delete($image->path);
+                if (file_exists($image->path)) {
+                    unlink($image->path);
+                }
+                $image->delete();
+            }
+
+            $sesiones = SessionesEvento::where('evento_id', $item->id)->get();
+            foreach ($sesiones as $sesion) {
+                $imagenSesion = Imagenes::where('related_id', $sesion->id)
+                    ->where('related_table', (new SessionesEvento())->getTable())
+                    ->get();
+                foreach ($imagenSesion as $imgSes) {
+                    Storage::disk('images')->delete($imgSes->path);
+                    if (file_exists($imgSes->path)) {
+                        unlink($imgSes->path);
+                    }
+                    $imgSes->delete();
+                }
+                $sesion->ponente()->dissociate();
+                $sesion->delete();
             }
 
             $item->delete();
@@ -512,6 +602,7 @@ class EventosController extends Component
             'require_approval' => '',
         ];
         $this->file = null;
+        $this->file2 = null;
     }
 
     #[On('setFields')]
@@ -542,6 +633,7 @@ class EventosController extends Component
             'fieldsSesiones.mode' => 'required|string|max:50',
             'fieldsSesiones.max_participants' => 'required|integer|min:1',
             'fieldsSesiones.require_approval' => 'required|in:0,1',
+            'file2' => 'nullable|image|mimes:jpeg,jpg,png|max:10240',
         ];
 
         $messages = [
@@ -567,11 +659,14 @@ class EventosController extends Component
             'fieldsSesiones.max_participants.integer' => 'El número máximo de participantes debe ser un entero.',
             'fieldsSesiones.max_participants.min' => 'El número máximo de participantes debe ser al menos 1.',
             'fieldsSesiones.require_approval.required' => 'El campo de aprobación requerida es obligatorio.',
-            'fieldsSesiones.require_approval.boolean' => 'El campo de aprobación requerida debe ser verdadero o falso.
-            ',
+            'fieldsSesiones.require_approval.boolean' => 'El campo de aprobación requerida debe ser verdadero o falso.',
+            'file2.image' => 'El archivo debe ser una imagen (jpeg, png).',
+            'file2.mimes' => 'El archivo debe ser una imagen (jpeg, png).',
+            'file2.max' => 'El archivo no puede tener más de 10MB.',
         ];
 
         $this->validate($rules, $messages);
+        $path = null;
 
         try {
             DB::beginTransaction();
@@ -579,6 +674,29 @@ class EventosController extends Component
             $this->fieldsSesiones['require_approval'] = (bool) $this->fieldsSesiones['require_approval'];
             $item->fill($this->fieldsSesiones);
             $item->save();
+
+            if ($this->file2) {
+                // Crear nombre de archivo: slug_del_titulo + random + extensión
+                $extension = $this->file2->getClientOriginalExtension();
+                $slugTitle = Str::slug($item->title, '-');
+                $randomCode = Str::random(8);
+                $filename = "{$slugTitle}-{$randomCode}.{$extension}";
+
+                // Guardar en el disco configurado ("images")
+                $path = $this->file2->storeAs('sesiones', $filename, 'images');
+
+                // Crear nuevo registro en la tabla de imágenes
+                Imagenes::create([
+                    'related_table' => (new SessionesEvento())->getTable(),
+                    'related_id' => $item->id,
+                    'url' => Storage::disk('images')->url($path),
+                    'path' => $path,
+                    'alt_text' => $item->title,
+                    'size' => $this->file2->getSize(),
+                    'mime_type' => $this->file2->getMimeType(),
+                    'is_main' => true,
+                ]);
+            }
             DB::commit();
 
             LogsSistema::create([
@@ -599,6 +717,13 @@ class EventosController extends Component
             $this->record_id = $item->evento_id;
         } catch (\Throwable $th) {
             DB::rollBack();
+            /* borrar el archivo */
+            if ($path) {
+                Storage::disk('images')->delete($path);
+                if (file_exists($path)) {
+                    unlink($path);
+                }
+            }
             LogsSistema::create([
                 'action' => 'error al crear SessionesEvento',
                 'user_id' => auth()->id(),
@@ -610,6 +735,7 @@ class EventosController extends Component
             ]);
             $this->dispatch("message-error", "Error al crear la sesión");
         }
+        $this->file2 = null;
     }
 
     public function updateSesion()
@@ -626,6 +752,7 @@ class EventosController extends Component
             'fieldsSesiones.mode' => 'required|string|max:50',
             'fieldsSesiones.max_participants' => 'required|integer|min:1',
             'fieldsSesiones.require_approval' => 'required|in:0,1',
+            'file2' => 'nullable|image|mimes:jpeg,jpg,png|max:10240',
         ];
 
         $messages = [
@@ -650,9 +777,13 @@ class EventosController extends Component
             'fieldsSesiones.max_participants.min' => 'El número.maxcdn de participantes debe ser al menos 1.',
             'fieldsSesiones.require_approval.required' => 'El campo de aprobación requerida es obligatorio.',
             'fieldsSesiones.require_approval.boolean' => 'El campo de aprobación requerida debe ser verdadero o falso.',
+            'file2.image' => 'El archivo debe ser una imagen.',
+            'file2.mimes' => 'El archivo debe ser una imagen con extensiones jpeg, jpg o png.',
+            'file2.max' => 'El archivo debe tener un tamaño máximo de 10MB.',
         ];
 
         $this->validate($rules, $messages);
+        $path = null;
 
         try {
             DB::beginTransaction();
@@ -660,6 +791,44 @@ class EventosController extends Component
             $this->fieldsSesiones['require_approval'] = (bool) $this->fieldsSesiones['require_approval'];
             $item->fill($this->fieldsSesiones);
             $item->save();
+
+            if ($this->file2) {
+                // Eliminar imagen anterior si existe
+                $currentImage = Imagenes::where('related_id', $item->id)
+                    ->where('related_table', (new SessionesEvento())->getTable())
+                    ->first();
+
+                if ($currentImage) {
+                    if (Storage::disk('images')->exists($currentImage->path)) {
+                        Storage::disk('images')->delete($currentImage->path);
+                        if (file_exists($currentImage->path)) {
+                            unlink($currentImage->path);
+                        }
+                    }
+                    $currentImage->delete();
+                }
+
+                // Crear nombre de archivo: slug_del_titulo + random + extensión
+                $extension = $this->file2->getClientOriginalExtension();
+                $slugTitle = Str::slug($item->title, '-');
+                $randomCode = Str::random(8);
+                $filename = "{$slugTitle}-{$randomCode}.{$extension}";
+
+                // Guardar en el disco configurado ("images")
+                $path = $this->file2->storeAs('sesiones', $filename, 'images');
+
+                // Crear nuevo registro en la tabla de imágenes
+                Imagenes::create([
+                    'related_table' => (new SessionesEvento())->getTable(),
+                    'related_id' => $item->id,
+                    'url' => Storage::disk('images')->url($path),
+                    'path' => $path,
+                    'alt_text' => $item->title,
+                    'size' => $this->file2->getSize(),
+                    'mime_type' => $this->file2->getMimeType(),
+                    'is_main' => true,
+                ]);
+            }
             DB::commit();
 
             LogsSistema::create([
@@ -681,6 +850,13 @@ class EventosController extends Component
             $this->record_id = $item->evento_id;
         } catch (\Throwable $th) {
             DB::rollBack();
+            /* borrar el archivo */
+            if ($path) {
+                Storage::disk('images')->delete($path);
+                if (file_exists($path)) {
+                    unlink($path);
+                }
+            }
 
             LogsSistema::create([
                 'action' => 'error al actualizar SessionesEvento',
@@ -694,6 +870,7 @@ class EventosController extends Component
 
             $this->dispatch("message-error", "Error al actualizar la sesión");
         }
+        $this->file2 = null;
     }
 
     public function editSesion($id)
@@ -711,6 +888,7 @@ class EventosController extends Component
             'mode' => '',
             'max_participants' => '',
             'require_approval' => '',
+            'main_image' => null,
         ];
 
         $item = SessionesEvento::find($id);
@@ -741,6 +919,7 @@ class EventosController extends Component
             'mode' => $item->mode,
             'max_participants' => $item->max_participants,
             'require_approval' => $item->require_approval ? '1' : '0',
+            'main_image' => $item->main_image,
         ];
 
         $evento = Eventos::find($item->evento_id);
@@ -756,6 +935,16 @@ class EventosController extends Component
         try {
             DB::beginTransaction();
             $item = SessionesEvento::find($id);
+            $images = Imagenes::where('related_id', $item->id)
+                ->where('related_table', (new SessionesEvento())->getTable())
+                ->get();
+            foreach ($images as $image) {
+                Storage::disk('images')->delete($image->path);
+                if (file_exists($image->path)) {
+                    unlink($image->path);
+                }
+                $image->delete();
+            }
             $item->delete();
             DB::commit();
             LogsSistema::create([

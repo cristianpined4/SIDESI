@@ -137,6 +137,22 @@
                         </select>
                         <div class="invalid-feedback">@error('fields.organizer_id') {{$message}} @enderror</div>
                     </div>
+                    <div class="form-group mb-2">
+                        <label class="form-label">Imagen Principal</label>
+                        <input wire:model="file" type="file" accept="image/*"
+                            class="form-control @error('file') was-validated is-invalid @enderror">
+                        <div class="invalid-feedback">@error('file') {{$message}} @enderror</div>
+                    </div>
+                    {{-- imagen --}}
+                    <div class="mb-2 w-full flex items-center justify-center">
+                        @if (isset($fields['main_image']) && $file == null)
+                        <img class="w-1/2" src="{{ $fields['main_image'] }}" alt="imagen" />
+                        @elseif ($file != null)
+                        <img class="w-1/2" src="{{ $file->temporaryUrl() }}" alt="imagen" />
+                        @else
+                        <img class="w-1/2" src="{{ url('/') }}/images/imagen_placeholder.avif" alt="imagen" />
+                        @endif
+                    </div>
                 </div>
 
                 <div class="modal-footer">
@@ -189,7 +205,7 @@
                         <table class="table w-full border border-gray-200 rounded-lg shadow-sm bg-white text-sm">
                             <thead class="bg-gray-100 text-gray-600 uppercase text-xs font-semibold">
                                 <tr>
-                                    <th class="px-4 py-3 text-left">ID</th>
+                                    <th class="px-4 py-3 text-left"></th>
                                     <th class="px-4 py-3 text-left">Título</th>
                                     <th class="px-4 py-3 text-left">Descripción</th>
                                     <th class="px-4 py-3 text-left">Tipo de sesión</th>
@@ -203,7 +219,15 @@
                             <tbody class="divide-y">
                                 @foreach ($records_sesiones as $sesion)
                                 <tr class="border-b hover:bg-gray-50">
-                                    <td class="px-4 py-3">{{ $sesion->id }}</td>
+                                    <td class="px-4 py-3">
+                                        @if ($sesion->main_image)
+                                        <img src="{{ $sesion->main_image }}" alt="{{ $sesion->title }}"
+                                            class="w-12 h-12 object-cover rounded">
+                                        @else
+                                        <img src="{{ url('/') }}/images/imagen_placeholder.avif" alt="Imagen"
+                                            class="w-12 h-12 object-cover rounded">
+                                        @endif
+                                    </td>
                                     <td class="px-4 py-3">{{ $sesion->title }}</td>
                                     <td class="px-4 py-3">{{ substr($sesion->description, 0, 50) }}{{
                                         strlen($sesion->description) > 50
@@ -349,6 +373,22 @@
                         <div class="invalid-feedback">@error('fieldsSesiones.require_approval') {{$message}} @enderror
                         </div>
                     </div>
+                    <div class="form-group mb-2">
+                        <label class="form-label">Imagen Principal</label>
+                        <input wire:model="file2" type="file" accept="image/*"
+                            class="form-control @error('file2') was-validated is-invalid @enderror">
+                        <div class="invalid-feedback">@error('file2') {{$message}} @enderror</div>
+                    </div>
+                    {{-- imagen --}}
+                    <div class="mb-2 w-full flex items-center justify-center">
+                        @if (isset($fieldsSesiones['main_image']) && $file2 == null)
+                        <img class="w-1/2" src="{{ $fieldsSesiones['main_image'] }}" alt="imagen" />
+                        @elseif ($file2 != null)
+                        <img class="w-1/2" src="{{ $file2->temporaryUrl() }}" alt="imagen" />
+                        @else
+                        <img class="w-1/2" src="{{ url('/') }}/images/imagen_placeholder.avif" alt="imagen" />
+                        @endif
+                    </div>
                 </div>
 
                 <div class="modal-footer">
@@ -379,7 +419,7 @@
         <table class="table min-w-full bg-white border border-gray-200 rounded-lg shadow-sm">
             <thead class="bg-gray-100 text-gray-600 uppercase text-xs font-semibold">
                 <tr>
-                    <th class="px-4 py-3 text-left">ID</th>
+                    <th class="px-4 py-3 text-left"></th>
                     <th class="px-4 py-3 text-left">Titulo</th>
                     <th class="px-4 py-3 text-left">Descripcion</th>
                     <th class="px-4 py-3 text-left">Hora de comienzo</th>
@@ -394,7 +434,15 @@
             <tbody class="text-gray-700 text-sm">
                 @foreach ($records as $evento)
                 <tr class="border-b hover:bg-gray-50">
-                    <td class="px-4 py-3">{{ $evento->id }}</td>
+                    <td class="px-4 py-3">
+                        @if ($evento->main_image)
+                        <img src="{{ $evento->main_image }}" alt="{{ $evento->title }}"
+                            class="w-12 h-12 object-cover rounded">
+                        @else
+                        <img src="{{ url('/') }}/images/imagen_placeholder.avif" alt="Imagen"
+                            class="w-12 h-12 object-cover rounded">
+                        @endif
+                    </td>
                     <td class="px-4 py-3">{{ $evento->title }}</td>
                     <td class="px-4 py-3">{{ substr($evento->description, 0, 50) }}{{ strlen($evento->description) > 50
                         ? '...' : '' }}</td>
