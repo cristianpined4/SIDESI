@@ -41,7 +41,7 @@
 
                     <div class="form-group mb-2">
                         <label class="form-label">Fin</label>
-                        <input wire:model="fields.end_time" type="datetime-local"
+                        <input wire:model="fields.end_time" type="datetime-local" min="{{ $fields['start_time'] }}"
                             class="form-control @error('fields.end_time') was-validated is-invalid @enderror">
                         <div class="invalid-feedback">@error('fields.end_time') {{$message}} @enderror</div>
                     </div>
@@ -119,7 +119,7 @@
                         <div class="invalid-feedback">@error('fields.is_paid') {{$message}} @enderror</div>
                     </div>
 
-                    <div class="form-group mb-2" id="price" style="display: none;" wire:ignore>
+                    <div class="form-group mb-2" id="price" style="display: none;" wire:ignore.self>
                         <label class="form-label">Precio ($)</label>
                         <input wire:model="fields.price" type="number" min="0" step="0.01" placeholder="0.00"
                             class="form-control @error('fields.price') was-validated is-invalid @enderror">

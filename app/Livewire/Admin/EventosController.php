@@ -163,6 +163,13 @@ class EventosController extends Component
             'file' => 'nullable|image|mimes:jpeg,jpg,png|max:10240',
         ];
 
+        if ($this->fields['is_paid'] && ($this->fields['is_paid'] == '1' || $this->fields['is_paid'] == 1)) {
+            $rules['fields.price'] = 'required|numeric|min:0.01';
+        } else {
+            $rules['fields.price'] = 'nullable|numeric|min:0';
+            $this->fields['price'] = 0;
+        }
+
         $messages = [
             'fields.title.required' => 'El título es obligatorio.',
             'fields.title.string' => 'El título debe ser un texto válido.',
@@ -196,8 +203,9 @@ class EventosController extends Component
             'fields.mode.max' => 'El modo no puede tener más de 50 caracteres.',
             'fields.is_paid.required' => 'El campo de pagado es obligatorio.',
             'fields.is_paid.boolean' => 'El campo de pagado debe ser verdadero o falso.',
+            'fields.price.required' => 'El precio es obligatorio.',
             'fields.price.numeric' => 'El precio debe ser un número.',
-            'fields.price.min' => 'El precio no puede ser negativo.',
+            'fields.price.min' => 'El precio no puede ser negativo y debe ser al menos mayor a 0.',
             'fields.organizer_id.required' => 'El organizador es obligatorio.',
             'fields.organizer_id.exists' => 'El organizador seleccionado no es válido.',
 
@@ -342,6 +350,13 @@ class EventosController extends Component
             'file' => 'nullable|image|mimes:jpeg,jpg,png|max:10240',
         ];
 
+        if ($this->fields['is_paid'] && ($this->fields['is_paid'] == '1' || $this->fields['is_paid'] == 1)) {
+            $rules['fields.price'] = 'required|numeric|min:0.01';
+        } else {
+            $rules['fields.price'] = 'nullable|numeric|min:0';
+            $this->fields['price'] = 0;
+        }
+
         $messages = [
             'fields.title.required' => 'El título es obligatorio.',
             'fields.title.string' => 'El título debe ser un texto válido.',
@@ -375,8 +390,9 @@ class EventosController extends Component
             'fields.mode.max' => 'El modo no puede tener más de 50 caracteres.',
             'fields.is_paid.required' => 'El campo de pagado es obligatorio.',
             'fields.is_paid.boolean' => 'El campo de pagado debe ser verdadero o falso.',
+            'fields.price.required' => 'El precio es obligatorio.',
             'fields.price.numeric' => 'El precio debe ser un número.',
-            'fields.price.min' => 'El precio no puede ser negativo.',
+            'fields.price.min' => 'El precio no puede ser negativo y debe ser al menos mayor a 0.',
             'fields.organizer_id.required' => 'El organizador es obligatorio.',
             'fields.organizer_id.exists' => 'El organizador seleccionado no es válido.',
 
