@@ -8,4 +8,9 @@ class SessionesEvento extends Model
 {
     protected $table = 'sessiones_eventos';
     protected $fillable = ['evento_id', 'title', 'description', 'start_time', 'end_time', 'location', 'mode', 'max_participants', 'require_approval', 'ponente_id'];
+
+    public function ponente()
+    {
+        return $this->belongsTo('App\Models\User', 'ponente_id');
+    }
 }

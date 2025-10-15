@@ -38,19 +38,20 @@ class EventosController extends Component
     ];   // inputs normales
     public $record_sesion_id;
     public $fieldsSesiones = [
-        'evento_id' => '',           
+        'evento_id' => '',
         'title' => '',
         'description' => '',
         'start_time' => '',
         'end_time' => '',
-        'ponente_id' => '',          
-        'mode' => '',            
+        'ponente_id' => '',
+        'mode' => '',
         'max_participants' => '',
-        'require_approval' => '', 
+        'require_approval' => '',
     ];
     public $records_sesiones;
     public $file;          // archivo temporal
     public $search = '';
+    public $search_sesiones = '';
     public $paginate = 10;
     public bool $loading = false;
 
@@ -80,12 +81,17 @@ class EventosController extends Component
         }
 
         $records = $query->orderBy('id', 'asc')->paginate($this->paginate);
-        $recordsUsers = User::whereIn('role_id', [1, 2])
-                ->where('is_active', true)
-                ->orderBy('name')
-                ->get();
+        $recordsUsers = User::selectRaw('id, CONCAT(name, " ", lastname) as name, is_active')->whereIn('role_id', [1, 2])
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get();
 
-        return view('livewire.admin.eventos', compact('records', 'recordsUsers'))
+        $recordsPonentes = User::selectRaw('id, CONCAT(name, " ", lastname) as name, is_active')->whereIn('role_id', [1, 2, 3, 4])
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get();
+
+        return view('livewire.admin.eventos', compact('records', 'recordsUsers', 'recordsPonentes'))
             ->extends('layouts.admin')
             ->section('content');
     }
@@ -94,7 +100,7 @@ class EventosController extends Component
     {
         if ($initVoid) {
             $this->resetUI();
-        } else{
+        } else {
             $this->resetErrorBag();
             $this->resetValidation();
         }
@@ -108,7 +114,7 @@ class EventosController extends Component
     }
 
     public function store()
-    {   
+    {
         $this->resetErrorBag();
         $this->resetValidation();
 
@@ -200,8 +206,8 @@ class EventosController extends Component
                 'status' => 'success',
             ]);
             $this->resetUI();
+            $this->cerrarModal('modal-home');
             $this->dispatch("message-success", "Eventos creado correctamente");
-            $this->abrirModal('modal-home');
         } catch (\Throwable $th) {
             DB::rollBack();
             LogsSistema::create([
@@ -220,7 +226,7 @@ class EventosController extends Component
     public function edit($id)
     {
         $this->resetUI();
-        
+
         $item = Eventos::find($id);
         if (!$item) {
             LogsSistema::create([
@@ -374,17 +380,34 @@ class EventosController extends Component
         }
     }
 
-    public function sesiones($id){
-        
-        $this->resetUi();
+    public function sesiones($id)
+    {
+
+        $this->resetUI();
 
         $items = SessionesEvento::where('evento_id', $id)
+            ->with('ponente')
+            ->where(function ($query) {
+                if (!empty($this->search_sesiones)) {
+                    $query->where('title', 'like', '%' . $this->search_sesiones . '%')
+                        ->orWhere('description', 'like', '%' . $this->search_sesiones . '%')
+                        ->orWhere('location', 'like', '%' . $this->search_sesiones . '%')
+                        ->orWhereHas('ponente', function ($q) {
+                            $q->whereRaw("CONCAT(name, ' ', lastname) LIKE ?", ['%' . $this->search_sesiones . '%']);
+                        });
+                }
+            })
             ->orderBy('id', 'asc')
             ->get();
 
+
+        $this->abrirModal('Sesion-modal');
         $this->records_sesiones = $items;
-        
-        $this->abrirModal('Sesion-modal', false);
+        $this->record_id = $id;
+        $this->fieldsSesiones['evento_id'] = $id;
+        $evento = Eventos::find($id);
+        $this->fields['start_time'] = $evento->start_time;
+        $this->fields['end_time'] = $evento->end_time;
     }
 
     #[On("delete")]
@@ -434,7 +457,298 @@ class EventosController extends Component
         $this->record_id = null;
         $this->record_sesion_id = null;
         $this->records_sesiones = collect();
-        $this->fields = [];
+        $this->fields = [
+            'title' => '',
+            'description' => '',
+            'start_time' => '',
+            'end_time' => '',
+            'location' => '',
+            'inscriptions_enabled' => '',
+            'max_participants' => '',
+            'contact_email' => '',
+            'contact_phone' => '',
+            'is_active' => '',
+            'mode' => '',
+            'is_paid' => '',
+            'price' => '',
+            'organizer_id' => '',
+        ];
+        $this->fieldsSesiones = [
+            'evento_id' => '',
+            'title' => '',
+            'description' => '',
+            'start_time' => '',
+            'end_time' => '',
+            'ponente_id' => '',
+            'mode' => '',
+            'max_participants' => '',
+            'require_approval' => '',
+        ];
         $this->file = null;
+    }
+
+    #[On('setFields')]
+    public function updateField($payload)
+    {
+        $c = explode('.', $payload['field']);
+        $variable = $c[0];
+        $field = $c[1];
+        if (isset($payload['field']) && array_key_exists($field, $this->$variable)) {
+            if (isset($payload['value'])) {
+                $this->$variable[$field] = $payload['value'];
+            }
+        }
+    }
+
+    public function storeSesion()
+    {
+        $this->resetErrorBag();
+        $this->resetValidation();
+
+        $rules = [
+            'fieldsSesiones.evento_id' => 'required|exists:eventos,id',
+            'fieldsSesiones.title' => 'required|string|max:250',
+            'fieldsSesiones.description' => 'required|string|max:1000',
+            'fieldsSesiones.start_time' => 'required|date',
+            'fieldsSesiones.end_time' => 'required|date|after:fieldsSesiones.start_time',
+            'fieldsSesiones.ponente_id' => 'required|exists:users,id',
+            'fieldsSesiones.mode' => 'required|string|max:50',
+            'fieldsSesiones.max_participants' => 'required|integer|min:1',
+            'fieldsSesiones.require_approval' => 'required|in:0,1',
+        ];
+
+        $messages = [
+            'fieldsSesiones.evento_id.required' => 'El evento es obligatorio.',
+            'fieldsSesiones.evento_id.exists' => 'El evento seleccionado no es válido.',
+            'fieldsSesiones.title.required' => 'El título es obligatorio.',
+            'fieldsSesiones.title.string' => 'El título debe ser un texto válido.',
+            'fieldsSesiones.title.max' => 'El título no puede tener más de 250 caracteres.',
+            'fieldsSesiones.description.required' => 'La descripción es obligatoria.',
+            'fieldsSesiones.description.string' => 'La descripción debe ser un texto válido.',
+            'fieldsSesiones.description.max' => 'La descripción no puede tener más de 1000 caracteres.',
+            'fieldsSesiones.start_time.required' => 'La fecha y hora de inicio son obligatorias.',
+            'fieldsSesiones.start_time.date' => 'La fecha y hora de inicio deben ser una fecha válida.',
+            'fieldsSesiones.end_time.required' => 'La fecha y hora de fin son obligatorias.',
+            'fieldsSesiones.end_time.date' => 'La fecha y hora de fin deben ser una fecha válida.',
+            'fieldsSesiones.end_time.after' => 'La fecha y hora de fin deben ser posteriores a la de inicio.',
+            'fieldsSesiones.ponente_id.required' => 'El ponente es obligatorio.',
+            'fieldsSesiones.ponente_id.exists' => 'El ponente seleccionado no es válido.',
+            'fieldsSesiones.mode.required' => 'El modo es obligatorio.',
+            'fieldsSesiones.mode.string' => 'El modo debe ser un texto válido.',
+            'fieldsSesiones.mode.max' => 'El modo no puede tener más de 50 caracteres.',
+            'fieldsSesiones.max_participants.required' => 'El número máximo de participantes es obligatorio.',
+            'fieldsSesiones.max_participants.integer' => 'El número máximo de participantes debe ser un entero.',
+            'fieldsSesiones.max_participants.min' => 'El número máximo de participantes debe ser al menos 1.',
+            'fieldsSesiones.require_approval.required' => 'El campo de aprobación requerida es obligatorio.',
+            'fieldsSesiones.require_approval.boolean' => 'El campo de aprobación requerida debe ser verdadero o falso.
+            ',
+        ];
+
+        $this->validate($rules, $messages);
+
+        try {
+            DB::beginTransaction();
+            $item = new SessionesEvento();
+            $this->fieldsSesiones['require_approval'] = (bool) $this->fieldsSesiones['require_approval'];
+            $item->fill($this->fieldsSesiones);
+            $item->save();
+            DB::commit();
+
+            LogsSistema::create([
+                'action' => 'create SessionesEvento',
+                'user_id' => auth()->id(),
+                'ip_address' => request()->ip(),
+                'description' => 'Creación de una nueva sesión con ID ' . $item->id,
+                'target_table' => (new SessionesEvento())->getTable(),
+                'target_id' => $item->id,
+                'status' => 'success',
+            ]);
+
+            $this->resetUI();
+            $this->dispatch("message-success", "Sesión creada correctamente");
+            $this->cerrarModal('Sesion-modal-form');
+            $this->sesiones($this->record_id);
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            LogsSistema::create([
+                'action' => 'error al crear SessionesEvento',
+                'user_id' => auth()->id(),
+                'ip_address' => request()->ip(),
+                'description' => 'Error al crear una nueva sesión: ' . $th->getMessage(),
+                'target_table' => (new SessionesEvento())->getTable(),
+                'target_id' => null,
+                'status' => 'error',
+            ]);
+            $this->dispatch("message-error", "Error al crear la sesión");
+        }
+    }
+
+    public function updateSesion()
+    {
+        $this->resetErrorBag();
+        $this->resetValidation();
+
+        $rules = [
+            'fieldsSesiones.title' => 'required|string|max:250',
+            'fieldsSesiones.description' => 'required|string|max:1000',
+            'fieldsSesiones.start_time' => 'required|date',
+            'fieldsSesiones.end_time' => 'required|date|after:fieldsSesiones.start_time',
+            'fieldsSesiones.ponente_id' => 'required|exists:users,id',
+            'fieldsSesiones.mode' => 'required|string|max:50',
+            'fieldsSesiones.max_participants' => 'required|integer|min:1',
+            'fieldsSesiones.require_approval' => 'required|in:0,1',
+        ];
+
+        $messages = [
+            'fieldsSesiones.title.required' => 'El título es obligatorio.',
+            'fieldsSesiones.title.string' => 'El título debe ser un texto válido.',
+            'fieldsSesiones.title.max' => 'El título no puede tener más de 250 caracteres.',
+            'fieldsSesiones.description.required' => 'La descripción es obligatoria.',
+            'fieldsSesiones.description.string' => 'La descripción debe ser un texto válido.',
+            'fieldsSesiones.description.max' => 'La descripción no puede tener más de 1000 caracteres.',
+            'fieldsSesiones.start_time.required' => 'La fecha y hora de inicio son obligatorias.',
+            'fieldsSesiones.start_time.date' => 'La fecha y hora de inicio deben ser una fecha válida.',
+            'fieldsSesiones.end_time.required' => 'La fecha y hora de fin son obligatorias.',
+            'fieldsSesiones.end_time.date' => 'La fecha y hora de fin deben ser una fecha válida.',
+            'fieldsSesiones.end_time.after' => 'La fecha y hora de fin deben ser posteriores a la de inicio.',
+            'fieldsSesiones.ponente_id.required' => 'El ponente es obligatorio.',
+            'fieldsSesiones.ponente_id.exists' => 'El ponente seleccionado no es válido.',
+            'fieldsSesiones.mode.required' => 'El modo es obligatorio.',
+            'fieldsSesiones.mode.string' => 'El modo debe ser un texto válido.',
+            'fieldsSesiones.mode.max' => 'El modo no puede tener más de 50 caracteres.',
+            'fieldsSesiones.max_participants.required' => 'El número.maxcdn de participantes es obligatorio.',
+            'fieldsSesiones.max_participants.integer' => 'El número.maxcdn de participantes debe ser un entero.',
+            'fieldsSesiones.max_participants.min' => 'El número.maxcdn de participantes debe ser al menos 1.',
+            'fieldsSesiones.require_approval.required' => 'El campo de aprobación requerida es obligatorio.',
+            'fieldsSesiones.require_approval.boolean' => 'El campo de aprobación requerida debe ser verdadero o falso.',
+        ];
+
+        $this->validate($rules, $messages);
+
+        try {
+            DB::beginTransaction();
+            $item = SessionesEvento::find($this->fieldsSesiones['id']);
+            $this->fieldsSesiones['require_approval'] = (bool) $this->fieldsSesiones['require_approval'];
+            $item->fill($this->fieldsSesiones);
+            $item->save();
+            DB::commit();
+
+            LogsSistema::create([
+                'action' => 'update SessionesEvento',
+                'user_id' => auth()->id(),
+                'ip_address' => request()->ip(),
+                'description' => 'Actualización de la sesión con ID ' . $item->id,
+                'target_table' => (new SessionesEvento())->getTable(),
+                'target_id' => $item->id,
+                'status' => 'success',
+            ]);
+
+            $this->resetUI();
+            $this->dispatch("message-success", "Sesión actualizada correctamente");
+            $this->cerrarModal('Sesion-modal-form');
+
+            $this->sesiones($item->evento_id);
+        } catch (\Throwable $th) {
+            DB::rollBack();
+
+            LogsSistema::create([
+                'action' => 'error al actualizar SessionesEvento',
+                'user_id' => auth()->id(),
+                'ip_address' => request()->ip(),
+                'description' => 'Error al actualizar la sesión con ID ' . $this->fieldsSesiones['id'] . ': ' . $th->getMessage(),
+                'target_table' => (new SessionesEvento())->getTable(),
+                'target_id' => $this->fieldsSesiones['id'],
+                'status' => 'error',
+            ]);
+
+            $this->dispatch("message-error", "Error al actualizar la sesión");
+        }
+    }
+
+    public function editSesion($id)
+    {
+        $this->resetErrorBag();
+        $this->resetValidation();
+
+        $this->fieldsSesiones = [
+            'evento_id' => '',
+            'title' => '',
+            'description' => '',
+            'start_time' => '',
+            'end_time' => '',
+            'ponente_id' => '',
+            'mode' => '',
+            'max_participants' => '',
+            'require_approval' => '',
+        ];
+
+        $item = SessionesEvento::find($id);
+        if (!$item) {
+            LogsSistema::create([
+                'action' => 'error al editar SessionesEvento',
+                'user_id' => auth()->id(),
+                'ip_address' => request()->ip(),
+                'description' => 'Intento de edición de una sesión inexistente con ID ' . $id,
+                'target_table' => (new SessionesEvento())->getTable(),
+                'target_id' => $id,
+                'status' => 'error',
+            ]);
+            $this->dispatch("message-error", "Sesión no encontrada");
+            return;
+        }
+
+        $this->record_sesion_id = $item->id;
+        $this->fieldsSesiones = [
+            'id' => $item->id,
+            'evento_id' => $item->evento_id,
+            'title' => $item->title,
+            'description' => $item->description,
+            'start_time' => $item->start_time,
+            'end_time' => $item->end_time,
+            'ponente_id' => $item->ponente_id,
+            'mode' => $item->mode,
+            'max_participants' => $item->max_participants,
+            'require_approval' => $item->require_approval ? '1' : '0',
+        ];
+
+        $evento = Eventos::find($item->evento_id);
+        $this->fields['start_time'] = $evento->start_time;
+        $this->fields['end_time'] = $evento->end_time;
+
+        $this->abrirModal('Sesion-modal-form', false);
+    }
+
+    #[On("deleteSesion")]
+    public function destroySesion($id)
+    {
+        try {
+            DB::beginTransaction();
+            $item = SessionesEvento::find($id);
+            $item->delete();
+            DB::commit();
+            LogsSistema::create([
+                'action' => 'delete SessionesEvento',
+                'user_id' => auth()->id(),
+                'ip_address' => request()->ip(),
+                'description' => 'Eliminación de la sesión con ID ' . $item->id,
+                'target_table' => (new SessionesEvento())->getTable(),
+                'target_id' => $item->id,
+                'status' => 'success',
+            ]);
+            $this->dispatch("message-success", "Sesión eliminada correctamente");
+            $this->sesiones($this->record_id);
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            LogsSistema::create([
+                'action' => 'error al eliminar SessionesEvento',
+                'user_id' => auth()->id(),
+                'ip_address' => request()->ip(),
+                'description' => 'Error al eliminar la sesión con ID ' . $item->id . ': ' . $th->getMessage(),
+                'target_table' => (new SessionesEvento())->getTable(),
+                'target_id' => $item->id,
+                'status' => 'error',
+            ]);
+            $this->dispatch("message-error", "Error al eliminar la sesión");
+        }
     }
 }

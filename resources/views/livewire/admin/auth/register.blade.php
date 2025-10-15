@@ -130,11 +130,11 @@
 
         function toggleInstitutionField() {
             const selectedRole = roleSelect.value;
-            if (selectedRole && selectedRole.toLowerCase() !== 'invitado') {
+            if (@this.fields.role_id && @this.fields.role_id.toLowerCase() !== 'invitado') {
                 institutionDiv.style.display = 'block';
             } else {
                 institutionDiv.style.display = 'none';
-                Livewire.dispatch('setFields', { payload: { field: 'institution', value: '' } });
+                @this.fields.institution = '';
             }
         }
 

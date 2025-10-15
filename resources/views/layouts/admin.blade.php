@@ -20,12 +20,8 @@
       <div class="flex items-center gap-3">
         <!-- Logo SIDESI (espacio reservado) -->
         <a href="{{ route('home-site') }}" class="flex items-center">
-          <img
-            src="{{ asset('images/logosidesii.png') }}"
-            alt="SIDESI"
-            class="h-10 w-auto object-contain"
-            loading="lazy"
-          />
+          <img src="{{ asset('images/logosidesii.png') }}" alt="SIDESI" class="h-10 w-auto object-contain"
+            loading="lazy" />
         </a>
 
         <div class="leading-tight">
@@ -41,8 +37,8 @@
       <!-- Derecha: usuario con dropdown (en la esquina) -->
       <div class="relative ml-auto">
         <button id="user-menu-button"
-                class="flex items-center gap-2 rounded-md px-2 py-1.5 hover:bg-slate-100 transition"
-                onclick="document.getElementById('userDropdown').classList.toggle('hidden')">
+          class="flex items-center gap-2 rounded-md px-2 py-1.5 hover:bg-slate-100 transition"
+          onclick="document.getElementById('userDropdown').classList.toggle('hidden')">
           <div class="hidden sm:flex flex-col items-end">
             <span class="text-sm font-medium text-slate-800">
               {{ Auth::user()->name }} {{ Auth::user()->lastname }}
@@ -52,29 +48,25 @@
             </span>
           </div>
 
-          <img
-            src="https://cdn-icons-png.flaticon.com/512/149/149071.png"
-            alt="Avatar"
-            class="h-9 w-9 rounded-full object-cover ring-1 ring-slate-200"
-          />
+          <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="Avatar"
+            class="h-9 w-9 rounded-full object-cover ring-1 ring-slate-200" />
 
-          <svg class="w-4 h-4 text-slate-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg class="w-4 h-4 text-slate-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 9l6 6 6-6" />
           </svg>
         </button>
 
         <!-- Dropdown (incluye Cerrar sesión) -->
         <div id="userDropdown"
-             class="absolute right-0 mt-2 w-56 bg-white border border-gray-100 rounded-xl shadow-lg overflow-hidden hidden z-50">
+          class="absolute right-0 mt-2 w-56 bg-white border border-gray-100 rounded-xl shadow-lg overflow-hidden hidden z-50">
           @if (Route::has('profile.show'))
-            <a href="{{ route('profile.show') }}" class="block px-4 py-2.5 text-sm text-slate-700 hover:bg-gray-50">Perfil</a>
+          <a href="{{ route('profile.show') }}"
+            class="block px-4 py-2.5 text-sm text-slate-700 hover:bg-gray-50">Perfil</a>
           @elseif (Route::has('profile.edit'))
-            <a href="{{ route('profile.edit') }}" class="block px-4 py-2.5 text-sm text-slate-700 hover:bg-gray-50">Perfil</a>
+          <a href="{{ route('profile.edit') }}"
+            class="block px-4 py-2.5 text-sm text-slate-700 hover:bg-gray-50">Perfil</a>
           @endif
-
-          <a href="{{ route('admin.dashboard') }}" class="block px-4 py-2.5 text-sm text-slate-700 hover:bg-gray-50">
-            Panel de Administración
-          </a>
 
           <form method="POST" action="{{ route('logout') }}">
             @csrf
