@@ -106,6 +106,17 @@ class EventosController extends Component
         }
         if ($newSession) {
             $this->record_sesion_id = null;
+            $this->fieldsSesiones = [
+                'evento_id' => $this->record_id,
+                'title' => '',
+                'description' => '',
+                'start_time' => '',
+                'end_time' => '',
+                'ponente_id' => '',
+                'mode' => '',
+                'max_participants' => '',
+                'require_approval' => '',
+            ];
         }
         $this->dispatch("abrir-modal", ['modal' => $idModal]);
     }

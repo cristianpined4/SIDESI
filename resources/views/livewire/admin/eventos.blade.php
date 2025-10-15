@@ -192,6 +192,7 @@
                                     <th class="px-4 py-3 text-left">ID</th>
                                     <th class="px-4 py-3 text-left">Título</th>
                                     <th class="px-4 py-3 text-left">Descripción</th>
+                                    <th class="px-4 py-3 text-left">Tipo de sesión</th>
                                     <th class="px-4 py-3 text-left">Ponente</th>
                                     <th class="px-4 py-3 text-left">Hora de comienzo</th>
                                     <th class="px-4 py-3 text-left">Hora fin</th>
@@ -207,6 +208,7 @@
                                     <td class="px-4 py-3">{{ substr($sesion->description, 0, 50) }}{{
                                         strlen($sesion->description) > 50
                                         ? '...' : '' }}</td>
+                                    <td class="px-4 py-3">{{ ucfirst($sesion->mode) }}</td>
                                     <td class="px-4 py-3">
                                         {{ $sesion->ponente ? $sesion->ponente->name . ' ' . $sesion->ponente->lastname
                                         : 'N/A' }}
