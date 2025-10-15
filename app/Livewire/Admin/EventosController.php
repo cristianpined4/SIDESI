@@ -84,12 +84,22 @@ class EventosController extends Component
         }
 
         $records = $query->orderBy('id', 'asc')->paginate($this->paginate);
-        $recordsUsers = User::selectRaw('id, CONCAT(name, " ", lastname) as name, is_active')->whereIn('role_id', [1, 2])
+        $driver = DB::getDriverName();
+
+        if ($driver === 'pgsql') {
+            $concatExpression = "TRIM(name || ' ' || lastname)";
+        } else {
+            $concatExpression = "TRIM(CONCAT_WS(' ', name, lastname))";
+        }
+
+        $recordsUsers = User::selectRaw("id, {$concatExpression} as name, is_active")
+            ->whereIn('role_id', [1, 2])
             ->where('is_active', true)
             ->orderBy('name')
             ->get();
 
-        $recordsPonentes = User::selectRaw('id, CONCAT(name, " ", lastname) as name, is_active')->whereIn('role_id', [1, 2, 3, 4])
+        $recordsPonentes = User::selectRaw("id, {$concatExpression} as name, is_active")
+            ->whereIn('role_id', [1, 2, 3, 4])
             ->where('is_active', true)
             ->orderBy('name')
             ->get();
@@ -471,10 +481,19 @@ class EventosController extends Component
 
         if (!empty($this->search_sesiones)) {
             $query->where(function ($q) {
-                $q->where('title', 'like', '%' . $this->search_sesiones . '%')
-                    ->orWhere('description', 'like', '%' . $this->search_sesiones . '%')
-                    ->orWhereHas('ponente', function ($q2) {
-                        $q2->whereRaw("CONCAT(name, ' ', lastname) LIKE ?", ['%' . $this->search_sesiones . '%']);
+                $search = '%' . $this->search_sesiones . '%';
+                $connection = $q->getConnection()->getDriverName();
+
+                $q->where('title', 'like', $search)
+                    ->orWhere('description', 'like', $search)
+                    ->orWhereHas('ponente', function ($q2) use ($search, $connection) {
+                        if ($connection === 'pgsql') {
+                            // PostgreSQL usa ||
+                            $q2->whereRaw("(name || ' ' || lastname) ILIKE ?", [$search]);
+                        } else {
+                            // MySQL y otros
+                            $q2->whereRaw("CONCAT(name, ' ', lastname) LIKE ?", [$search]);
+                        }
                     });
             });
         }
