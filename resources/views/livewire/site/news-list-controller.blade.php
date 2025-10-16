@@ -45,9 +45,9 @@ relevantes para la comunidad estudiantil de ingeniería.')
                             class="appearance-none bg-white border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 pr-8">
                             <option value="all">Todas las categorías</option>
                             <option value="evento">Eventos</option>
-                            <option value="empleo">Empleo</option>
-                            <option value="taller">Talleres</option>
-                            <option value="egresados">Egresados</option>
+                            <option value="Convocatoria">Convocatoria</option>
+                         
+                            <option value="Informacion">Informacion</option>
                         </select>
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -87,16 +87,54 @@ relevantes para la comunidad estudiantil de ingeniería.')
             <div class="grid lg:grid-cols-3 gap-8 w-4/5 max-w-7xl mx-auto">
                 @foreach($filteredNews as $news)
                 <div class="bg-white rounded-xl overflow-hidden shadow-sm news-card-hover cursor-pointer group"
-                    wire:key="news-{{ $news['id'] }}" onclick="openNewsModal(@js($news))">
-                    <!-- Imagen agregada como en el original -->
-                    <img src="{{ $news['image'] }}" alt="{{ $news['title'] }}"
-                        class="w-full h-48 object-cover transition-transform duration-400 group-hover:scale-105">
+                    wire:key="news-{{ $news->id }}"
+                    onclick="openNewsModal(@js([
+                        'id' => $news->id,
+                        'category' => $news->category,
+                        'category_label' => $news->category_label,
+                        'title' => $news->title,
+                        'description' => $news->description,
+                        'details' => $news->details,
+                        'image' => $news->main_image ?? 'https://via.placeholder.com/800x500?text=Sin+Imagen',
+                        'date' => $news->date,
+                        'location' => 'Por definir',
+                        'time' => 'Próximamente',
+                        'participants' => 'Comunidad universitaria'
+                    ]))">
+
+                    <!-- Imagen fija según categoría -->
+                    <img src="
+                        @switch($news->category)
+                            @case('evento')
+                                https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&h=500&fit=crop
+                                @break
+                            @case('empleo')
+                                https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&h=500&fit=crop
+                                @break
+                            @case('taller')
+                                https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=800&h=500&fit=crop
+                                @break
+                            @case('egresados')
+                                https://universae.com/wp-content/uploads/2023/06/que-es-el-networking-1200x900.webp
+                                @break
+                            @case('noticia')
+                                https://images.unsplash.com/photo-1591115765373-5207764f72e7?w=800&h=500&fit=crop
+                                @break
+                            @case('info')
+                                https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=800&h=500&fit=crop
+                                @break
+                            @default
+                                https://via.placeholder.com/800x500?text=Sin+Imagen
+                        @endswitch
+                    "
+                    alt="{{ $news->title }}"
+                    class="w-full h-48 object-cover transition-transform duration-400 group-hover:scale-105">
 
                     <div class="p-6 flex flex-col gap-4">
                         <div class="flex items-center justify-between">
                             <span
-                                class="inline-flex items-center justify-center rounded-md px-3 py-1 text-xs font-medium badge-{{ $news['category'] }}">
-                                {{ $news['category_label'] }}
+                                class="inline-flex items-center justify-center rounded-md px-3 py-1 text-xs font-medium badge-{{ $news->category }}">
+                                {{ $news->category_label }}
                             </span>
                             <div class="flex items-center text-sm text-gray-500">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -107,16 +145,16 @@ relevantes para la comunidad estudiantil de ingeniería.')
                                     <rect width="18" height="18" x="3" y="4" rx="2"></rect>
                                     <path d="M3 10h18"></path>
                                 </svg>
-                                {{ $news['date'] }}
+                                {{ $news->date }}
                             </div>
                         </div>
 
                         <h3 class="font-semibold text-xl text-balance group-hover:text-blue-600 transition-colors">
-                            {{ $news['title'] }}
+                            {{ $news->title }}
                         </h3>
 
                         <p class="text-gray-600 text-base leading-relaxed">
-                            {{ $news['description'] }}
+                            {{ $news->description }}
                         </p>
 
                         <div
@@ -167,17 +205,16 @@ relevantes para la comunidad estudiantil de ingeniería.')
             <div class="modal-body">
                 <div class="modal-meta">
                     <span id="modal-badge" class="modal-badge">Evento</span>
-                    <span id="modal-date" class="modal-date">📅 10 de Marzo, 2024</span>
+                    <span id="modal-date" class="modal-date"></span>
                 </div>
-                <h2 id="modal-title" class="modal-title">Hackathon de Innovación Tecnológica 2024</h2>
-                <p id="modal-description" class="modal-description">Participa en el hackathon más grande del año y
-                    desarrolla soluciones innovadoras para problemas reales.</p>
+                <h2 id="modal-title" class="modal-title"></h2>
+                <p id="modal-description" class="modal-description"></p>
 
                 <div class="modal-details">
                     <div class="detail-item">
                         <span class="detail-icon"></span>
                         <span class="detail-label">Ubicación:</span>
-                        <span id="modal-location" class="detail-value">Auditorio Principal - Campus Central</span>
+                        <span id="modal-location" class="detail-value"></span>
                     </div>
                     <div class="detail-item">
                         <span class="detail-icon"></span>
@@ -187,14 +224,12 @@ relevantes para la comunidad estudiantil de ingeniería.')
                     <div class="detail-item">
                         <span class="detail-icon"></span>
                         <span class="detail-label">Dirigido a:</span>
-                        <span id="modal-participants" class="detail-value">Estudiantes y profesionales de todas las
-                            carreras</span>
+                        <span id="modal-participants" class="detail-value"></span>
                     </div>
                     <div class="detail-item">
                         <span class="detail-icon"></span>
                         <span class="detail-label">Detalles:</span>
-                        <span id="modal-full-details" class="detail-value">Este evento reúne a los mejores talentos en
-                            tecnología para resolver desafíos actuales de la industria.</span>
+                        <span id="modal-full-details" class="detail-value"></span>
                     </div>
                 </div>
 
@@ -202,9 +237,7 @@ relevantes para la comunidad estudiantil de ingeniería.')
                     <button class="btn btn-secondary" id="modal-share">
                         <span>📤</span> Compartir
                     </button>
-                    <button class="btn btn-primary" id="modal-register">
-                        <span>📝</span> Registrarse
-                    </button>
+                 
                 </div>
             </div>
         </div>
@@ -213,103 +246,103 @@ relevantes para la comunidad estudiantil de ingeniería.')
 
 <script>
     function openNewsModal(news) {
-    // Actualizar contenido del modal
-    document.getElementById('modal-image').src = news.image;
-    document.getElementById('modal-title').textContent = news.title;
-    document.getElementById('modal-description').textContent = news.description;
-    document.getElementById('modal-full-details').textContent = news.details;
-    document.getElementById('modal-date').textContent = `📅 ${news.date}`;
-    document.getElementById('modal-location').textContent = news.location;
-    document.getElementById('modal-time').textContent = news.time;
-    document.getElementById('modal-participants').textContent = news.participants;
+        // Actualizar contenido del modal
+        document.getElementById('modal-image').src = news.image;
+        document.getElementById('modal-title').textContent = news.title;
+        document.getElementById('modal-description').textContent = news.description;
+        document.getElementById('modal-full-details').textContent = news.details;
+        document.getElementById('modal-date').textContent = `📅 ${news.date}`;
+        document.getElementById('modal-location').textContent = news.location;
+        document.getElementById('modal-time').textContent = news.time;
+        document.getElementById('modal-participants').textContent = news.participants;
 
-    // Actualizar badge según categoría
-    const modalBadge = document.getElementById('modal-badge');
-    modalBadge.textContent = news.category_label;
-    modalBadge.className = 'modal-badge ' + news.category;
+        // Actualizar badge según categoría
+        const modalBadge = document.getElementById('modal-badge');
+        modalBadge.textContent = news.category_label;
+        modalBadge.className = 'modal-badge ' + news.category;
 
-    // Mostrar modal
-    document.getElementById('news-modal').classList.add('show');
-    document.body.style.overflow = 'hidden';
-}
+        // Mostrar modal
+        document.getElementById('news-modal').classList.add('show');
+        document.body.style.overflow = 'hidden';
+    }
 
-function closeNewsModal() {
-    document.getElementById('news-modal').classList.remove('show');
-    document.body.style.overflow = 'auto';
-}
+    function closeNewsModal() {
+        document.getElementById('news-modal').classList.remove('show');
+        document.body.style.overflow = 'auto';
+    }
 
-function registerForEvent() {
-    const title = document.getElementById('modal-title').textContent;
-    alert(`¡Gracias por tu interés en "${title}"! Serás redirigido al formulario de registro.`);
-    closeNewsModal();
-}
+    function registerForEvent() {
+        const title = document.getElementById('modal-title').textContent;
+        alert(`¡Gracias por tu interés en "${title}"! Serás redirigido al formulario de registro.`);
+        closeNewsModal();
+    }
 
-function shareEvent() {
-    const title = document.getElementById('modal-title').textContent;
-    const url = window.location.href;
-    
-    if (navigator.share) {
-        navigator.share({
-            title: title,
-            url: url
-        }).then(() => {
-            console.log('Evento compartido exitosamente');
-        }).catch(err => {
-            console.log('Error al compartir:', err);
+    function shareEvent() {
+        const title = document.getElementById('modal-title').textContent;
+        const url = window.location.href;
+        
+        if (navigator.share) {
+            navigator.share({
+                title: title,
+                url: url
+            }).then(() => {
+                console.log('Evento compartido exitosamente');
+            }).catch(err => {
+                console.log('Error al compartir:', err);
+                fallbackShare(title, url);
+            });
+        } else {
             fallbackShare(title, url);
+        }
+    }
+
+    function fallbackShare(title, url) {
+        // Fallback para navegadores que no soportan Web Share API
+        navigator.clipboard.writeText(`${title} - ${url}`).then(() => {
+            alert('Enlace copiado al portapapeles');
+        }).catch(err => {
+            // Fallback más básico
+            const tempInput = document.createElement('input');
+            tempInput.value = `${title} - ${url}`;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+            alert('Enlace copiado al portapapeles');
         });
-    } else {
-        fallbackShare(title, url);
-    }
-}
-
-function fallbackShare(title, url) {
-    // Fallback para navegadores que no soportan Web Share API
-    navigator.clipboard.writeText(`${title} - ${url}`).then(() => {
-        alert('Enlace copiado al portapapeles');
-    }).catch(err => {
-        // Fallback más básico
-        const tempInput = document.createElement('input');
-        tempInput.value = `${title} - ${url}`;
-        document.body.appendChild(tempInput);
-        tempInput.select();
-        document.execCommand('copy');
-        document.body.removeChild(tempInput);
-        alert('Enlace copiado al portapapeles');
-    });
-}
-
-// Event listeners
-document.addEventListener('DOMContentLoaded', function() {
-    const modalClose = document.getElementById('modal-close');
-    const modalShare = document.getElementById('modal-share');
-    const modalRegister = document.getElementById('modal-register');
-    const modal = document.getElementById('news-modal');
-
-    if (modalClose) {
-        modalClose.addEventListener('click', closeNewsModal);
     }
 
-    if (modalShare) {
-        modalShare.addEventListener('click', shareEvent);
-    }
+    // Event listeners
+    document.addEventListener('DOMContentLoaded', function() {
+        const modalClose = document.getElementById('modal-close');
+        const modalShare = document.getElementById('modal-share');
+        const modalRegister = document.getElementById('modal-register');
+        const modal = document.getElementById('news-modal');
 
-    if (modalRegister) {
-        modalRegister.addEventListener('click', registerForEvent);
-    }
-
-    // Cerrar modal al hacer clic fuera
-    modal.addEventListener('click', function(event) {
-        if (event.target === modal) {
-            closeNewsModal();
+        if (modalClose) {
+            modalClose.addEventListener('click', closeNewsModal);
         }
-    });
 
-    // Cerrar modal con tecla Escape
-    document.addEventListener('keydown', function(event) {
-        if (event.key === 'Escape') {
-            closeNewsModal();
+        if (modalShare) {
+            modalShare.addEventListener('click', shareEvent);
         }
+
+        if (modalRegister) {
+            modalRegister.addEventListener('click', registerForEvent);
+        }
+
+        // Cerrar modal al hacer clic fuera
+        modal.addEventListener('click', function(event) {
+            if (event.target === modal) {
+                closeNewsModal();
+            }
+        });
+
+        // Cerrar modal con tecla Escape
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeNewsModal();
+            }
+        });
     });
-});
 </script>
