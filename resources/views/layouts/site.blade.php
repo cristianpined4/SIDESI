@@ -35,6 +35,14 @@
               <img src="{{ asset('images/logosidesii.png') }}" alt="Logo SIDESI"
                 style="max-height: 64px; width: auto; object-fit: contain;" class="block self-end m-2l-0" />
             </a>
+            <div class="border-l border-black h-10 mx-0"></div>
+            <div class="hidden md:block">
+              <a href="{{ route('home-site') }}" class="text-xs text-slate-500 hover:text-blue-600 transition">
+              </a>
+              <a href="{{ url('/') }}" class="flex h-16 items-end leading-none">
+              <img src="{{ asset('images/logoues.png') }}" alt="Logo SIDESI"
+                style="max-height: 64px; width: auto; object-fit: contain;" class="block self-end m-2l-0" />
+            </a>
           </div>
           <nav class="hidden md:flex items-center space-x-6">
             @include('layouts.Components.site-main-menu')

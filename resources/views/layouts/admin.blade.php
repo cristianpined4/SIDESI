@@ -23,6 +23,7 @@
           <img src="{{ asset('images/logosidesii.png') }}" alt="SIDESI" class="h-10 w-auto object-contain"
             loading="lazy" />
         </a>
+        <div class="border-l border-black h-10 mx-0"></div>
 
         <div class="leading-tight">
           <h1 class="text-base sm:text-lg font-semibold text-slate-800">
