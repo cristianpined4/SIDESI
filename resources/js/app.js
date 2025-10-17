@@ -106,7 +106,7 @@ window.openModal = openModal;
 
 const closeModal = (modal) => {
     modal.style.display = "none";
-    clearForm(modal);
+    //clearForm(modal);
 };
 
 window.closeModal = closeModal;

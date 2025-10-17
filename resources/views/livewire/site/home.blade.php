@@ -39,8 +39,8 @@
             <div class="grid lg:grid-cols-2 gap-12 items-center">
                 <div class="space-y-8">
                     <div class="space-y-4">
-                        <h1 class="text-4xl lg:text-6xl font-bold text-balance leading-tight">Sistema de Desarrollo de
-                            <span class="text-primary">Estudiantes de Ingeniería</span>
+                        <h1 class="text-4xl lg:text-6xl font-bold text-balance leading-tight">Sección de Ingeniería de
+                            <span class="text-primary">Sistemas Informáticos</span>
                         </h1>
                         <p class="text-xl text-muted-foreground text-pretty leading-relaxed">Plataforma integral para la
                             gestión
