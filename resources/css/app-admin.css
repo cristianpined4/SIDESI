@@ -363,3 +363,108 @@ select:focus {
 .loading[show="true"] {
   display: flex !important;
 }
+
+
+/* === MENÚ RESPONSIVE PARA PANTALLAS PEQUEÑAS === */
+@media (max-width: 768px) {
+  .admin-nav {
+    position: fixed !important;
+    top: 60px; /* deja visible el header completo */
+    left: 0;
+    width: 240px;
+    max-height: calc(100vh - 60px); /* evita que se salga del viewport */
+    background: linear-gradient(180deg, #f9fbfd 0%, #e3f2fd 100%);
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.15);
+    border-right: 1px solid #dbe3ec;
+    overflow-y: auto;
+    transform: translateX(-110%);
+    transition: transform 0.3s ease-in-out;
+    z-index: 9999;
+  }
+
+  .admin-nav.menu-open {
+    transform: translateX(0);
+  }
+
+  .admin-nav ul,
+  .admin-nav {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+
+  .admin-nav a,
+  .admin-nav button {
+    width: 100%;
+    text-align: left;
+    display: block;
+    color: #334155;
+    border-radius: 6px;
+    transition: background 0.2s ease;
+  }
+
+  .admin-nav a:hover {
+    background: rgba(37, 99, 235, 0.08);
+  }
+
+  /* Asegurar que Dashboard se vea primero */
+  .admin-nav > *:first-child,
+  .admin-nav ul > *:first-child {
+    margin-top: 0 !important;
+  }
+
+  /* Fondo oscuro detrás del menú */
+  #menu-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    display: none;
+    z-index: 9998;
+    transition: opacity 0.3s ease;
+  }
+
+  #menu-overlay.show {
+    display: block;
+  }
+
+  /* Header compacto */
+  header .leading-tight {
+    display: none !important;
+  }
+
+  header .w-full {
+    padding-right: 3rem;
+  }
+
+  header .flex.items-center.gap-3 {
+    align-items: center;
+  }
+
+  header {
+    position: relative;
+    z-index: 10000;
+  }
+
+  .menu-toggle {
+      position: absolute;
+      top: 14px;
+      right: 16px;
+      background: none;
+      border: none;
+      font-size: 1.9rem;
+      color: #1e293b;
+      cursor: pointer;
+      z-index: 10000;
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s ease;
+    }
+
+  .menu-toggle:active {
+    transform: scale(0.9);
+  }
+}
+/* === FIN MENÚ RESPONSIVE PARA PANTALLAS PEQUEÑAS === */
+
