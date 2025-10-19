@@ -27,12 +27,16 @@ class DocumentosController extends Component
 
     public function render()
     {
-        $query = Documentos::query();
+        $query = Documentos::query()
+            ->where('visibility', 'publico')
+            ->where('is_valid', true);
 
         if (!empty($this->search)) {
-            foreach ((new Documentos())->getFillable() as $field) {
-                $query->orWhere($field, 'like', '%' . $this->search . '%');
-            }
+            $s = trim($this->search);
+            $query->where(function ($q) use ($s) {
+                $q->where('name', 'like', "%$s%")
+                  ->orWhere('description', 'like', "%$s%");
+            });
         }
 
         $records = $query->orderBy('id', 'desc')->paginate($this->paginate);

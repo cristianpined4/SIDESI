@@ -74,29 +74,27 @@
             </div>
         </div>
 
-        <!-- Título de Sección -->
+        <!-- Listado de Documentos Públicos -->
         <div class="mb-8">
+            @if ($records->count() > 0)
             <section class="contenedor-tarjetas">
+                @foreach ($records as $doc)
                 <div class="tarjeta-documento">
                     <div class="icono-pdf">📄</div>
-                    <h3 class="titulo-doc">Manual de Usuario</h3>
-                    <p class="descripcion-doc">Documento con instrucciones básicas de uso.</p>
+                    <h3 class="titulo-doc" title="{{ $doc->name }}">{{ \Illuminate\Support\Str::limit($doc->name, 80) }}</h3>
+                    <p class="descripcion-doc" title="{{ $doc->description }}">{{ \Illuminate\Support\Str::limit($doc->description, 120) }}</p>
                     <div class="botones">
-                        <a class="boton ver" href="docs/manual_usuario.pdf" target="_blank">Ver</a>
-                        <a class="boton descargar" href="docs/manual_usuario.pdf" download>Descargar</a>
+                        <a class="boton ver" href="{{ asset($doc->path) }}" target="_blank" rel="noopener noreferrer">Ver</a>
+                        <a class="boton descargar" href="{{ asset($doc->path) }}" download>Descargar</a>
                     </div>
                 </div>
-
-                <div class="tarjeta-documento">
-                    <div class="icono-pdf">📄</div>
-                    <h3 class="titulo-doc">Informe Técnico</h3>
-                    <p class="descripcion-doc">Resumen del rendimiento del sistema.</p>
-                    <div class="botones">
-                        <a class="boton ver" href="docs/informe_tecnico.pdf" target="_blank">Ver</a>
-                        <a class="boton descargar" href="docs/informe_tecnico.pdf" download>Descargar</a>
-                    </div>
-                </div>
+                @endforeach
             </section>
+            @else
+            <div class="text-center text-gray-600 py-10">
+                No se encontraron documentos públicos.
+            </div>
+            @endif
         </div>
 
         @if (count($records) > 0)
