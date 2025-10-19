@@ -10,7 +10,9 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Eventos;
 use App\Models\SessionesEvento;
+use App\Models\InscripcionesEvento;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 
 class EventosController extends Component
 {
@@ -21,6 +23,8 @@ class EventosController extends Component
     public $records_event;
     public $records_sesion;
     public $records_ponente;
+    public $is_registered;
+    public $pendiente;
     public $fields = [];   // inputs normales
     public $file;          // archivo temporal
     public $search = '';
@@ -61,7 +65,7 @@ class EventosController extends Component
 
     public function cerrarModal($idModal = 'modal-home')
     {
-        $this->resetUI();
+        //$this->resetUI();
         $this->dispatch("cerrar-modal", ['modal' => $idModal]);
     }
 
@@ -163,7 +167,7 @@ class EventosController extends Component
 
     public function sesiones($id)
     {
-
+        // $this->resetUI();
         $query = SessionesEvento::query()
             ->where('evento_id', $id)
             ->with('ponente')
@@ -203,6 +207,19 @@ class EventosController extends Component
         //     $this->fields['end_time'] = $evento->end_time;
         // }
 
+        //verificar si esta inscrito el usuario
+        if (Auth::check()) {
+            $inscripcion = InscripcionesEvento::where('evento_id', $id)
+                ->where('user_id', Auth::id())
+                ->first();
+
+            // Detectar si el usuario está inscrito
+            $this->is_registered = (bool) $inscripcion;
+
+            // Detectar si la inscripción está pendiente (solo si existe)
+            $this->pendiente = $inscripcion && $inscripcion->status === 'pendiente';
+        }
+
         $this->abrirModal('event-modal', false);
     }
 
@@ -218,6 +235,100 @@ class EventosController extends Component
         $this->records_ponente = $ponente;
 
         $this->abrirModal('sesion-modal', false);
+    }
+
+    public function inscribir($idEvento){
+        $user = Auth::user();
+
+        if (!$user) {
+            $this->dispatch('message-error', 'Debes iniciar sesión para cancelar una inscripción.');
+            return;
+        }
+        
+        $this->cerrarModal('event-modal');
+        $this->dispatch('confirmar-inscripcion', idEvento: $idEvento);
+    }
+
+    protected $listeners = ['Confirmarinscribir', 'confirmarCancelacionFinal'];
+
+    public function Confirmarinscribir($idEvento)
+    {
+        $user = Auth::user();
+        $inscripcion = InscripcionesEvento::where('user_id', $user->id)
+                                        ->where('evento_id', $idEvento)
+                                        ->first();
+
+        if ($inscripcion) {
+            $this->dispatch('confirmar-cancelacion', $idEvento);
+            return;
+        }
+
+        try {
+            DB::beginTransaction();
+
+            $evento = Eventos::findOrFail($idEvento);
+            $item = new InscripcionesEvento();
+            $item->user_id = $user->id;
+            $item->evento_id = $idEvento;
+            if ($evento->is_paid === true) {
+                $item->status = 'pendiente';
+            }
+            $item->save();
+
+            DB::commit();
+
+            $this->cerrarModal('event-modal');
+            $this->dispatch('inscripcion-message', $idEvento, 'Inscripción exitosa');
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            $this->dispatch('message-error', 'Error al inscribirse: ' . $th->getMessage());
+        }
+    }
+
+    public function cancelarInscripcion($idEvento)
+    {
+        $user = Auth::user();
+        if (!$user) {
+            $this->dispatch('message-error', 'Debes iniciar sesión para cancelar una inscripción.');
+            return;
+        }
+        
+        $inscripcion = InscripcionesEvento::where('user_id', $user->id)
+        ->where('evento_id', $idEvento)
+        ->first();
+        
+        if (!$inscripcion) {
+            $this->dispatch('message-error', 'No tienes una inscripción activa en este evento.');
+            return;
+        }
+        $this->cerrarModal('event-modal');
+        $this->dispatch('confirmar-cancelacion', idEvento: $idEvento);
+    }
+
+    public function confirmarCancelacionFinal($idEvento)
+    {
+        try {
+            DB::beginTransaction();
+
+            $user = Auth::user();
+
+            $inscripcion = InscripcionesEvento::where('user_id', $user->id)
+                ->where('evento_id', $idEvento)
+                ->first();
+
+            if ($inscripcion) {
+                $inscripcion->delete();
+                DB::commit();
+                $this->is_registered = false;
+                $this->dispatch('inscripcion-message', $idEvento, 'Cancelacion exitosa');
+            } else {
+                $this->dispatch('message-error', 'No se encontró la inscripción.');
+            }
+
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            $this->dispatch('message-error', 'Error al cancelar inscripción: ' . $th->getMessage());
+        }
     }
 
      #[On("delete")]
@@ -248,6 +359,7 @@ class EventosController extends Component
         $this->records_event = collect();
         $this->records_sesion = collect();
         $this->records_ponente = collect();
+        $this->is_registered = false;
         $this->fields = [];
         $this->file = null;
         $this->resetErrorBag();
