@@ -37,6 +37,7 @@
             </div>
         </div>
     </div>
+    <!-- Modal para hola 123 -->
 
     <!-- Modal para Detalles del Evento -->
     <div id="event-modal" class="news-modal modal" wire:ignore.self>
@@ -74,7 +75,6 @@
                 </div>
 
                 @auth
-<<<<<<< Updated upstream
                     {{-- filtro para saber si esta activo o si estan permitidas las inscripciones --}}
                     @if($records_event?->is_active && $records_event?->inscriptions_enabled)
                         {{-- ¿el usuario esta inscrito en el evento? --}}
@@ -100,29 +100,6 @@
                             </button>
                         @endif
                     @endif
-=======
-                @if ($is_registered)
-                @if ($pendiente)
-                <button type="button"
-                    class="btn bg-yellow-500 text-white px-4 py-2 rounded-md cursor-not-allowed opacity-75"
-                    wire:click="cancelarInscripcion({{ $records_event?->id }})">
-                    Inscripción pendiente (Cancelar)
-                </button>
-                @else
-                <button type="button"
-                    class="btn bg-gray-400 text-white px-4 py-2 rounded-md hover:bg-gray-500"
-                    wire:click="cancelarInscripcion({{ $records_event?->id }})">
-                    Ya inscrito (Cancelar)
-                </button>
-                @endif
-                @else
-                <button type="button"
-                    class="btn bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md"
-                    wire:click="inscribir({{ $records_event?->id }})">
-                    Inscribirse
-                </button>
-                @endif
->>>>>>> Stashed changes
                 @endauth
 
                 <h2 class="modal-title">Sesiones</h2>
