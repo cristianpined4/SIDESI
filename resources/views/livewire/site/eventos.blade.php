@@ -3,7 +3,10 @@
 
 
 <main>
-    
+    <div class="loading" wire:loading.attr="show" show="false">
+        <div class="loader"></div>
+        <p class="loading-text">Cargando...</p>
+    </div>
     <!-- modales -->
     <div id="modal-home" class="modal" wire:ignore.self>
         <div class="modal-dialog">
@@ -69,8 +72,9 @@
                     <p><strong>Email:</strong> <span>{{ $records_event?->contact_email }}</span></p>
                     <p><strong>Telefono:</strong> <span>{{ $records_event?->contact_phone }}</span></p>
                 </div>
-                
+
                 @auth
+<<<<<<< Updated upstream
                     {{-- filtro para saber si esta activo o si estan permitidas las inscripciones --}}
                     @if($records_event?->is_active && $records_event?->inscriptions_enabled)
                         {{-- ¿el usuario esta inscrito en el evento? --}}
@@ -96,26 +100,49 @@
                             </button>
                         @endif
                     @endif
+=======
+                @if ($is_registered)
+                @if ($pendiente)
+                <button type="button"
+                    class="btn bg-yellow-500 text-white px-4 py-2 rounded-md cursor-not-allowed opacity-75"
+                    wire:click="cancelarInscripcion({{ $records_event?->id }})">
+                    Inscripción pendiente (Cancelar)
+                </button>
+                @else
+                <button type="button"
+                    class="btn bg-gray-400 text-white px-4 py-2 rounded-md hover:bg-gray-500"
+                    wire:click="cancelarInscripcion({{ $records_event?->id }})">
+                    Ya inscrito (Cancelar)
+                </button>
+                @endif
+                @else
+                <button type="button"
+                    class="btn bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md"
+                    wire:click="inscribir({{ $records_event?->id }})">
+                    Inscribirse
+                </button>
+                @endif
+>>>>>>> Stashed changes
                 @endauth
 
                 <h2 class="modal-title">Sesiones</h2>
-                
+
                 <div class="container mx-auto px-4 py-12">
                     @if ($records_sesiones && $records_sesiones->count() > 0)
-                        <div class="grid md:grid-cols-2 lg:grid-cols-2 gap-8">
-                            @foreach($records_sesiones as $sesion)
-                                {{-- Cards de sesiones --}}
-                                <div class="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300 cursor-pointer group"
-                                    wire:click="sesion({{$sesion->id}})">
-                                    <!-- Imagen -->
-                                    <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&h=500&fit=crop"
-                                        alt="{{ $sesion->title }}"
-                                        class="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105">
+                    <div class="grid md:grid-cols-2 lg:grid-cols-2 gap-8">
+                        @foreach($records_sesiones as $sesion)
+                        {{-- Cards de sesiones --}}
+                        <div class="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300 cursor-pointer group"
+                            wire:click="sesion({{$sesion->id}})">
+                            <!-- Imagen -->
+                            <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&h=500&fit=crop"
+                                alt="{{ $sesion->title }}"
+                                class="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105">
 
-                                    <!-- Contenido -->
-                                    <div class="p-6 flex flex-col gap-3">
-                                        <div class="flex justify-between items-center">
-                                            <span class="
+                            <!-- Contenido -->
+                            <div class="p-6 flex flex-col gap-3">
+                                <div class="flex justify-between items-center">
+                                    <span class="
                                                 px-2 py-1 rounded text-sm font-medium
                                                 {{ $sesion->mode === 'taller' ? 'bg-blue-100 text-blue-600' : 
                                                 ($sesion->mode === 'ponencia' ? 'bg-green-100 text-green-600' : 
@@ -123,47 +150,47 @@
                                                 ($sesion->mode === 'otro' ? 'bg-yellow-100 text-yellow-600' : 
                                                 'bg-gray-100 text-gray-600'))) }}
                                             ">
-                                                {{ ucfirst($sesion->mode ?? 'Desconocido') }}
-                                            </span>
-                                            <span class="text-gray-500 text-sm">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="inline-block w-4 h-4 mr-1" fill="none"
-                                                    viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M8 7V3m8 4V3m-9 8h10m-11 6h12a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                                                </svg>
-                                                {{ \Carbon\Carbon::parse($sesion->start_time)->format('d/m/Y H:i') }}
-                                            </span>
-                                        </div>
-
-                                        <h3 class="text-lg font-semibold text-gray-800 group-hover:text-blue-600 transition-colors">
-                                            {{ $sesion->title }} 
-                                        </h3>
-                                        <p class="text-gray-600 text-sm line-clamp-2">
-                                            {{ $sesion->description }}
-                                        </p>
-
-                                        <div class="flex items-center justify-between text-sm text-gray-500 mt-2">
-                                            <span class="flex items-center gap-1">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" viewBox="0 0 24 24"
-                                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                                    stroke-linejoin="round">
-                                                    <path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 1118 0z" />
-                                                    <circle cx="12" cy="10" r="3" />
-                                                </svg>
-                                                {{ $sesion->location ?: 'Por definir' }}
-                                            </span>
-                                        </div>
-                                    </div>
+                                        {{ ucfirst($sesion->mode ?? 'Desconocido') }}
+                                    </span>
+                                    <span class="text-gray-500 text-sm">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="inline-block w-4 h-4 mr-1" fill="none"
+                                            viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M8 7V3m8 4V3m-9 8h10m-11 6h12a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                        </svg>
+                                        {{ \Carbon\Carbon::parse($sesion->start_time)->format('d/m/Y H:i') }}
+                                    </span>
                                 </div>
-                                {{-- Fin cards de sesiones --}}
-                            @endforeach
+
+                                <h3 class="text-lg font-semibold text-gray-800 group-hover:text-blue-600 transition-colors">
+                                    {{ $sesion->title }}
+                                </h3>
+                                <p class="text-gray-600 text-sm line-clamp-2">
+                                    {{ $sesion->description }}
+                                </p>
+
+                                <div class="flex items-center justify-between text-sm text-gray-500 mt-2">
+                                    <span class="flex items-center gap-1">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" viewBox="0 0 24 24"
+                                            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                            stroke-linejoin="round">
+                                            <path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 1118 0z" />
+                                            <circle cx="12" cy="10" r="3" />
+                                        </svg>
+                                        {{ $sesion->location ?: 'Por definir' }}
+                                    </span>
+                                </div>
+                            </div>
                         </div>
+                        {{-- Fin cards de sesiones --}}
+                        @endforeach
+                    </div>
                     @else
-                        <!-- Si no hay sesiones -->
-                        <div class="text-center py-16">
-                            <h3 class="text-xl font-semibold mb-2">No hay sesiones disponibles</h3>
-                            <p class="text-gray-500">Vuelve más tarde.</p>
-                        </div>
+                    <!-- Si no hay sesiones -->
+                    <div class="text-center py-16">
+                        <h3 class="text-xl font-semibold mb-2">No hay sesiones disponibles</h3>
+                        <p class="text-gray-500">Vuelve más tarde.</p>
+                    </div>
                     @endif
                 </div>
 
@@ -317,13 +344,12 @@
                 </button>
             </div>
         </div>
-
-        <!-- Título de Sección -->
-        <div class="mb-8">
-            <h2 class="text-3xl font-bold text-gray-800">Todos los Eventos</h2>
-        </div>
         <!-- Grid de Cards -->
         <div class="container mx-auto px-4 py-12">
+            <!-- Título de Sección -->
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-gray-800 ">Todos los Eventos</h2>
+            </div>
             @if(count($records) > 0)
             <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                 @foreach($records as $event)
@@ -354,7 +380,7 @@
                         </div>
 
                         <h3 class="text-lg font-semibold text-gray-800 group-hover:text-blue-600 transition-colors">
-                            {{ $event->title }} 
+                            {{ $event->title }}
                         </h3>
                         <p class="text-gray-600 text-sm line-clamp-2">
                             {{ $event->description }}
@@ -401,81 +427,91 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
-    document.addEventListener('livewire:initialized', function () {
-            Livewire.on('cerrar-modal', function (modal) {
-                let modalElement = document.getElementById(modal[0].modal);
-                if (modalElement) {
-                    closeModal(modalElement);
-                }
-            });
+    document.addEventListener('livewire:initialized', function() {
+        Livewire.on('cerrar-modal', function(modal) {
+            let modalElement = document.getElementById(modal[0].modal);
+            if (modalElement) {
+                closeModal(modalElement);
+            }
+        });
 
-            Livewire.on('abrir-modal', function (modal) {
-                let modalElement = document.getElementById(modal[0].modal);
-                if (modalElement) {
-                    openModal(modalElement);
-                }
-            });
+        Livewire.on('abrir-modal', function(modal) {
+            let modalElement = document.getElementById(modal[0].modal);
+            if (modalElement) {
+                openModal(modalElement);
+            }
+        });
 
-            Livewire.on('inscripcion-message', (data) => {
-                
-                const idEvento = data[0];
-                const message = data[1];
-                
-                console.log('ID:', idEvento, 'Mensaje:', message); 
-                
-                Swal.fire('Éxito', message, 'success').then(() => {
-                    @this.call('sesiones', idEvento);
-                });
-            });
+        Livewire.on('inscripcion-message', (data) => {
 
-            Livewire.on('confirmar-cancelacion', ({ idEvento }) => {
-                Swal.fire({
-                    title: '¿Cancelar inscripción?',
-                    text: '¿Está seguro que desea cancelar su inscripción a este evento?',
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonText: 'Sí, cancelar',
-                    cancelButtonText: 'No, mantener',
-                    customClass: {
-                        container: 'swal2-container z-[9999]'
-                    }
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        Livewire.dispatch('confirmarCancelacionFinal', { idEvento });
-                    } else{
-                        @this.call('sesiones', idEvento);
-                    }
-                });
-            });
+            const idEvento = data[0];
+            const message = data[1];
 
-            Livewire.on('confirmar-inscripcion', ({ idEvento }) => {
-                Swal.fire({
-                    title: 'confirmar inscripción?',
-                    text: '¿Está seguro que desea confirmar su inscripción a este evento?',
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonText: 'Sí',
-                    cancelButtonText: 'No',
-                    customClass: {
-                        container: 'swal2-container z-[9999]'
-                    }
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        Livewire.dispatch('Confirmarinscribir', { idEvento });
-                    }
-                });
+            console.log('ID:', idEvento, 'Mensaje:', message);
+
+            Swal.fire('Éxito', message, 'success').then(() => {
+                @this.call('sesiones', idEvento);
             });
         });
 
-        const confirmarEliminar = async id => {
-            if (await window.Confirm(
+        Livewire.on('confirmar-cancelacion', ({
+            idEvento
+        }) => {
+            Swal.fire({
+                title: '¿Cancelar inscripción?',
+                text: '¿Está seguro que desea cancelar su inscripción a este evento?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Sí, cancelar',
+                cancelButtonText: 'No, mantener',
+                customClass: {
+                    container: 'swal2-container z-[9999]'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Livewire.dispatch('confirmarCancelacionFinal', {
+                        idEvento
+                    });
+                } else {
+                    @this.call('sesiones', idEvento);
+                }
+            });
+        });
+
+        Livewire.on('confirmar-inscripcion', ({
+            idEvento
+        }) => {
+            Swal.fire({
+                title: '¿Confirmar inscripción?',
+                text: '¿Está seguro que desea confirmar su inscripción a este evento?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Sí',
+                cancelButtonText: 'No',
+                customClass: {
+                    container: 'swal2-container z-[9999]'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Livewire.dispatch('Confirmarinscribir', {
+                        idEvento
+                    });
+                }
+            });
+        });
+    });
+
+    const confirmarEliminar = async id => {
+        if (await window.Confirm(
                 'Eliminar',
                 '¿Estas seguro de eliminar este Eventos?',
                 'warning',
                 'Si, eliminar',
                 'Cancelar'
             )) {
-                Livewire.dispatch('delete', { id });
-            }
+            Livewire.dispatch('delete', {
+                id
+            });
         }
+    }
 </script>
