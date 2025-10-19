@@ -31,6 +31,159 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal para Detalles del Evento -->
+    <div id="event-modal" class="news-modal modal" wire:ignore.self>
+        <div class="modal-content">
+            <div class="modal-header">
+                <img id="event-image" src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&h=500&fit=crop" alt="Evento" class="modal-image">
+                <button class="modal-close" onclick="closeModal(this.closest('.modal'))">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-meta">
+                    <span
+                        class="inline-block text-xs font-semibold px-3 py-1 rounded-full 
+                        {{ $records_event?->mode === 'virtual' ? 'bg-blue-100 text-blue-600' : ($records_event?->mode === 'presencial' ? 'bg-green-100 text-green-600' : 'bg-purple-100 text-purple-600') }}">
+                        {{ ucfirst($records_event?->mode ?? 'Desconocido') }}
+                    </span>
+                    <span class="text-gray-500 text-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="inline-block w-4 h-4 mr-1" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M8 7V3m8 4V3m-9 8h10m-11 6h12a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                        {{ \Carbon\Carbon::parse($records_event?->start_time)->format('d/m/Y H:i') }}
+                    </span>
+                </div>
+
+                <h2 class="modal-title">{{ $records_event?->title }}</h2>
+                <p id="event-description" class="modal-description"></p>
+
+                <div class="modal-details">
+                    <p><strong>Ubicación:</strong>{{ $records_event?->location }}<span></span></p>
+                    <p><strong>Inicio:</strong> <span>{{ \Carbon\Carbon::parse($records_event?->start_time)->format('d/m/Y H:i') }}</span></p>
+                    <p><strong>Fin:</strong> <span>{{ \Carbon\Carbon::parse($records_event?->end_time)->format('d/m/Y H:i') }}</span></p>
+                    <p><strong>Email:</strong> <span>{{ $records_event?->contact_email }}</span></p>
+                    <p><strong>Telefono:</strong> <span>{{ $records_event?->contact_phone }}</span></p>
+                </div>
+
+                <h2 class="modal-title">Sesiones</h2>
+                
+                <div class="container mx-auto px-4 py-12">
+                    @if ($records_sesiones && $records_sesiones->count() > 0)
+                        <div class="grid md:grid-cols-2 lg:grid-cols-2 gap-8">
+                            @foreach($records_sesiones as $sesion)
+                                {{-- Cards de sesiones --}}
+                                <div class="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300 cursor-pointer group"
+                                    wire:click="sesion({{$sesion->id}})">
+                                    <!-- Imagen -->
+                                    <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&h=500&fit=crop"
+                                        alt="{{ $sesion->title }}"
+                                        class="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105">
+
+                                    <!-- Contenido -->
+                                    <div class="p-6 flex flex-col gap-3">
+                                        <div class="flex justify-between items-center">
+                                            <span class="
+                                                px-2 py-1 rounded text-sm font-medium
+                                                {{ $sesion->mode === 'taller' ? 'bg-blue-100 text-blue-600' : 
+                                                ($sesion->mode === 'ponencia' ? 'bg-green-100 text-green-600' : 
+                                                ($sesion->mode === 'panel' ? 'bg-purple-100 text-purple-600' : 
+                                                ($sesion->mode === 'otro' ? 'bg-yellow-100 text-yellow-600' : 
+                                                'bg-gray-100 text-gray-600'))) }}
+                                            ">
+                                                {{ ucfirst($sesion->mode ?? 'Desconocido') }}
+                                            </span>
+                                            <span class="text-gray-500 text-sm">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="inline-block w-4 h-4 mr-1" fill="none"
+                                                    viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M8 7V3m8 4V3m-9 8h10m-11 6h12a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                                </svg>
+                                                {{ \Carbon\Carbon::parse($sesion->start_time)->format('d/m/Y H:i') }}
+                                            </span>
+                                        </div>
+
+                                        <h3 class="text-lg font-semibold text-gray-800 group-hover:text-blue-600 transition-colors">
+                                            {{ $sesion->title }} 
+                                        </h3>
+                                        <p class="text-gray-600 text-sm line-clamp-2">
+                                            {{ $sesion->description }}
+                                        </p>
+
+                                        <div class="flex items-center justify-between text-sm text-gray-500 mt-2">
+                                            <span class="flex items-center gap-1">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" viewBox="0 0 24 24"
+                                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                                    stroke-linejoin="round">
+                                                    <path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 1118 0z" />
+                                                    <circle cx="12" cy="10" r="3" />
+                                                </svg>
+                                                {{ $sesion->location ?: 'Por definir' }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                {{-- Fin cards de sesiones --}}
+                            @endforeach
+                        </div>
+                    @else
+                        <!-- Si no hay sesiones -->
+                        <div class="text-center py-16">
+                            <h3 class="text-xl font-semibold mb-2">No hay sesiones disponibles</h3>
+                            <p class="text-gray-500">Vuelve más tarde.</p>
+                        </div>
+                    @endif
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <!-- Fin Modal para Detalles del Evento -->
+
+    <!-- Modal para Detalles de la Sesion -->
+    <div id="sesion-modal" class="news-modal modal" wire:ignore.self>
+        <div class="modal-content">
+            <div class="modal-header">
+                <img id="event-image" src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&h=500&fit=crop" alt="sesion" class="modal-image">
+                <button class="modal-close" onclick="closeModal(this.closest('.modal'))">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-meta">
+                    <span class="
+                        px-2 py-1 rounded text-sm font-medium
+                        {{ $records_sesion?->mode === 'taller' ? 'bg-blue-100 text-blue-600' : 
+                        ($records_sesion?->mode === 'ponencia' ? 'bg-green-100 text-green-600' : 
+                        ($records_sesion?->mode === 'panel' ? 'bg-purple-100 text-purple-600' : 
+                        ($records_sesion?->mode === 'otro' ? 'bg-yellow-100 text-yellow-600' : 
+                        'bg-gray-100 text-gray-600'))) }}
+                    ">
+                        {{ ucfirst($records_sesion->mode ?? 'Desconocido') }}
+                    </span>
+                    <span class="text-gray-500 text-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="inline-block w-4 h-4 mr-1" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M8 7V3m8 4V3m-9 8h10m-11 6h12a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                        {{ \Carbon\Carbon::parse($records_sesion?->start_time)->format('d/m/Y H:i') }}
+                    </span>
+                </div>
+
+                <h2 class="modal-title">{{ $records_sesion?->title }}</h2>
+                <p id="event-description" class="modal-description"></p>
+
+                <div class="modal-details">
+                    <p><strong>Ubicación:</strong>{{ $records_sesion?->location }}<span></span></p>
+                    <p><strong>Inicio:</strong> <span>{{ \Carbon\Carbon::parse($records_sesion?->start_time)->format('d/m/Y H:i') }}</span></p>
+                    <p><strong>Fin:</strong> <span>{{ \Carbon\Carbon::parse($records_sesion?->end_time)->format('d/m/Y H:i') }}</span></p>
+                    <p><strong>Ponente:</strong> <span>{{ $records_ponente?->name }}</span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Fin Modal para Detalles del Evento -->
+
     <!-- fin modales -->
 
     <!-- Contenido - inicio -->
@@ -138,6 +291,78 @@
         <div class="mb-8">
             <h2 class="text-3xl font-bold text-gray-800">Todos los Eventos</h2>
         </div>
+        <!-- Grid de Cards -->
+        <div class="container mx-auto px-4 py-12">
+            @if(count($records) > 0)
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                @foreach($records as $event)
+                <div class="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300 cursor-pointer group"
+                    wire:click="sesiones({{ $event->id }})">
+
+                    <!-- Imagen -->
+                    <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&h=500&fit=crop"
+                        alt="{{ $event->title }}"
+                        class="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105">
+
+                    <!-- Contenido -->
+                    <div class="p-6 flex flex-col gap-3">
+                        <div class="flex justify-between items-center">
+                            <span
+                                class="inline-block text-xs font-semibold px-3 py-1 rounded-full 
+                                {{ $event->mode === 'virtual' ? 'bg-blue-100 text-blue-600' : ($event->mode === 'presencial' ? 'bg-green-100 text-green-600' : 'bg-purple-100 text-purple-600') }}">
+                                {{ ucfirst($event->mode ?? 'Desconocido') }}
+                            </span>
+                            <span class="text-gray-500 text-sm">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="inline-block w-4 h-4 mr-1" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M8 7V3m8 4V3m-9 8h10m-11 6h12a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                </svg>
+                                {{ \Carbon\Carbon::parse($event->start_time)->format('d/m/Y H:i') }}
+                            </span>
+                        </div>
+
+                        <h3 class="text-lg font-semibold text-gray-800 group-hover:text-blue-600 transition-colors">
+                            {{ $event->title }} 
+                        </h3>
+                        <p class="text-gray-600 text-sm line-clamp-2">
+                            {{ $event->description }}
+                        </p>
+
+                        <div class="flex items-center justify-between text-sm text-gray-500 mt-2">
+                            <span class="flex items-center gap-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 1118 0z" />
+                                    <circle cx="12" cy="10" r="3" />
+                                </svg>
+                                {{ $event->location ?: 'Por definir' }}
+                            </span>
+                            @if($event->is_paid)
+                            <span class="text-blue-600 font-medium">${{ number_format($event->price, 2) }}</span>
+                            @else
+                            <span class="text-green-600 font-medium">Gratis</span>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+                @endforeach
+            </div>
+
+            <!-- Paginación -->
+            <div class="mt-10">
+                {{ $records->links() }}
+            </div>
+
+            @else
+            <!-- Si no hay eventos -->
+            <div class="text-center py-16">
+                <h3 class="text-xl font-semibold mb-2">No hay eventos disponibles</h3>
+                <p class="text-gray-500">Intenta cambiar los filtros o vuelve más tarde.</p>
+            </div>
+            @endif
+        </div>
     </div>
     <!-- Contenido - fin -->
 </main>
@@ -170,4 +395,21 @@
                 Livewire.dispatch('delete', { id });
             }
         }
+</script>
+
+<script>
+function openEventModal(event) {
+    document.getElementById('event-title').textContent = event.title;
+    document.getElementById('event-description').textContent = event.description;
+    document.getElementById('event-location').textContent = event.location || 'Por definir';
+    document.getElementById('event-start').textContent = event.start_time;
+    document.getElementById('event-end').textContent = event.end_time;
+    document.getElementById('event-contact').textContent = `${event.contact_email || ''} ${event.contact_phone || ''}`;
+    document.getElementById('event-mode').textContent = event.mode ? event.mode.toUpperCase() : 'SIN MODALIDAD';
+    document.getElementById('event-date').textContent = `📅 ${event.start_time}`;
+    document.getElementById('event-image').src =
+        "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&h=500&fit=crop";
+    document.getElementById('event-modal').classList.add('show');
+    document.body.style.overflow = 'hidden';
+}
 </script>
