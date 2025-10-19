@@ -1,6 +1,9 @@
 @section('title', "Eventos")
 
+
+
 <main>
+    
     <!-- modales -->
     <div id="modal-home" class="modal" wire:ignore.self>
         <div class="modal-dialog">
@@ -66,6 +69,30 @@
                     <p><strong>Email:</strong> <span>{{ $records_event?->contact_email }}</span></p>
                     <p><strong>Telefono:</strong> <span>{{ $records_event?->contact_phone }}</span></p>
                 </div>
+                
+                @auth
+                    @if ($is_registered)
+                        @if ($pendiente)
+                            <button type="button"
+                                class="btn bg-yellow-500 text-white px-4 py-2 rounded-md cursor-not-allowed opacity-75"
+                                wire:click="cancelarInscripcion({{ $records_event?->id }})">
+                                Inscripción pendiente (Cancelar)
+                            </button>
+                        @else
+                            <button type="button"
+                                class="btn bg-gray-400 text-white px-4 py-2 rounded-md hover:bg-gray-500"
+                                wire:click="cancelarInscripcion({{ $records_event?->id }})">
+                                Ya inscrito (Cancelar)
+                            </button>
+                        @endif
+                    @else
+                        <button type="button"
+                            class="btn bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md"
+                            wire:click="inscribir({{ $records_event?->id }})">
+                            Inscribirse
+                        </button>
+                    @endif
+                @endauth
 
                 <h2 class="modal-title">Sesiones</h2>
                 
@@ -182,7 +209,7 @@
             </div>
         </div>
     </div>
-    <!-- Fin Modal para Detalles del Evento -->
+    <!-- Fin Modal para Detalles de la sesion -->
 
     <!-- fin modales -->
 
@@ -367,6 +394,8 @@
     <!-- Contenido - fin -->
 </main>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
     document.addEventListener('livewire:initialized', function () {
             Livewire.on('cerrar-modal', function (modal) {
@@ -382,6 +411,56 @@
                     openModal(modalElement);
                 }
             });
+
+            Livewire.on('inscripcion-message', (data) => {
+                
+                const idEvento = data[0];
+                const message = data[1];
+                
+                console.log('ID:', idEvento, 'Mensaje:', message); 
+                
+                Swal.fire('Éxito', message, 'success').then(() => {
+                    @this.call('sesiones', idEvento);
+                });
+            });
+
+            Livewire.on('confirmar-cancelacion', ({ idEvento }) => {
+                Swal.fire({
+                    title: '¿Cancelar inscripción?',
+                    text: '¿Está seguro que desea cancelar su inscripción a este evento?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Sí, cancelar',
+                    cancelButtonText: 'No, mantener',
+                    customClass: {
+                        container: 'swal2-container z-[9999]'
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        Livewire.dispatch('confirmarCancelacionFinal', { idEvento });
+                    } else{
+                        @this.call('sesiones', idEvento);
+                    }
+                });
+            });
+
+            Livewire.on('confirmar-inscripcion', ({ idEvento }) => {
+                Swal.fire({
+                    title: 'confirmar inscripción?',
+                    text: '¿Está seguro que desea confirmar su inscripción a este evento?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Sí',
+                    cancelButtonText: 'No',
+                    customClass: {
+                        container: 'swal2-container z-[9999]'
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        Livewire.dispatch('Confirmarinscribir', { idEvento });
+                    }
+                });
+            });
         });
 
         const confirmarEliminar = async id => {
@@ -395,21 +474,4 @@
                 Livewire.dispatch('delete', { id });
             }
         }
-</script>
-
-<script>
-function openEventModal(event) {
-    document.getElementById('event-title').textContent = event.title;
-    document.getElementById('event-description').textContent = event.description;
-    document.getElementById('event-location').textContent = event.location || 'Por definir';
-    document.getElementById('event-start').textContent = event.start_time;
-    document.getElementById('event-end').textContent = event.end_time;
-    document.getElementById('event-contact').textContent = `${event.contact_email || ''} ${event.contact_phone || ''}`;
-    document.getElementById('event-mode').textContent = event.mode ? event.mode.toUpperCase() : 'SIN MODALIDAD';
-    document.getElementById('event-date').textContent = `📅 ${event.start_time}`;
-    document.getElementById('event-image').src =
-        "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&h=500&fit=crop";
-    document.getElementById('event-modal').classList.add('show');
-    document.body.style.overflow = 'hidden';
-}
 </script>
