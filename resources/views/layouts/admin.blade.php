@@ -84,14 +84,62 @@
 
 <script>
   // Cerrar dropdown al hacer clic fuera
-  document.addEventListener('click', function (e) {
+  document.addEventListener('click', function(e) {
     const d = document.getElementById('userDropdown');
     const b = document.getElementById('user-menu-button');
     if (d && b && !b.contains(e.target) && !d.contains(e.target)) d.classList.add('hidden');
   });
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const adminNav = document.querySelector('.admin-nav');
+    const header = document.querySelector('header');
+
+    // Botón hamburguesa
+    const toggleBtn = document.createElement('button');
+    toggleBtn.innerHTML = '☰';
+    toggleBtn.className = 'menu-toggle';
+    header.appendChild(toggleBtn);
+
+    // Overlay oscuro
+    const overlay = document.createElement('div');
+    overlay.id = 'menu-overlay';
+    document.body.appendChild(overlay);
+
+    // Abrir y cerrar menú
+    const openMenu = () => {
+      adminNav.classList.add('menu-open');
+      overlay.classList.add('show');
+      toggleBtn.classList.add('active');
+    };
+    const closeMenu = () => {
+      adminNav.classList.remove('menu-open');
+      overlay.classList.remove('show');
+      toggleBtn.classList.remove('active');
+    };
+    const toggleMenu = () => {
+      if (adminNav.classList.contains('menu-open')) closeMenu();
+      else openMenu();
+    };
+
+    toggleBtn.addEventListener('click', toggleMenu);
+    overlay.addEventListener('click', closeMenu);
+
+    // Responsividad
+    const handleResize = () => {
+      if (window.innerWidth > 768) {
+        toggleBtn.style.display = 'none';
+        adminNav.classList.remove('menu-open');
+        overlay.classList.remove('show');
+        adminNav.removeAttribute('style');
+      } else {
+        toggleBtn.style.display = 'block';
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    handleResize();
+  });
 </script>
-
-
 
 <div class="admin-nav flex-center">
   @include('layouts.Components.admin-main-menu')
