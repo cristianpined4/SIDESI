@@ -36,7 +36,7 @@
                 style="max-height: 64px; width: auto; object-fit: contain;" class="block self-end m-2l-0" />
             </a>
             <div class="border-l border-black h-10 mx-0"></div>
-            <div class="hidden md:block">
+            <div class="block">
               <a href="{{ route('home-site') }}" class="text-xs text-slate-500 hover:text-blue-600 transition">
               </a>
               <a href="{{ url('/') }}" class="flex h-16 items-end leading-none">
@@ -44,12 +44,12 @@
                   style="max-height: 64px; width: auto; object-fit: contain;" class="block self-end m-2l-0" />
               </a>
             </div>
-            <nav class="hidden md:flex items-center space-x-6">
+            <nav class="hidden lg:flex items-center space-x-6">
               @include('layouts.Components.site-main-menu')
             </nav>
           </div>
           <div class="flex items-center space-x-4">
-            <div class="hidden sm:flex items-center space-x-2">
+            <div class="hidden lg:flex items-center space-x-2">
               <div class="relative">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                   stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -75,7 +75,7 @@
               </svg>Acceder</a>
             @else
             <!-- Menú de usuario -->
-            <div class="relative hidden sm:flex" x-data="{ menuVisible: false }">
+            <div class="relative hidden lg:flex" x-data="{ menuVisible: false }">
               <button @click="menuVisible = !menuVisible" class="flex items-center space-x-2 focus:outline-none">
                 <img
                   src="https://images.unsplash.com/photo-1499714608240-22fc6ad53fb2?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
@@ -129,7 +129,7 @@
             </div>
             @endif
             <button data-slot="button"
-              class="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg:not([class*=&#x27;size-&#x27;])]:size-4 shrink-0 [&amp;_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50 h-8 rounded-md gap-1.5 px-3 has-[&gt;svg]:px-2.5 md:hidden"
+              class="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg:not([class*=&#x27;size-&#x27;])]:size-4 shrink-0 [&amp;_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50 h-8 rounded-md gap-1.5 px-3 has-[&gt;svg]:px-2.5 lg:hidden"
               id="mobile-menu-button"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                 class="lucide lucide-menu h-5 w-5">
