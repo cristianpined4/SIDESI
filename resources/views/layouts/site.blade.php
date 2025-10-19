@@ -33,7 +33,7 @@
           <div class="flex items-center space-x-4">
             <a href="{{ url('/') }}" class="flex h-16 items-end leading-none">
               <img src="{{ asset('images/logosidesii.png') }}" alt="Logo SIDESI"
-                style="max-height: 64px; width: auto; object-fit: contain;" class="block self-end m-2l-0" />
+                style="max-height: 64px; width: auto; object-fit: contain;" class="block self-center m-2l-0" />
             </a>
             <div class="border-l border-black h-10 mx-0"></div>
             <div class="block">
@@ -41,7 +41,7 @@
               </a>
               <a href="{{ url('/') }}" class="flex h-16 items-end leading-none">
                 <img src="{{ asset('images/logoues.png') }}" alt="Logo SIDESI"
-                  style="max-height: 64px; width: auto; object-fit: contain;" class="block self-end m-2l-0" />
+                  style="max-height: 64px; width: auto; object-fit: contain;" class="block self-center m-2l-0" />
               </a>
             </div>
             <nav class="hidden lg:flex items-center space-x-6">
