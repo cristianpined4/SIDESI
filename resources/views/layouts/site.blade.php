@@ -40,13 +40,14 @@
               <a href="{{ route('home-site') }}" class="text-xs text-slate-500 hover:text-blue-600 transition">
               </a>
               <a href="{{ url('/') }}" class="flex h-16 items-end leading-none">
-              <img src="{{ asset('images/logoues.png') }}" alt="Logo SIDESI"
-                style="max-height: 64px; width: auto; object-fit: contain;" class="block self-end m-2l-0" />
-            </a>
+                <img src="{{ asset('images/logoues.png') }}" alt="Logo SIDESI"
+                  style="max-height: 64px; width: auto; object-fit: contain;" class="block self-end m-2l-0" />
+              </a>
+            </div>
+            <nav class="hidden md:flex items-center space-x-6">
+              @include('layouts.Components.site-main-menu')
+            </nav>
           </div>
-          <nav class="hidden md:flex items-center space-x-6">
-            @include('layouts.Components.site-main-menu')
-          </nav>
           <div class="flex items-center space-x-4">
             <div class="hidden sm:flex items-center space-x-2">
               <div class="relative">
@@ -223,7 +224,6 @@
             </div>
           </div>
         </div>
-      </div>
     </header>
     @yield('content')
     <footer class="bg-secondary text-secondary-foreground">
