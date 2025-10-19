@@ -9,7 +9,7 @@
     <a href="#">Noticias</a>
   </li>
   <li class="nav-tab">
-    <a href="#">Documentos</a>
+    <a @if(Route::is('admin.documentos')) class="active" @endif href="{{route('admin.documentos')}}">Documentos</a>
   </li>
   <li class="nav-tab">
     <a @if(Route::is('admin.usuarios')) class="active" @endif href="{{route('admin.usuarios')}}">Usuarios</a>
