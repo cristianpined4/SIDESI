@@ -246,7 +246,12 @@ class EventosController extends Component
         }
         
         $this->cerrarModal('event-modal');
-        $this->dispatch('confirmar-inscripcion', idEvento: $idEvento);
+        if($this->records_event->is_paid){
+            $this->dispatch('confirmar-inscripcion', idEvento: $idEvento, title: '¿Confirmar solicitud de inscripción?', text: '¿Está seguro que desea confirmar su solicitud de inscripción a este evento?');
+        }else{
+            $this->dispatch('confirmar-inscripcion', idEvento: $idEvento, title: '¿Confirmar inscripción?', text: '¿Está seguro que desea confirmar su inscripción a este evento?');
+        }
+        
     }
 
     protected $listeners = ['Confirmarinscribir', 'confirmarCancelacionFinal'];
@@ -278,7 +283,11 @@ class EventosController extends Component
             DB::commit();
 
             $this->cerrarModal('event-modal');
-            $this->dispatch('inscripcion-message', $idEvento, 'Inscripción exitosa');
+            if($evento->is_paid){
+                $this->dispatch('inscripcion-message', $idEvento, 'Peticion de Inscripción exitosa');
+            }else{
+                $this->dispatch('inscripcion-message', $idEvento, 'Inscripción exitosa');
+            }
         } catch (\Throwable $th) {
             DB::rollBack();
             $this->dispatch('message-error', 'Error al inscribirse: ' . $th->getMessage());
@@ -302,7 +311,12 @@ class EventosController extends Component
             return;
         }
         $this->cerrarModal('event-modal');
-        $this->dispatch('confirmar-cancelacion', idEvento: $idEvento);
+
+        if($this->records_event->is_paid){
+            $this->dispatch('confirmar-cancelacion', idEvento: $idEvento, title: '¿Cancelar solicitud de inscripción?', text: '¿Está seguro que desea cancelar su solicitud de inscripción a este evento?');
+        }else{
+            $this->dispatch('confirmar-cancelacion', idEvento: $idEvento, title: '¿Cancelar inscripción?', text: '¿Está seguro que desea cancelar su inscripción a este evento?');
+        }
     }
 
     public function confirmarCancelacionFinal($idEvento)

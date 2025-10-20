@@ -37,7 +37,6 @@
             </div>
         </div>
     </div>
-    <!-- Modal para hola 123 -->
 
     <!-- Modal para Detalles del Evento -->
     <div id="event-modal" class="news-modal modal" wire:ignore.self>
@@ -432,11 +431,11 @@
         });
 
         Livewire.on('confirmar-cancelacion', ({
-            idEvento
+            idEvento, title, text
         }) => {
             Swal.fire({
-                title: '¿Cancelar inscripción?',
-                text: '¿Está seguro que desea cancelar su inscripción a este evento?',
+                title: title,
+                text: text,
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonText: 'Sí, cancelar',
@@ -456,11 +455,11 @@
         });
 
         Livewire.on('confirmar-inscripcion', ({
-            idEvento
+            idEvento, title, text
         }) => {
             Swal.fire({
-                title: '¿Confirmar inscripción?',
-                text: '¿Está seguro que desea confirmar su inscripción a este evento?',
+                title: title,
+                text: text,
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonText: 'Sí',
