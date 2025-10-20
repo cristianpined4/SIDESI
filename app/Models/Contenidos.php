@@ -35,7 +35,7 @@ class Contenidos extends Model
     // Imagen principal
     public function getMainImageAttribute()
     {
-        return $this->imagenes()->where('is_main', true)->first()?->url ?? null;
+        return $this->imagenes()->where('is_main', true)->first()?->path ?? null;
     }
 
     // Categoría para frontend
