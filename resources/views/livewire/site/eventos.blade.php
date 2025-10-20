@@ -77,7 +77,7 @@
                     {{-- filtro para saber si esta activo o si estan permitidas las inscripciones --}}
                     @if($records_event?->is_active && $records_event?->inscriptions_enabled)
                         {{-- ¿el usuario esta inscrito en el evento? --}}
-                        @if ($is_registered) 
+                        @if ($is_registered_evento) 
                             @if ($pendiente){{-- si la inscripcion esta pendiente --}}
                                 <button type="button"
                                     class="btn bg-yellow-500 text-white px-4 py-2 rounded-md cursor-not-allowed opacity-75"
@@ -213,6 +213,26 @@
                     <p><strong>Fin:</strong> <span>{{ \Carbon\Carbon::parse($records_sesion?->end_time)->format('d/m/Y H:i') }}</span></p>
                     <p><strong>Ponente:</strong> <span>{{ $records_ponente?->name }}</span></p>
                 </div>
+
+                @auth
+                    {{-- filtro para saber si esta activo o si estan permitidas las inscripciones --}}
+                    @if($is_registered_evento)
+                        {{-- ¿el usuario esta inscrito en la sesion? --}}
+                        @if ($is_registered_sesion) 
+                            <button type="button"
+                                class="btn bg-gray-400 text-white px-4 py-2 rounded-md hover:bg-gray-500"
+                                wire:click="cancelarInscripcionSesion({{ $records_sesion?->id }})">
+                                Ya inscrito (Cancelar)
+                            </button>
+                        @else {{--boton para inscribirse--}}
+                            <button type="button"
+                                class="btn bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md"
+                                wire:click="inscribirSesion({{ $records_sesion?->id }})">
+                                Inscribirse
+                            </button>
+                        @endif
+                    @endif
+                @endauth
             </div>
         </div>
     </div>
@@ -422,16 +442,15 @@
 
             const idEvento = data[0];
             const message = data[1];
-
-            console.log('ID:', idEvento, 'Mensaje:', message);
+            const metodo = data[2];
 
             Swal.fire('Éxito', message, 'success').then(() => {
-                @this.call('sesiones', idEvento);
+                @this.call(metodo, idEvento);
             });
         });
 
         Livewire.on('confirmar-cancelacion', ({
-            idEvento, title, text
+            idEvento, idSesion, title, text, metodoCancelacion, metodo
         }) => {
             Swal.fire({
                 title: title,
@@ -445,17 +464,23 @@
                 }
             }).then((result) => {
                 if (result.isConfirmed) {
-                    Livewire.dispatch('confirmarCancelacionFinal', {
-                        idEvento
-                    });
+                    if (idEvento) {
+                        Livewire.dispatch(metodoCancelacion, { idEvento });
+                    } else if (idSesion) {
+                        Livewire.dispatch(metodoCancelacion, { idSesion });
+                    }
                 } else {
-                    @this.call('sesiones', idEvento);
+                    if (idEvento !== null) {
+                        @this.call(metodo, idEvento);
+                    } else if (idSesion !== null) {
+                        @this.call(metodo, idSesion);  
+                    }
                 }
             });
         });
 
         Livewire.on('confirmar-inscripcion', ({
-            idEvento, title, text
+            idEvento, idSesion, title, text, metodo
         }) => {
             Swal.fire({
                 title: title,
@@ -469,9 +494,11 @@
                 }
             }).then((result) => {
                 if (result.isConfirmed) {
-                    Livewire.dispatch('Confirmarinscribir', {
-                        idEvento
-                    });
+                    if (idEvento !== null) {
+                        Livewire.dispatch(metodo, { idEvento });
+                    } else if (idSesion !== null) {
+                        Livewire.dispatch(metodo, { idSesion });
+                    }
                 }
             });
         });
