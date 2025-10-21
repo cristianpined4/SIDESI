@@ -364,15 +364,21 @@ select:focus {
   display: flex !important;
 }
 
+.loading[show2="true"] {
+  display: grid !important;
+}
+
 
 /* === MENÚ RESPONSIVE PARA PANTALLAS PEQUEÑAS === */
 @media (max-width: 768px) {
   .admin-nav {
     position: fixed !important;
-    top: 60px; /* deja visible el header completo */
+    top: 60px;
+    /* deja visible el header completo */
     left: 0;
     width: 240px;
-    max-height: calc(100vh - 60px); /* evita que se salga del viewport */
+    max-height: calc(100vh - 60px);
+    /* evita que se salga del viewport */
     background: linear-gradient(180deg, #f9fbfd 0%, #e3f2fd 100%);
     box-shadow: 2px 0 8px rgba(0, 0, 0, 0.15);
     border-right: 1px solid #dbe3ec;
@@ -408,8 +414,8 @@ select:focus {
   }
 
   /* Asegurar que Dashboard se vea primero */
-  .admin-nav > *:first-child,
-  .admin-nav ul > *:first-child {
+  .admin-nav>*:first-child,
+  .admin-nav ul>*:first-child {
     margin-top: 0 !important;
   }
 
@@ -446,25 +452,25 @@ select:focus {
   }
 
   .menu-toggle {
-      position: absolute;
-      top: 14px;
-      right: 16px;
-      background: none;
-      border: none;
-      font-size: 1.9rem;
-      color: #1e293b;
-      cursor: pointer;
-      z-index: 10000;
-      line-height: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: transform 0.2s ease;
-    }
+    position: absolute;
+    top: 14px;
+    right: 16px;
+    background: none;
+    border: none;
+    font-size: 1.9rem;
+    color: #1e293b;
+    cursor: pointer;
+    z-index: 10000;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease;
+  }
 
   .menu-toggle:active {
     transform: scale(0.9);
   }
 }
-/* === FIN MENÚ RESPONSIVE PARA PANTALLAS PEQUEÑAS === */
 
+/* === FIN MENÚ RESPONSIVE PARA PANTALLAS PEQUEÑAS === */

@@ -79,12 +79,12 @@ class DocumentosController extends Component
         // Evita colisiones: agrega un sufijo único si ya existe
         $fileName = $baseName . '.' . $extension;
 
-        if (\Storage::disk('documents')->exists($fileName)) {
-        $fileName = $baseName . '-' . uniqid() . '.' . $extension;
+        if (Storage::disk('documents')->exists($fileName)) {
+            $fileName = $baseName . '-' . uniqid() . '.' . $extension;
         }
-        
-        $path = $this->file->storeAs('', $fileName, 'documents'); 
-        $storagePath = 'documents/'.$path;
+
+        $path = $this->file->storeAs('', $fileName, 'documents');
+        $storagePath = 'documents/' . $path;
 
         $item = Documentos::create([
             'user_id' => auth()->id(),
