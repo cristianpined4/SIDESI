@@ -195,7 +195,7 @@
   </div>
 
   {{-- Overlay de carga Livewire --}}
-  <div wire:loading class="fixed inset-0 z-50 grid place-items-center bg-white/80 backdrop-blur-sm"
+  <div wire:loading class="fixed inset-0 z-50 grid place-items-center bg-white/80 backdrop-blur-sm loading2"
     wire:loading.attr="show2" show2="false">
     <div class="flex items-center gap-3 text-zinc-700">
       <svg class="animate-spin h-6 w-6" viewBox="0 0 24 24" fill="none">

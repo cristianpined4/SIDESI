@@ -364,7 +364,7 @@ select:focus {
   display: flex !important;
 }
 
-.loading[show2="true"] {
+.loading2[show2="true"] {
   display: grid !important;
 }
 

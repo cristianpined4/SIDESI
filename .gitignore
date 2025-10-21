@@ -21,6 +21,7 @@
 /storage/app/public/*
 /storage/app/private/*
 /storage/app/images/*
+/storage/app/documents/*
 /storage/*.key
 /storage/pail
 /vendor
