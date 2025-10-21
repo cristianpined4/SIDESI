@@ -6,10 +6,10 @@
     <a @if(Route::is('admin.eventos')) class="active" @endif href="{{route('admin.eventos')}}">Eventos</a>
   </li>
   <li class="nav-tab">
-    <a href="#">Noticias</a>
+    <a @if(Route::is('admin.noticias')) class="active" @endif href="{{route('admin.noticias')}}">Noticias</a>
   </li>
   <li class="nav-tab">
-    <a href="#">Documentos</a>
+    <a @if(Route::is('admin.documentos')) class="active" @endif href="{{route('admin.documentos')}}">Documentos</a>
   </li>
   <li class="nav-tab">
     <a @if(Route::is('admin.usuarios')) class="active" @endif href="{{route('admin.usuarios')}}">Usuarios</a>
