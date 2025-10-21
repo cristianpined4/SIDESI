@@ -10,7 +10,12 @@ class Contenidos extends Model
     protected $table = 'contenidos';
 
     protected $fillable = [
-        'title', 'slug', 'description', 'content_type', 'autor_id', 'status'
+        'title',
+        'slug',
+        'description',
+        'content_type',
+        'autor_id',
+        'status'
     ];
 
     protected $appends = ['main_image', 'category', 'category_label', 'date', 'details'];
@@ -35,13 +40,13 @@ class Contenidos extends Model
     // Imagen principal
     public function getMainImageAttribute()
     {
-        return $this->imagenes()->where('is_main', true)->first()?->path ?? null;
+        return $this->imagenes()->where('is_main', true)->first()?->url ?? null;
     }
 
     // Categoría para frontend
     public function getCategoryAttribute()
     {
-        return match($this->content_type) {
+        return match ($this->content_type) {
             'Evento' => 'evento',
             'Convocatoria' => 'empleo',
             'Noticia' => 'noticia',
@@ -53,7 +58,7 @@ class Contenidos extends Model
     // Etiqueta legible
     public function getCategoryLabelAttribute()
     {
-        return match($this->content_type) {
+        return match ($this->content_type) {
             'Evento' => 'Evento',
             'Convocatoria' => 'Convocatoria',
             'Noticia' => 'Noticia',
@@ -72,7 +77,7 @@ class Contenidos extends Model
     public function getDetailsAttribute()
     {
         if ($this->contenidoCuerpo && !empty($this->contenidoCuerpo->body)) {
-            return DB::connection()->getPdo()->quote($this->contenidoCuerpo->body) 
+            return DB::connection()->getPdo()->quote($this->contenidoCuerpo->body)
                 ? rtrim(ltrim(pack('H*', bin2hex($this->contenidoCuerpo->body)), "'"), "'")
                 : (is_string($this->contenidoCuerpo->body) ? $this->contenidoCuerpo->body : '');
         }

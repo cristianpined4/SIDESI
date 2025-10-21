@@ -107,6 +107,10 @@ window.openModal = openModal;
 const closeModal = (modal) => {
     modal.style.display = "none";
     //clearForm(modal);
+    if (window.tinyMCEInstance) {
+        tinymce.remove("#editor-body");
+        window.tinyMCEInstance = null;
+    }
 };
 
 window.closeModal = closeModal;

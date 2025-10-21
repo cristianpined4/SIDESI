@@ -16,6 +16,7 @@ use App\Models\Imagenes;
 use App\Models\User;
 use App\Models\SessionesEvento;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\File;
 
 class EventosController extends Component
 {
@@ -283,6 +284,9 @@ class EventosController extends Component
             $this->dispatch("message-error", "Error al crear");
         }
         $this->file = null;
+        if (File::exists(storage_path('app/private'))) {
+            File::deleteDirectory(storage_path('app/private'));
+        }
     }
 
     public function edit($id)
@@ -484,6 +488,9 @@ class EventosController extends Component
         }
 
         $this->file = null;
+        if (File::exists(storage_path('app/private'))) {
+            File::deleteDirectory(storage_path('app/private'));
+        }
     }
 
     public function sesiones($id)
@@ -771,6 +778,9 @@ class EventosController extends Component
             $this->dispatch("message-error", "Error al crear la sesión");
         }
         $this->file2 = null;
+        if (File::exists(storage_path('app/private'))) {
+            File::deleteDirectory(storage_path('app/private'));
+        }
     }
 
     public function updateSesion()
@@ -906,6 +916,9 @@ class EventosController extends Component
             $this->dispatch("message-error", "Error al actualizar la sesión");
         }
         $this->file2 = null;
+        if (File::exists(storage_path('app/private'))) {
+            File::deleteDirectory(storage_path('app/private'));
+        }
     }
 
     public function editSesion($id)

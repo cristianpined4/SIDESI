@@ -474,3 +474,52 @@ select:focus {
 }
 
 /* === FIN MENÚ RESPONSIVE PARA PANTALLAS PEQUEÑAS === */
+
+/* === INICIO STYLES EDITOR === */
+.tinymce-container {
+  border: 1px solid #ced4da;
+  border-radius: 0.375rem;
+}
+
+.tinymce-container.is-invalid .tox-tinymce {
+  border-color: #dc3545 !important;
+}
+
+.tox-statusbar__branding,
+.tox-menu.tox-collection div[aria-label="Export"],
+.tox-menu.tox-collection div[aria-label="Exportar"],
+.tox-menu.tox-collection div[aria-label="Nuevo documento"],
+.tox-menu.tox-collection div[aria-label="New document"],
+.d-none,
+.tox-notifications-container,
+.tox-promotion {
+  display: none !important;
+}
+
+.tox-edit-area p>a {
+  color: #004cff !important;
+  text-decoration: underline !important;
+}
+
+.tox.tox-tinymce {
+  transition: all 300ms ease-in !important;
+}
+
+.tox.tox-tinymce.custom-fullscreen {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 9999 !important;
+  background: white;
+  border-radius: 0px !important;
+}
+
+.overflow-y-hidden {
+  overflow-y: hidden !important;
+}
+
+/* === FIN STYLES EDITOR === */
