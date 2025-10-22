@@ -42,7 +42,9 @@
     <div id="event-modal" class="news-modal modal" wire:ignore.self>
         <div class="modal-content">
             <div class="modal-header">
-                <img id="event-image" src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&h=500&fit=crop" alt="Evento" class="modal-image">
+                <img id="event-image"
+                    src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&h=500&fit=crop" alt="Evento"
+                    class="modal-image">
                 <button class="modal-close" onclick="closeModal(this.closest('.modal'))">×</button>
             </div>
             <div class="modal-body">
@@ -58,7 +60,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M8 7V3m8 4V3m-9 8h10m-11 6h12a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                         </svg>
-                        {{ \Carbon\Carbon::parse($records_event?->start_time)->format('d/m/Y H:i') }}
+                        {{ \Carbon\Carbon::parse($records_event?->start_time)->format('d/m/Y h:i A') }}
                     </span>
                 </div>
 
@@ -66,42 +68,79 @@
                 <p id="event-description" class="modal-description"></p>
 
                 <div class="modal-details">
-                    <p><strong>Ubicación:</strong>{{ $records_event?->location }}<span></span></p>
-                    <p><strong>Inicio:</strong> <span>{{ \Carbon\Carbon::parse($records_event?->start_time)->format('d/m/Y H:i') }}</span></p>
-                    <p><strong>Fin:</strong> <span>{{ \Carbon\Carbon::parse($records_event?->end_time)->format('d/m/Y H:i') }}</span></p>
-                    <p><strong>Email:</strong> <span>{{ $records_event?->contact_email }}</span></p>
-                    <p><strong>Telefono:</strong> <span>{{ $records_event?->contact_phone }}</span></p>
+                    <table class="w-full text-sm leading-relaxed">
+                        <tbody>
+                            <tr>
+                                <td class="py-2 align-top font-medium">Ubicación:</td>
+                                <td class="py-2">{{ $records_event?->location }}</td>
+                            </tr>
+
+                            <tr>
+                                <td class="py-2 align-top font-medium">Inicio:</td>
+                                <td class="py-2">
+                                    {{ \Carbon\Carbon::parse($records_event?->start_time)->format('d/m/Y h:i A') }}
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td class="py-2 align-top font-medium">Fin:</td>
+                                <td class="py-2">
+                                    {{ \Carbon\Carbon::parse($records_event?->end_time)->format('d/m/Y h:i A') }}
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td class="py-2 align-top font-medium">Email:</td>
+                                <td class="py-2">{{ $records_event?->contact_email }}</td>
+                            </tr>
+                            <tr>
+                                <td class="py-2 align-top font-medium">Teléfono:</td>
+                                @php
+                                $rawPhone = preg_replace('/\D/', '', $records_event?->contact_phone ?? '');
+                                // Si ya empieza con 503, lo dejamos; si no, lo agregamos
+                                if (!str_starts_with($rawPhone, '503')) {
+                                $rawPhone = '503' . $rawPhone;
+                                }
+                                // Quitamos el código país para darle formato al resto
+                                $number = substr($rawPhone, 3);
+                                // Aseguramos que tenga 8 dígitos
+                                $number = str_pad(substr($number, 0, 8), 8, '0');
+                                // Aplicamos formato xxxx-xxxx
+                                $formatted = '+503 ' . substr($number, 0, 4) . '-' . substr($number, 4, 4);
+                                @endphp
+                                <td class="py-2">{{ $formatted }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
 
                 @auth
-                    {{-- filtro para saber si esta activo o si estan permitidas las inscripciones --}}
-                    @if($records_event?->is_active && $records_event?->inscriptions_enabled)
-                        {{-- ¿el usuario esta inscrito en el evento? --}}
-                        @if ($is_registered_evento) 
-                            @if ($pendiente){{-- si la inscripcion esta pendiente --}}
-                                <button type="button"
-                                    class="btn bg-yellow-500 text-white px-4 py-2 rounded-md cursor-not-allowed opacity-75"
-                                    wire:click="cancelarInscripcion({{ $records_event?->id }})">
-                                    Inscripción pendiente (Cancelar)
-                                </button>
-                            @else
-                                <button type="button"
-                                    class="btn bg-gray-400 text-white px-4 py-2 rounded-md hover:bg-gray-500"
-                                    wire:click="cancelarInscripcion({{ $records_event?->id }})">
-                                    Ya inscrito (Cancelar)
-                                </button>
-                            @endif
-                        @else {{--boton para inscribirse--}}
-                            <button type="button"
-                                class="btn bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md"
-                                wire:click="inscribir({{ $records_event?->id }})">
-                                Inscribirse
-                            </button>
-                        @endif
-                    @endif
+                {{-- filtro para saber si esta activo o si estan permitidas las inscripciones --}}
+                @if($records_event?->is_active && $records_event?->inscriptions_enabled)
+                {{-- ¿el usuario esta inscrito en el evento? --}}
+                @if ($is_registered_evento)
+                @if ($pendiente){{-- si la inscripcion esta pendiente --}}
+                <button type="button"
+                    class="btn bg-yellow-500 text-white px-4 py-2 rounded-md cursor-not-allowed opacity-75"
+                    wire:click="cancelarInscripcion({{ $records_event?->id }})">
+                    Inscripción pendiente (Cancelar)
+                </button>
+                @else
+                <button type="button" class="btn bg-gray-400 text-white px-4 py-2 rounded-md hover:bg-gray-500"
+                    wire:click="cancelarInscripcion({{ $records_event?->id }})">
+                    Ya inscrito (Cancelar)
+                </button>
+                @endif
+                @else {{--boton para inscribirse--}}
+                <button type="button" class="btn bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md"
+                    wire:click="inscribir({{ $records_event?->id }})">
+                    Inscribirse
+                </button>
+                @endif
+                @endif
                 @endauth
 
-                <h2 class="modal-title">Sesiones</h2>
+                <h2 class="modal-title mt-10">Sesiones</h2>
 
                 <div class="container mx-auto px-4 py-12">
                     @if ($records_sesiones && $records_sesiones->count() > 0)
@@ -129,16 +168,17 @@
                                         {{ ucfirst($sesion->mode ?? 'Desconocido') }}
                                     </span>
                                     <span class="text-gray-500 text-sm">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="inline-block w-4 h-4 mr-1" fill="none"
-                                            viewBox="0 0 24 24" stroke="currentColor">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="inline-block w-4 h-4 mr-1"
+                                            fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M8 7V3m8 4V3m-9 8h10m-11 6h12a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                                         </svg>
-                                        {{ \Carbon\Carbon::parse($sesion->start_time)->format('d/m/Y H:i') }}
+                                        {{ \Carbon\Carbon::parse($sesion->start_time)->format('d/m/Y h:i A') }}
                                     </span>
                                 </div>
 
-                                <h3 class="text-lg font-semibold text-gray-800 group-hover:text-blue-600 transition-colors">
+                                <h3
+                                    class="text-lg font-semibold text-gray-800 group-hover:text-blue-600 transition-colors">
                                     {{ $sesion->title }}
                                 </h3>
                                 <p class="text-gray-600 text-sm line-clamp-2">
@@ -147,9 +187,9 @@
 
                                 <div class="flex items-center justify-between text-sm text-gray-500 mt-2">
                                     <span class="flex items-center gap-1">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" viewBox="0 0 24 24"
-                                            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                            stroke-linejoin="round">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400"
+                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                            stroke-linecap="round" stroke-linejoin="round">
                                             <path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 1118 0z" />
                                             <circle cx="12" cy="10" r="3" />
                                         </svg>
@@ -179,7 +219,9 @@
     <div id="sesion-modal" class="news-modal modal" wire:ignore.self>
         <div class="modal-content">
             <div class="modal-header">
-                <img id="event-image" src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&h=500&fit=crop" alt="sesion" class="modal-image">
+                <img id="event-image"
+                    src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&h=500&fit=crop" alt="sesion"
+                    class="modal-image">
                 <button class="modal-close" onclick="closeModal(this.closest('.modal'))">×</button>
             </div>
             <div class="modal-body">
@@ -200,7 +242,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M8 7V3m8 4V3m-9 8h10m-11 6h12a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                         </svg>
-                        {{ \Carbon\Carbon::parse($records_sesion?->start_time)->format('d/m/Y H:i') }}
+                        {{ \Carbon\Carbon::parse($records_sesion?->start_time)->format('d/m/Y h:i A') }}
                     </span>
                 </div>
 
@@ -208,30 +250,48 @@
                 <p id="event-description" class="modal-description"></p>
 
                 <div class="modal-details">
-                    <p><strong>Ubicación:</strong>{{ $records_sesion?->location }}<span></span></p>
-                    <p><strong>Inicio:</strong> <span>{{ \Carbon\Carbon::parse($records_sesion?->start_time)->format('d/m/Y H:i') }}</span></p>
-                    <p><strong>Fin:</strong> <span>{{ \Carbon\Carbon::parse($records_sesion?->end_time)->format('d/m/Y H:i') }}</span></p>
-                    <p><strong>Ponente:</strong> <span>{{ $records_ponente?->name }}</span></p>
+                    <table class="w-full text-sm leading-relaxed">
+                        <tbody>
+                            <tr>
+                                <td class="py-2 align-top font-medium">Ubicación:</td>
+                                <td class="py-2">{{ $records_sesion?->location }}</td>
+                            </tr>
+                            <tr>
+                                <td class="py-2 align-top font-medium">Inicio:</td>
+                                <td class="py-2">
+                                    {{ \Carbon\Carbon::parse($records_sesion?->start_time)->format('d/m/Y h:i A') }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="py-2 align-top font-medium">Fin:</td>
+                                <td class="py-2">
+                                    {{ \Carbon\Carbon::parse($records_sesion?->end_time)->format('d/m/Y h:i A') }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="py-2 align-top font-medium">Ponente:</td>
+                                <td class="py-2">{{ $records_ponente?->name }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
 
                 @auth
-                    {{-- filtro para saber si esta activo o si estan permitidas las inscripciones --}}
-                    @if($is_registered_evento)
-                        {{-- ¿el usuario esta inscrito en la sesion? --}}
-                        @if ($is_registered_sesion) 
-                            <button type="button"
-                                class="btn bg-gray-400 text-white px-4 py-2 rounded-md hover:bg-gray-500"
-                                wire:click="cancelarInscripcionSesion({{ $records_sesion?->id }})">
-                                Ya inscrito (Cancelar)
-                            </button>
-                        @else {{--boton para inscribirse--}}
-                            <button type="button"
-                                class="btn bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md"
-                                wire:click="inscribirSesion({{ $records_sesion?->id }})">
-                                Inscribirse
-                            </button>
-                        @endif
-                    @endif
+                {{-- filtro para saber si esta activo o si estan permitidas las inscripciones --}}
+                @if($is_registered_evento)
+                {{-- ¿el usuario esta inscrito en la sesion? --}}
+                @if ($is_registered_sesion)
+                <button type="button" class="btn bg-gray-400 text-white px-4 py-2 rounded-md hover:bg-gray-500"
+                    wire:click="cancelarInscripcionSesion({{ $records_sesion?->id }})">
+                    Ya inscrito (Cancelar)
+                </button>
+                @else {{--boton para inscribirse--}}
+                <button type="button" class="btn bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md"
+                    wire:click="inscribirSesion({{ $records_sesion?->id }})">
+                    Inscribirse
+                </button>
+                @endif
+                @endif
                 @endauth
             </div>
         </div>
@@ -371,7 +431,7 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M8 7V3m8 4V3m-9 8h10m-11 6h12a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                                 </svg>
-                                {{ \Carbon\Carbon::parse($event->start_time)->format('d/m/Y H:i') }}
+                                {{ \Carbon\Carbon::parse($event->start_time)->format('d/m/Y h:i A') }}
                             </span>
                         </div>
 
@@ -384,15 +444,15 @@
 
                         <div class="flex items-center justify-between text-sm text-gray-500 mt-2">
                             <span class="flex items-center gap-1">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" viewBox="0 0 24 24"
-                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                    stroke-linejoin="round">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400"
+                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 1118 0z" />
                                     <circle cx="12" cy="10" r="3" />
                                 </svg>
                                 {{ $event->location ?: 'Por definir' }}
                             </span>
-                            @if($event->is_paid)
+                            @if($event->is_paid && doubleval($event->price) > 0)
                             <span class="text-blue-600 font-medium">${{ number_format($event->price, 2) }}</span>
                             @else
                             <span class="text-green-600 font-medium">Gratis</span>

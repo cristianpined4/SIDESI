@@ -15,9 +15,6 @@
     <a @if(Route::is('admin.usuarios')) class="active" @endif href="{{route('admin.usuarios')}}">Usuarios</a>
   </li>
   <li class="nav-tab">
-    <a href="#">Roles</a>
-  </li>
-  <li class="nav-tab">
     <a href="#">Reportes</a>
   </li>
   <li class="nav-tab">

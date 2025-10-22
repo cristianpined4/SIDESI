@@ -50,7 +50,7 @@
           </div>
           <div class="flex items-center space-x-4">
             <div class="hidden lg:flex items-center space-x-2">
-              <div class="relative">
+              <div class="relative" style="opacity: 0; visibility: none;">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                   stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                   class="lucide lucide-search absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground">
@@ -143,15 +143,16 @@
           <div class="px-2 pt-2 pb-3 space-y-1">
             @include('layouts.Components.site-main-menu')
             <div class="px-3 py-2" bis_skin_checked="1">
-              <div class="relative" bis_skin_checked="1"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                  viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                  stroke-linejoin="round"
+              <div class="relative" bis_skin_checked="1" style="opacity: 0; visibility: none;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                   class="lucide lucide-search absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground">
                   <circle cx="11" cy="11" r="8"></circle>
                   <path d="m21 21-4.3-4.3"></path>
                 </svg><input data-slot="input"
                   class="file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-input flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive pl-8"
-                  placeholder="Buscar..." type="search"></div>
+                  placeholder="Buscar..." type="search">
+              </div>
             </div>
             <div class="px-3 py-2" bis_skin_checked="1">
               @if(!Auth::check())

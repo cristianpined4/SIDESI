@@ -315,8 +315,6 @@
                             if (isFullscreen) {
                                 editorContainer.classList.add('custom-fullscreen');
                                 document.body.style.overflow = 'hidden !important';
-                                document.querySelector('#fuse-toolbar').style.display = 'none';
-                                document.querySelector('#fuse-toolbar').style.pointerEvents = 'none';
                                 if (parentOverflow != null) {
                                     positionScrollY = parentOverflow.scrollTop;
                                     parentOverflow.scrollTop = 0;
