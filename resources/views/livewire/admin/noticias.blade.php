@@ -77,9 +77,21 @@
                     <div class="form-group mb-2">
                         <label class="form-label">Contenido (cuerpo)</label>
                         <div wire:ignore class="tinymce-container">
+                            <div id="loadingEditor">
+                                <div class="flex items-center gap-3 text-zinc-700"
+                                    style="justify-content: center;position: relative;height: 10rem;">
+                                    <svg class="animate-spin h-6 w-6" viewBox="0 0 24 24" fill="none">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                                            stroke-width="3" />
+                                        <path class="opacity-75" fill="currentColor"
+                                            d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+                                    </svg>
+                                    <span class="font-medium">Cargando Editor…</span>
+                                </div>
+                            </div>
                             <textarea id="editor-body" wire:model.live="body"
                                 placeholder="Contenido largo del contenido"
-                                class="form-control @error('body') is-invalid @enderror" rows="10"></textarea>
+                                class="form-control @error('body') is-invalid @enderror hidden" rows="0"></textarea>
                         </div>
                         <div class="invalid-feedback">@error('body') {{$message}} @enderror</div>
                     </div>
@@ -209,6 +221,10 @@
             }
 
             const editorElement = document.getElementById('editor-body');
+            const loadingEditor = document.getElementById('loadingEditor');
+            if (loadingEditor) {
+                loadingEditor.style.display = 'block';
+            }
             if (!editorElement) {
                 return;
             }
@@ -300,6 +316,7 @@
                     // Carga datos existentes
                     editor.on('init', function () {
                         editor.setContent(body);
+                        loadingEditor.style.display = 'none';
                     });
 
                     editor.ui.registry.addButton('customFullscreen', {
@@ -332,10 +349,6 @@
                         }
                     });
                 },
-                
-                // ========================================
-                // **VALIDACIÓN DE ERRORES**
-                // ========================================
                 oninvalid: function () {
                     tinymce.activeEditor.getContainer().classList.add('is-invalid');
                 }
