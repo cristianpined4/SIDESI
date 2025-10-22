@@ -102,33 +102,9 @@ relevantes para la comunidad estudiantil de ingeniería.')
                         'participants' => 'Comunidad universitaria'
                     ]))">
 
-                    <!-- Imagen fija según categoría -->
-                    <img src="
-                        @switch($news->category)
-                            @case('evento')
-                                https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&h=500&fit=crop
-                                @break
-                            @case('empleo')
-                                https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&h=500&fit=crop
-                                @break
-                            @case('taller')
-                                https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=800&h=500&fit=crop
-                                @break
-                            @case('egresados')
-                                https://universae.com/wp-content/uploads/2023/06/que-es-el-networking-1200x900.webp
-                                @break
-                            @case('noticia')
-                                https://images.unsplash.com/photo-1591115765373-5207764f72e7?w=800&h=500&fit=crop
-                                @break
-                            @case('info')
-                                https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=800&h=500&fit=crop
-                                @break
-                            @default
-                                https://via.placeholder.com/800x500?text=Sin+Imagen
-                        @endswitch
-                    "
+                    <img src="{{ $news->main_image }}"
                     alt="{{ $news->title }}"
-                    class="w-full h-48 object-cover transition-transform duration-400 group-hover:scale-105">
+                    class="h-48 w-full object-cover transition-transform duration-400 group-hover:scale-105">
 
                     <div class="p-6 flex flex-col gap-4">
                         <div class="flex items-center justify-between">
@@ -198,8 +174,8 @@ relevantes para la comunidad estudiantil de ingeniería.')
     <!-- Modal para detalles de noticias - CLASE MODIFICADA -->
     <div id="news-modal" class="news-modal" wire:ignore.self>
         <div class="modal-content">
-            <div class="modal-header">
-                <img id="modal-image" src="" alt="Evento" class="modal-image">
+            <div class="modal-header flex justify-center items-center">
+                <img id="modal-image" src="" alt="Evento" class="max-h-96 w-auto object-contain mx-auto block">
                 <button class="modal-close" id="modal-close">×</button>
             </div>
             <div class="modal-body">

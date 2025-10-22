@@ -259,9 +259,5 @@ class DocumentosController extends Component
         return view('livewire.admin.documentos', compact('records'))
             ->extends('layouts.admin')
             ->section('content');
-        /*return view('livewire.admin.documentos', [
-            'documentos' => $documentos,
-        ])->extends('layouts.admin')
-        ->section('content');*/
     }
 }

@@ -31,7 +31,7 @@ class NewsListController extends Component
                   ->orWhere('description', 'like', $term);
             });
         }
-
+        $query->orderBy('updated_at', 'desc');
         return $query->paginate($this->paginate);
     }
 
