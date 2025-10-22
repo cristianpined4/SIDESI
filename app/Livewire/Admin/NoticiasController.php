@@ -14,6 +14,7 @@ use App\Models\Contenidos;
 use App\Models\ContenidoCuerpo;
 use App\Models\Imagenes;
 use App\Models\LogsSistema;
+use Illuminate\Support\Facades\File;
 
 class NoticiasController extends Component
 {
@@ -48,7 +49,7 @@ class NoticiasController extends Component
             $this->resetErrorBag();
             $this->resetValidation();
         }
-        $this->dispatch("abrir-modal", ['modal' => $idModal]);
+        $this->dispatch("abrir-modal", ['modal' => $idModal, 'body' => $this->body]);
     }
 
     public function cerrarModal($idModal = 'modal-home')
@@ -121,7 +122,7 @@ class NoticiasController extends Component
                     'related_table' => (new Contenidos())->getTable(),
                     'related_id' => $item->id,
                     'url' => Storage::disk('images')->url($path),
-                    'path' => 'img/' . $path,
+                    'path' => $path,
                     'alt_text' => $item->title,
                     'size' => $this->file->getSize(),
                     'mime_type' => $this->file->getMimeType(),
@@ -165,6 +166,9 @@ class NoticiasController extends Component
         }
 
         $this->file = null;
+        if (File::exists(storage_path('app/private'))) {
+            File::deleteDirectory(storage_path('app/private'));
+        }
     }
 
     public function edit($id)
@@ -296,6 +300,9 @@ class NoticiasController extends Component
         }
 
         $this->file = null;
+        if (File::exists(storage_path('app/private'))) {
+            File::deleteDirectory(storage_path('app/private'));
+        }
     }
 
     #[On("delete")]

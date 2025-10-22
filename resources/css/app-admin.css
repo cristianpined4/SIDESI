@@ -364,15 +364,21 @@ select:focus {
   display: flex !important;
 }
 
+.loading2[show2="true"] {
+  display: grid !important;
+}
+
 
 /* === MENÚ RESPONSIVE PARA PANTALLAS PEQUEÑAS === */
 @media (max-width: 768px) {
   .admin-nav {
     position: fixed !important;
-    top: 60px; /* deja visible el header completo */
+    top: 60px;
+    /* deja visible el header completo */
     left: 0;
     width: 240px;
-    max-height: calc(100vh - 60px); /* evita que se salga del viewport */
+    max-height: calc(100vh - 60px);
+    /* evita que se salga del viewport */
     background: linear-gradient(180deg, #f9fbfd 0%, #e3f2fd 100%);
     box-shadow: 2px 0 8px rgba(0, 0, 0, 0.15);
     border-right: 1px solid #dbe3ec;
@@ -408,8 +414,8 @@ select:focus {
   }
 
   /* Asegurar que Dashboard se vea primero */
-  .admin-nav > *:first-child,
-  .admin-nav ul > *:first-child {
+  .admin-nav>*:first-child,
+  .admin-nav ul>*:first-child {
     margin-top: 0 !important;
   }
 
@@ -446,25 +452,74 @@ select:focus {
   }
 
   .menu-toggle {
-      position: absolute;
-      top: 14px;
-      right: 16px;
-      background: none;
-      border: none;
-      font-size: 1.9rem;
-      color: #1e293b;
-      cursor: pointer;
-      z-index: 10000;
-      line-height: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: transform 0.2s ease;
-    }
+    position: absolute;
+    top: 14px;
+    right: 16px;
+    background: none;
+    border: none;
+    font-size: 1.9rem;
+    color: #1e293b;
+    cursor: pointer;
+    z-index: 10000;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease;
+  }
 
   .menu-toggle:active {
     transform: scale(0.9);
   }
 }
+
 /* === FIN MENÚ RESPONSIVE PARA PANTALLAS PEQUEÑAS === */
 
+/* === INICIO STYLES EDITOR === */
+.tinymce-container {
+  border: 1px solid #ced4da;
+  border-radius: 0.375rem;
+}
+
+.tinymce-container.is-invalid .tox-tinymce {
+  border-color: #dc3545 !important;
+}
+
+.tox-statusbar__branding,
+.tox-menu.tox-collection div[aria-label="Export"],
+.tox-menu.tox-collection div[aria-label="Exportar"],
+.tox-menu.tox-collection div[aria-label="Nuevo documento"],
+.tox-menu.tox-collection div[aria-label="New document"],
+.d-none,
+.tox-notifications-container,
+.tox-promotion {
+  display: none !important;
+}
+
+.tox-edit-area p>a {
+  color: #004cff !important;
+  text-decoration: underline !important;
+}
+
+.tox.tox-tinymce {
+  transition: all 300ms ease-in !important;
+}
+
+.tox.tox-tinymce.custom-fullscreen {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 9999 !important;
+  background: white;
+  border-radius: 0px !important;
+}
+
+.overflow-y-hidden {
+  overflow-y: hidden !important;
+}
+
+/* === FIN STYLES EDITOR === */

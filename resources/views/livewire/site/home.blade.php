@@ -50,18 +50,25 @@
                         </p>
                     </div>
                     <div class="flex flex-col sm:flex-row gap-4">
-                        <button data-slot="button"
-                            class="inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg:not([class*=&#x27;size-&#x27;])]:size-4 shrink-0 [&amp;_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive bg-primary text-primary-foreground shadow-xs hover:bg-primary/90 h-10 rounded-md px-6 has-[&gt;svg]:px-4 text-base"
-                            wire:click="abrirModal">Explorar
-                            Eventos<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                        <!-- Botón: Explorar Eventos -->
+                        <a href="{{ route('site.eventos') }}"
+                            class="inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive bg-primary text-primary-foreground shadow-xs hover:bg-primary/90 h-10 rounded-md px-6 has-[>svg]:px-4 text-base">
+                            Explorar Eventos
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                 stroke-linejoin="round" class="lucide lucide-arrow-right ml-2 h-5 w-5">
                                 <path d="M5 12h14"></path>
                                 <path d="m12 5 7 7-7 7"></path>
-                            </svg></button><button data-slot="button"
-                            class="inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg:not([class*=&#x27;size-&#x27;])]:size-4 shrink-0 [&amp;_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive border shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50 h-10 rounded-md px-6 has-[&gt;svg]:px-4 text-base bg-transparent">Ver
-                            Documentos</button>
+                            </svg>
+                        </a>
+
+                        <!-- Botón: Ver Documentos -->
+                        <a href="{{ route('site.documentos') }}"
+                            class="inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive border shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50 h-10 rounded-md px-6 has-[>svg]:px-4 text-base bg-transparent">
+                            Ver Documentos
+                        </a>
                     </div>
+
                     <div class="grid grid-cols-3 gap-6 pt-8">
                         <div class="text-center">
                             <div
@@ -402,32 +409,32 @@
 
 <script>
     document.addEventListener('livewire:initialized', function() {
-            Livewire.on('cerrar-modal', function(modal) {
-                let modalElement = document.getElementById(modal[0].modal);
-                if (modalElement) {
-                    closeModal(modalElement);
-                }
-            });
-
-            Livewire.on('abrir-modal', function(modal) {
-                let modalElement = document.getElementById(modal[0].modal);
-                if (modalElement) {
-                    openModal(modalElement);
-                }
-            });
+        Livewire.on('cerrar-modal', function(modal) {
+            let modalElement = document.getElementById(modal[0].modal);
+            if (modalElement) {
+                closeModal(modalElement);
+            }
         });
 
-        const confirmarEliminar = async id => {
-            if (await window.Confirm(
-                    'Eliminar',
-                    '¿Estas seguro de eliminar este Home?',
-                    'warning',
-                    'Si, eliminar',
-                    'Cancelar'
-                )) {
-                Livewire.dispatch('delete', {
-                    id
-                });
+        Livewire.on('abrir-modal', function(modal) {
+            let modalElement = document.getElementById(modal[0].modal);
+            if (modalElement) {
+                openModal(modalElement);
             }
+        });
+    });
+
+    const confirmarEliminar = async id => {
+        if (await window.Confirm(
+                'Eliminar',
+                '¿Estas seguro de eliminar este Home?',
+                'warning',
+                'Si, eliminar',
+                'Cancelar'
+            )) {
+            Livewire.dispatch('delete', {
+                id
+            });
         }
+    }
 </script>

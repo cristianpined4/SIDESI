@@ -87,8 +87,7 @@ relevantes para la comunidad estudiantil de ingeniería.')
             <div class="grid lg:grid-cols-3 gap-8 w-4/5 max-w-7xl mx-auto">
                 @foreach($filteredNews as $news)
                 <div class="bg-white rounded-xl overflow-hidden shadow-sm news-card-hover cursor-pointer group"
-                    wire:key="news-{{ $news->id }}"
-                    onclick="openNewsModal(@js([
+                    wire:key="news-{{ $news->id }}" onclick="openNewsModal(@js([
                         'id' => $news->id,
                         'category' => $news->category,
                         'category_label' => $news->category_label,
@@ -97,14 +96,15 @@ relevantes para la comunidad estudiantil de ingeniería.')
                         'details' => $news->details,
                         'image' => $news->main_image ?? 'https://via.placeholder.com/800x500?text=Sin+Imagen',
                         'date' => $news->date,
-                        'location' => 'Por definir',
+                        /* 'location' => 'Por definir',
                         'time' => 'Próximamente',
-                        'participants' => 'Comunidad universitaria'
+                        'participants' => 'Comunidad universitaria' */
                     ]))">
 
-                    <img src="{{ $news->main_image }}"
-                    alt="{{ $news->title }}"
-                    class="h-48 w-full object-cover transition-transform duration-400 group-hover:scale-105">
+                    <!-- Imagen fija según categoría -->
+                    <img src="{{ $news->main_image ?? 'https://via.placeholder.com/800x500?text=Sin+Imagen' }}"
+                        alt="{{ $news->title }}"
+                        class="w-full h-48 object-cover transition-transform duration-400 group-hover:scale-105">
 
                     <div class="p-6 flex flex-col gap-4">
                         <div class="flex items-center justify-between">
@@ -187,33 +187,34 @@ relevantes para la comunidad estudiantil de ingeniería.')
                 <p id="modal-description" class="modal-description"></p>
 
                 <div class="modal-details">
-                    <div class="detail-item">
+                    {{-- <div class="detail-item">
                         <span class="detail-icon"></span>
                         <span class="detail-label">Ubicación:</span>
                         <span id="modal-location" class="detail-value"></span>
-                    </div>
-                    <div class="detail-item">
+                    </div> --}}
+                    {{-- <div class="detail-item">
                         <span class="detail-icon"></span>
                         <span class="detail-label">Horario:</span>
                         <span id="modal-time" class="detail-value">9:00 AM - 6:00 PM</span>
-                    </div>
-                    <div class="detail-item">
+                    </div> --}}
+                    {{-- <div class="detail-item">
                         <span class="detail-icon"></span>
                         <span class="detail-label">Dirigido a:</span>
                         <span id="modal-participants" class="detail-value"></span>
-                    </div>
-                    <div class="detail-item">
+                    </div> --}}
+                    {{-- <div class="detail-item">
                         <span class="detail-icon"></span>
                         <span class="detail-label">Detalles:</span>
                         <span id="modal-full-details" class="detail-value"></span>
-                    </div>
+                    </div> --}}
+                    <div id="modal-full-details" class="detail-value"></div>
                 </div>
 
                 <div class="modal-actions">
                     <button class="btn btn-secondary" id="modal-share">
                         <span>📤</span> Compartir
                     </button>
-                 
+
                 </div>
             </div>
         </div>
@@ -226,11 +227,11 @@ relevantes para la comunidad estudiantil de ingeniería.')
         document.getElementById('modal-image').src = news.image;
         document.getElementById('modal-title').textContent = news.title;
         document.getElementById('modal-description').textContent = news.description;
-        document.getElementById('modal-full-details').textContent = news.details;
+        document.getElementById('modal-full-details').innerHTML = news.details;
         document.getElementById('modal-date').textContent = `📅 ${news.date}`;
-        document.getElementById('modal-location').textContent = news.location;
+      /*   document.getElementById('modal-location').textContent = news.location;
         document.getElementById('modal-time').textContent = news.time;
-        document.getElementById('modal-participants').textContent = news.participants;
+        document.getElementById('modal-participants').textContent = news.participants; */
 
         // Actualizar badge según categoría
         const modalBadge = document.getElementById('modal-badge');

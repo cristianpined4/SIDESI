@@ -10,6 +10,9 @@ use App\Models\Documentos;
 use App\Models\LogsSistema;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
 
 class DocumentosController extends Component
 {
@@ -74,41 +77,66 @@ class DocumentosController extends Component
         ];
         $this->validate($rules);
 
-        $extension = $this->file->getClientOriginalExtension();
-        $baseName = Str::slug($this->fields['title']);
-        // Evita colisiones: agrega un sufijo único si ya existe
-        $fileName = $baseName . '.' . $extension;
+        $path = null;
+        try {
+            DB::beginTransaction();
+            $extension = $this->file->getClientOriginalExtension();
+            $baseName = Str::slug($this->fields['title']);
+            // Evita colisiones: agrega un sufijo único si ya existe
+            $fileName = $baseName . '.' . $extension;
 
-        if (\Storage::disk('documents')->exists($fileName)) {
-        $fileName = $baseName . '-' . uniqid() . '.' . $extension;
+            if (Storage::disk('documents')->exists($fileName)) {
+                $fileName = $baseName . '-' . uniqid() . '.' . $extension;
+            }
+
+            $path = $this->file->storeAs('', $fileName, 'documents');
+            $storagePath = 'documents/' . $path;
+
+            $item = Documentos::create([
+                'user_id' => auth()->id(),
+                'name' => $this->fields['title'],
+                'description' => $this->fields['description'],
+                'path' => $storagePath,
+                'type' => $extension,
+                'is_valid' => true,
+                'visibility' => $this->fields['visibility'],
+            ]);
+            DB::commit();
+
+            LogsSistema::create([
+                'action' => 'create Documentos',
+                'user_id' => auth()->id(),
+                'ip_address' => request()->ip(),
+                'description' => 'Creación de un nuevo Documento con ID ' . $item->id,
+                'target_table' => (new Documentos())->getTable(),
+                'target_id' => $item->id,
+                'status' => 'success',
+            ]);
+
+            $this->resetUI();
+            $this->cerrarModal('modal-home');
+            $this->dispatch("message-success", "Documento creado correctamente");
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Storage::disk('documents')->delete($path);
+            if (file_exists($path)) {
+                unlink($path);
+            }
+            LogsSistema::create([
+                'action' => 'create Documentos',
+                'user_id' => auth()->id(),
+                'ip_address' => request()->ip(),
+                'description' => 'Error al crear un nuevo Documento: ' . $e->getMessage(),
+                'target_table' => (new Documentos())->getTable(),
+                'target_id' => null,
+                'status' => 'error',
+            ]);
+            $this->dispatch("message-error", "Error al subir el documento");
         }
-        
-        $path = $this->file->storeAs('', $fileName, 'documents'); 
-        $storagePath = 'documents/'.$path;
 
-        $item = Documentos::create([
-            'user_id' => auth()->id(),
-            'name' => $this->fields['title'],
-            'description' => $this->fields['description'],
-            'path' => $storagePath,
-            'type' => $extension,
-            'is_valid' => true,
-            'visibility' => $this->fields['visibility'],
-        ]);
-
-        LogsSistema::create([
-            'action' => 'create Documentos',
-            'user_id' => auth()->id(),
-            'ip_address' => request()->ip(),
-            'description' => 'Creación de un nuevo Documento con ID ' . $item->id,
-            'target_table' => (new Documentos())->getTable(),
-            'target_id' => $item->id,
-            'status' => 'success',
-        ]);
-
-        $this->resetUI();
-        $this->cerrarModal('modal-home');
-        session()->flash('message', 'Documento creado correctamente.');
+        if (File::exists(storage_path('app/private'))) {
+            File::deleteDirectory(storage_path('app/private'));
+        }
     }
 
     public function edit($id)
@@ -140,73 +168,98 @@ class DocumentosController extends Component
         ];
         $this->validate($rules);
 
-        $item = Documentos::find($this->record_id);
-        if (!$item) {
-            session()->flash('error', 'Documento no encontrado.');
-            return;
-        }
-
-        $item->name = $this->fields['title'];
-        $item->description = $this->fields['description'];
-        $item->visibility = $this->fields['visibility'];
-
-        if ($this->file) {
-            // Reemplazo del archivo: borrar el anterior en el disco 'documents' y subir el nuevo
-            if ($item->path) {
-                $oldName = basename($item->path);
-                if (Storage::disk('documents')->exists($oldName)) {
-                    Storage::disk('documents')->delete($oldName);
-                }
+        $path = null;
+        try {
+            DB::beginTransaction();
+            $item = Documentos::find($this->record_id);
+            if (!$item) {
+                session()->flash('error', 'Documento no encontrado.');
+                return;
             }
 
-            $extension = $this->file->getClientOriginalExtension();
-            $baseName = Str::slug($this->fields['title']);
-            $fileName = $baseName . '.' . $extension;
-            if (Storage::disk('documents')->exists($fileName)) {
-                $fileName = $baseName . '-' . uniqid() . '.' . $extension;
-            }
-            $stored = $this->file->storeAs('', $fileName, 'documents'); // devuelve nombre de archivo
-            $item->path = 'documents/' . $stored;
-            $item->type = $extension;
-        } else {
-            // Sin nuevo archivo: si solo cambió el nombre, renombrar el archivo físico
-            if ($item->path) {
-                $oldName = basename($item->path);
-                $currentExt = $item->type ?: pathinfo($oldName, PATHINFO_EXTENSION);
-                $newBase = Str::slug($this->fields['title']);
-                $newName = $newBase . '.' . $currentExt;
+            $item->name = $this->fields['title'];
+            $item->description = $this->fields['description'];
+            $item->visibility = $this->fields['visibility'];
 
-                if ($oldName !== $newName) {
-                    // Evitar colisión
-                    $finalName = $newName;
-                    if (Storage::disk('documents')->exists($finalName)) {
-                        $finalName = $newBase . '-' . uniqid() . '.' . $currentExt;
-                    }
+            if ($this->file) {
+                // Reemplazo del archivo: borrar el anterior en el disco 'documents' y subir el nuevo
+                if ($item->path) {
+                    $oldName = basename($item->path);
                     if (Storage::disk('documents')->exists($oldName)) {
-                        Storage::disk('documents')->move($oldName, $finalName);
-                        $item->path = 'documents/' . $finalName;
-                    } else {
-                        // Si por alguna razón no existe, no fallar: mantener path actual
+                        Storage::disk('documents')->delete($oldName);
+                    }
+                }
+
+                $extension = $this->file->getClientOriginalExtension();
+                $baseName = Str::slug($this->fields['title']);
+                $fileName = $baseName . '.' . $extension;
+                if (Storage::disk('documents')->exists($fileName)) {
+                    $fileName = $baseName . '-' . uniqid() . '.' . $extension;
+                }
+                $stored = $this->file->storeAs('', $fileName, 'documents'); // devuelve nombre de archivo
+                $item->path = 'documents/' . $stored;
+                $item->type = $extension;
+            } else {
+                // Sin nuevo archivo: si solo cambió el nombre, renombrar el archivo físico
+                if ($item->path) {
+                    $oldName = basename($item->path);
+                    $currentExt = $item->type ?: pathinfo($oldName, PATHINFO_EXTENSION);
+                    $newBase = Str::slug($this->fields['title']);
+                    $newName = $newBase . '.' . $currentExt;
+
+                    if ($oldName !== $newName) {
+                        // Evitar colisión
+                        $finalName = $newName;
+                        if (Storage::disk('documents')->exists($finalName)) {
+                            $finalName = $newBase . '-' . uniqid() . '.' . $currentExt;
+                        }
+                        if (Storage::disk('documents')->exists($oldName)) {
+                            Storage::disk('documents')->move($oldName, $finalName);
+                            $item->path = 'documents/' . $finalName;
+                        } else {
+                            // Si por alguna razón no existe, no fallar: mantener path actual
+                        }
                     }
                 }
             }
+
+            $item->save();
+            DB::commit();
+
+            LogsSistema::create([
+                'action' => 'update Documentos',
+                'user_id' => auth()->id(),
+                'ip_address' => request()->ip(),
+                'description' => 'Actualización del Documento con ID ' . $item->id,
+                'target_table' => (new Documentos())->getTable(),
+                'target_id' => $item->id,
+                'status' => 'success',
+            ]);
+
+            $this->resetUI();
+            $this->cerrarModal('modal-home');
+            $this->dispatch("message-success", "Documento actualizado correctamente");
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Storage::disk('documents')->delete($path);
+            if (file_exists($this->file->getRealPath())) {
+                unlink($this->file->getRealPath());
+            }
+            LogsSistema::create([
+                'action' => 'update Documentos',
+                'user_id' => auth()->id(),
+                'ip_address' => request()->ip(),
+                'description' => 'Actualización del Documento con ID ' . $item->id,
+                'target_table' => (new Documentos())->getTable(),
+                'target_id' => $item->id,
+                'status' => 'error',
+            ]);
+            $this->dispatch("message-error", $e->getMessage());
         }
 
-        $item->save();
-
-        LogsSistema::create([
-            'action' => 'update Documentos',
-            'user_id' => auth()->id(),
-            'ip_address' => request()->ip(),
-            'description' => 'Actualización del Documento con ID ' . $item->id,
-            'target_table' => (new Documentos())->getTable(),
-            'target_id' => $item->id,
-            'status' => 'success',
-        ]);
-
-        $this->resetUI();
-        $this->cerrarModal('modal-home');
-        session()->flash('message', 'Documento actualizado correctamente.');
+        if (File::exists(storage_path('app/private'))) {
+            File::deleteDirectory(storage_path('app/private'));
+        }
     }
 
     #[On("delete")]
@@ -234,7 +287,7 @@ class DocumentosController extends Component
             'target_id' => $id,
             'status' => 'success',
         ]);
-        session()->flash('message', 'Documento eliminado correctamente.');
+        $this->dispatch("message-success", "Documento eliminado correctamente");
     }
 
     public function resetUI()
