@@ -31,28 +31,49 @@ class EventosController extends Component
     public $file;          // archivo temporal
     public $search = '';
     public $paginate = 10;
-
+    public $modalidad = '';
+    public $tab = 'proximos';
     public function paginationView()
     {
         return 'vendor.livewire.tailwind';
     }
 
-    public function render()
-    {
-        $query = Eventos::query();
+public function render()
+{
+    $query = Eventos::query();
 
-        if (!empty($this->search)) {
-            foreach ((new Eventos())->getFillable() as $field) {
-                $query->orWhere($field, 'like', '%' . $this->search . '%');
-            }
-        }
-
-        $records = $query->orderBy('id', 'desc')->paginate($this->paginate);
-
-        return view('livewire.site.eventos', compact('records'))
-            ->extends('layouts.site')
-            ->section('content');
+    // Búsqueda
+    if (!empty($this->search)) {
+        $term = '%' . $this->search . '%';
+        $query->where(function ($q) use ($term) {
+            $q->where('title', 'like', $term)
+              ->orWhere('description', 'like', $term)
+              ->orWhere('location', 'like', $term)
+              ->orWhere('contact_email', 'like', $term);
+        });
     }
+
+    // Filtro por modalidad (solo si se seleccionó algo)
+    if (!empty($this->modalidad)) {
+        $query->where('mode', $this->modalidad);
+    }
+
+    // ⚠️ TEMPORAL: COMENTA ESTO PARA VER TODOS LOS EVENTOS
+ 
+    if ($this->tab === 'proximos') {
+        $query->where('start_time', '>=', now());
+    } else {
+        $query->where('start_time', '<', now());
+    }
+
+
+    // Ordenar por fecha de inicio (más recientes primero)
+    $records = $query->orderBy('start_time', 'desc')->paginate($this->paginate);
+
+    return view('livewire.site.eventos', compact('records'))
+        ->extends('layouts.site')
+        ->section('content');
+}
 
     public function abrirModal($idModal = 'modal-home', $initVoid = true)
     {

@@ -58,7 +58,9 @@ class EventosController extends Component
     public $search_sesiones = '';
     public $paginate = 10;
     public bool $loading = false;
-
+    public $orden = 'desc';      // 'asc' o 'desc'
+    public $modalidad = '';      // '', 'presencial', 'virtual'
+    public $estado = ''; // '', 'activo', 'inactivo'
     public function paginationView()
     {
         return 'vendor.livewire.tailwind';
@@ -74,41 +76,59 @@ class EventosController extends Component
         $this->records_sesiones = collect();
     }
 
-    public function render()
-    {
-        $query = Eventos::query();
+public function render()
+{
+    $query = Eventos::query();
 
-        if (!empty($this->search)) {
-            foreach ((new Eventos())->getFillable() as $field) {
-                $query->orWhere($field, 'like', '%' . $this->search . '%');
-            }
-        }
-
-        $records = $query->orderBy('id', 'asc')->paginate($this->paginate);
-        $driver = DB::getDriverName();
-
-        if ($driver === 'pgsql') {
-            $concatExpression = "TRIM(name || ' ' || lastname)";
-        } else {
-            $concatExpression = "TRIM(CONCAT_WS(' ', name, lastname))";
-        }
-
-        $recordsUsers = User::selectRaw("id, {$concatExpression} as name, is_active")
-            ->whereIn('role_id', [1, 2])
-            ->where('is_active', true)
-            ->orderBy('name')
-            ->get();
-
-        $recordsPonentes = User::selectRaw("id, {$concatExpression} as name, is_active")
-            ->whereIn('role_id', [1, 2, 3, 4])
-            ->where('is_active', true)
-            ->orderBy('name')
-            ->get();
-
-        return view('livewire.admin.eventos', compact('records', 'recordsUsers', 'recordsPonentes'))
-            ->extends('layouts.admin')
-            ->section('content');
+    // Búsqueda
+    if (!empty($this->search)) {
+        $searchTerm = '%' . $this->search . '%';
+        $query->where(function ($q) use ($searchTerm) {
+            $q->where('title', 'like', $searchTerm)
+              ->orWhere('description', 'like', $searchTerm)
+              ->orWhere('location', 'like', $searchTerm)
+              ->orWhere('contact_email', 'like', $searchTerm);
+        });
     }
+
+    // Filtro por modalidad
+    if (!empty($this->modalidad)) {
+        $query->where('mode', $this->modalidad);
+    }
+    // Filtro por estado (activo/inactivo)
+    if ($this->estado === 'activo') {
+        $query->where('is_active', true);
+    } elseif ($this->estado === 'inactivo') {
+        $query->where('is_active', false);
+    }
+
+    // Orden por fecha de inicio
+    $query->orderBy('start_time', $this->orden);
+
+    $records = $query->paginate($this->paginate);
+
+    // Usuarios y ponentes (sin cambios)
+    $driver = DB::getDriverName();
+    if ($driver === 'pgsql') {
+        $concatExpression = "TRIM(name || ' ' || lastname)";
+    } else {
+        $concatExpression = "TRIM(CONCAT_WS(' ', name, lastname))";
+    }
+    $recordsUsers = User::selectRaw("id, {$concatExpression} as name, is_active")
+        ->whereIn('role_id', [1, 2])
+        ->where('is_active', true)
+        ->orderBy('name')
+        ->get();
+    $recordsPonentes = User::selectRaw("id, {$concatExpression} as name, is_active")
+        ->whereIn('role_id', [1, 2, 3, 4])
+        ->where('is_active', true)
+        ->orderBy('name')
+        ->get();
+
+    return view('livewire.admin.eventos', compact('records', 'recordsUsers', 'recordsPonentes'))
+        ->extends('layouts.admin')
+        ->section('content');
+}
 
     public function abrirModal($idModal = 'modal-home', $initVoid = true, $newSession = false)
     {

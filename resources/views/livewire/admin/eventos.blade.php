@@ -183,6 +183,7 @@
                         aria-label="Cerrar" onclick="closeModal(this.closest('.modal'))">
                         &times;
                     </button>
+                    
                 </div>
 
                 <!-- Barra superior de acciones -->
@@ -191,7 +192,9 @@
                         <input type="text" placeholder="Buscar..."
                             class="form-input w-full border border-gray-300 rounded-md focus:border-blue-500 focus:ring focus:ring-blue-200 transition"
                             wire:model.live.debounce.500ms="search_sesiones">
+                            
                     </div>
+                    
                     <button
                         class="btn btn-primary bg-blue-600 hover:bg-blue-700 text-white font-medium px-3 py-1.5 text-sm rounded-md shadow-sm transition"
                         wire:click="abrirModal('Sesion-modal-form',false,true)">
@@ -409,6 +412,40 @@
         <div class="flex items-start gap-4 flex-col" style="max-width: 800px;width: 100%;">
             <h2 class="text-xl font-semibold">Módulo Eventos</h2>
             <input type="text" placeholder="Buscar..." class="form-input" wire:model.live.debounce.500ms="search">
+            <!-- Filtros adicionales -->
+            <div class="flex flex-wrap gap-4 mt-4">
+                <!-- Filtro: Orden -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Fechas</label>
+                    <select wire:model.live="orden"
+                        class="form-select block w-full border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200">
+                        <option value="desc">Primeras Fechas</option>
+                        <option value="asc">Ultimas Fechas<option>
+                    </select>
+                </div>
+
+                <!-- Filtro: Modalidad -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Modalidad</label>
+                    <select wire:model.live="modalidad"
+                        class="form-select block w-full border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200">
+                        <option value="">Todas</option>
+                        <option value="presencial">Presencial</option>
+                        <option value="virtual">Virtual</option>
+                    </select>
+                </div>
+
+                <!-- Filtro: Estado -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Estado</label>
+                    <select wire:model.live="estado"
+                        class="form-select block w-full border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200">
+                        <option value="">Todos</option>
+                        <option value="activo">Activo</option>
+                        <option value="inactivo">Inactivo</option>
+                    </select>
+                </div>
+            </div>
         </div>
         <button class="btn btn-primary" style="max-width: 200px;" wire:click="abrirModal('modal-home')">
             Nuevo Evento

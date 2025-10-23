@@ -330,29 +330,7 @@
                 </div>
 
                 <!-- Filtro Tipo de Evento -->
-                <div class="w-full lg:w-auto">
-                    <div class="relative">
-                        <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none"
-                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z">
-                            </path>
-                        </svg>
-                        <select wire:model.live="tipo_evento"
-                            class="w-full lg:w-56 pl-12 pr-10 py-3 border border-gray-300 rounded-lg bg-white text-gray-700 appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                            <option value="">Tipo de evento</option>
-                            <option value="congreso">Congreso</option>
-                            <option value="taller">Taller</option>
-                            <option value="seminario">Seminario</option>
-                            <option value="conferencia">Conferencia</option>
-                        </select>
-                        <svg class="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none"
-                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7">
-                            </path>
-                        </svg>
-                    </div>
-                </div>
+              
 
                 <!-- Filtro Modalidad -->
                 <div class="w-full lg:w-auto">
