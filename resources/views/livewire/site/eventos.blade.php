@@ -115,29 +115,52 @@
                 </div>
 
                 @auth
-                {{-- filtro para saber si esta activo o si estan permitidas las inscripciones --}}
-                @if($records_event?->is_active && $records_event?->inscriptions_enabled)
-                {{-- ¿el usuario esta inscrito en el evento? --}}
-                @if ($is_registered_evento)
-                @if ($pendiente){{-- si la inscripcion esta pendiente --}}
-                <button type="button"
-                    class="btn bg-yellow-500 text-white px-4 py-2 rounded-md cursor-not-allowed opacity-75"
-                    wire:click="cancelarInscripcion({{ $records_event?->id }})">
-                    Inscripción pendiente (Cancelar)
-                </button>
-                @else
-                <button type="button" class="btn bg-gray-400 text-white px-4 py-2 rounded-md hover:bg-gray-500"
-                    wire:click="cancelarInscripcion({{ $records_event?->id }})">
-                    Ya inscrito (Cancelar)
-                </button>
-                @endif
-                @else {{--boton para inscribirse--}}
-                <button type="button" class="btn bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md"
-                    wire:click="inscribir({{ $records_event?->id }})">
-                    Inscribirse
-                </button>
-                @endif
-                @endif
+                    {{-- Si el usuario es organizador --}}
+                    @if ($is_organizer)
+                        <div class="flex justify-center items-center py-6">
+                            <p class="text-xl font-semibold text-green-600 bg-green-100 px-6 py-3 rounded-lg shadow-sm">
+                                Eres el organizador de este evento
+                            </p>
+                        </div>
+                    @else
+                        {{-- Si el evento está activo y permite inscripciones --}}
+                        @if ($records_event?->is_active && $records_event?->inscriptions_enabled)
+                            
+                            {{-- ¿El usuario está inscrito en el evento? --}}
+                            @if ($is_registered_evento)
+
+                                {{-- Si la inscripción está pendiente --}}
+                                @if ($pendiente)
+                                    <button 
+                                        type="button"
+                                        class="btn bg-yellow-500 text-white px-4 py-2 rounded-md cursor-not-allowed opacity-75"
+                                        wire:click="cancelarInscripcion({{ $records_event?->id }})"
+                                    >
+                                        Inscripción pendiente (Cancelar)
+                                    </button>
+                                @else
+                                    <button 
+                                        type="button"
+                                        class="btn bg-gray-400 text-white px-4 py-2 rounded-md hover:bg-gray-500"
+                                        wire:click="cancelarInscripcion({{ $records_event?->id }})"
+                                    >
+                                        Ya inscrito (Cancelar)
+                                    </button>
+                                @endif
+
+                            @else
+                                {{-- Botón para inscribirse --}}
+                                <button 
+                                    type="button"
+                                    class="btn bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md"
+                                    wire:click="inscribir({{ $records_event?->id }})"
+                                >
+                                    Inscribirse
+                                </button>
+                            @endif
+
+                        @endif
+                    @endif
                 @endauth
 
                 <h2 class="modal-title mt-10">Sesiones</h2>
@@ -277,21 +300,37 @@
                 </div>
 
                 @auth
-                {{-- filtro para saber si esta activo o si estan permitidas las inscripciones --}}
-                @if($is_registered_evento)
-                {{-- ¿el usuario esta inscrito en la sesion? --}}
-                @if ($is_registered_sesion)
-                <button type="button" class="btn bg-gray-400 text-white px-4 py-2 rounded-md hover:bg-gray-500"
-                    wire:click="cancelarInscripcionSesion({{ $records_sesion?->id }})">
-                    Ya inscrito (Cancelar)
-                </button>
-                @else {{--boton para inscribirse--}}
-                <button type="button" class="btn bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md"
-                    wire:click="inscribirSesion({{ $records_sesion?->id }})">
-                    Inscribirse
-                </button>
-                @endif
-                @endif
+                    {{-- Si el usuario es ponente --}}
+                    @if ($is_ponente)
+                        <div class="flex justify-center items-center py-6">
+                            <p class="text-xl font-semibold text-blue-600 bg-blue-100 px-6 py-3 rounded-lg shadow-sm">
+                                Eres el ponente de esta sesión
+                            </p>
+                        </div>
+                    @else
+                        {{-- Filtro para saber si el usuario está inscrito en el evento --}}
+                        @if ($is_registered_evento && $pendiente === false)
+                            {{-- ¿El usuario está inscrito en la sesión? --}}
+                            @if ($is_registered_sesion)
+                                <button 
+                                    type="button"
+                                    class="btn bg-gray-400 text-white px-4 py-2 rounded-md hover:bg-gray-500"
+                                    wire:click="cancelarInscripcionSesion({{ $records_sesion?->id }})"
+                                >
+                                    Ya inscrito (Cancelar)
+                                </button>
+                            @else
+                                {{-- Botón para inscribirse a la sesión --}}
+                                <button 
+                                    type="button"
+                                    class="btn bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md"
+                                    wire:click="inscribirSesion({{ $records_sesion?->id }})"
+                                >
+                                    Inscribirse
+                                </button>
+                            @endif
+                        @endif
+                    @endif
                 @endauth
             </div>
         </div>

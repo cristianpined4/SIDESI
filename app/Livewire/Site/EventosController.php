@@ -26,6 +26,8 @@ class EventosController extends Component
     public $records_ponente;
     public $is_registered_evento;
     public $is_registered_sesion;
+    public $is_organizer;
+    public $is_ponente;
     public $pendiente;
     public $fields = [];   // inputs normales
     public $file;          // archivo temporal
@@ -239,6 +241,9 @@ public function render()
             // Detectar si el usuario está inscrito a el evento
             $this->is_registered_evento = (bool) $inscripcion;
 
+            //detectar si el usuario es el organizador
+            $this->is_organizer = $item->organizer_id === Auth::id();
+
             // Detectar si la inscripción está pendiente (solo si existe)
             $this->pendiente = $inscripcion && $inscripcion->status === 'pendiente';
         }
@@ -265,6 +270,9 @@ public function render()
 
             // Detectar si el usuario está inscrito a el evento
             $this->is_registered_sesion = (bool) $inscripcion;
+
+            // Detectar si el usuario es ponente
+            $this->is_ponente = $ponente->id === Auth::id();
 
             // Detectar si la inscripción está pendiente (solo si existe)
             // $this->pendiente = $inscripcion && $inscripcion->status === 'pendiente';
@@ -479,6 +487,8 @@ public function render()
         $this->records_ponente = collect();
         $this->is_registered_evento = false;
         $this->is_registered_sesion = false;
+        $this->is_organizer = false;
+        $this->is_ponente = false;
         $this->fields = [];
         $this->file = null;
         $this->resetErrorBag();
