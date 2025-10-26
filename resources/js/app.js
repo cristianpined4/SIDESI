@@ -2,6 +2,8 @@ import "./bootstrap";
 import Swal from "sweetalert2";
 import Chart from "chart.js/auto";
 import moment from "moment";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 
 window.moment = moment;
 window.months =
@@ -191,3 +193,6 @@ document.addEventListener("Livewire:initialized", () => {
         });
     });
 });
+
+window.html2canvas = html2canvas;
+window.jsPDF = jsPDF;
