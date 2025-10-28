@@ -75,16 +75,19 @@
         </div>
 
         <!-- Listado de Documentos Públicos -->
-        <div class="mb-8">
+        <div class="mb-8 mx-auto w-4/5 max-w-7xl">
             @if ($records->count() > 0)
-            <section class="contenedor-tarjetas">
+            <section class="contenedor-tarjetas" style="margin-left: 0 !important; margin-right: 0 !important;">
                 @foreach ($records as $doc)
                 <div class="tarjeta-documento">
                     <div class="icono-pdf">📄</div>
-                    <h3 class="titulo-doc" title="{{ $doc->name }}">{{ \Illuminate\Support\Str::limit($doc->name, 80) }}</h3>
-                    <p class="descripcion-doc" title="{{ $doc->description }}">{{ \Illuminate\Support\Str::limit($doc->description, 120) }}</p>
+                    <h3 class="titulo-doc" title="{{ $doc->name }}">{{ \Illuminate\Support\Str::limit($doc->name, 80) }}
+                    </h3>
+                    <p class="descripcion-doc" title="{{ $doc->description }}">{{
+                        \Illuminate\Support\Str::limit($doc->description, 120) }}</p>
                     <div class="botones">
-                        <a class="boton ver" href="{{ asset($doc->path) }}" target="_blank" rel="noopener noreferrer">Ver</a>
+                        <a class="boton ver" href="{{ asset($doc->path) }}" target="_blank"
+                            rel="noopener noreferrer">Ver</a>
                         <a class="boton descargar" href="{{ asset($doc->path) }}" download>Descargar</a>
                     </div>
                 </div>
