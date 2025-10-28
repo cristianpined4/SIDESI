@@ -29,6 +29,7 @@ class EventosController extends Component
     public $is_organizer;
     public $is_ponente;
     public $pendiente;
+    public $rechazado;
     public $fields = [];   // inputs normales
     public $file;          // archivo temporal
     public $search = '';
@@ -246,6 +247,7 @@ public function render()
 
             // Detectar si la inscripción está pendiente (solo si existe)
             $this->pendiente = $inscripcion && $inscripcion->status === 'pendiente';
+            $this->rechazado = $inscripcion && $inscripcion->status === 'rechazado';
         }
 
         $this->abrirModal('event-modal', false);
@@ -489,6 +491,8 @@ public function render()
         $this->is_registered_sesion = false;
         $this->is_organizer = false;
         $this->is_ponente = false;
+        $this->pendiente = false;
+        $this->rechazado = false;
         $this->fields = [];
         $this->file = null;
         $this->resetErrorBag();

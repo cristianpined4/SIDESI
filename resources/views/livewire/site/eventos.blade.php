@@ -43,7 +43,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <img id="event-image"
-                    src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&h=500&fit=crop" alt="Evento"
+                    src="{{$records_event->main_image ?? 'https://via.placeholder.com/800x500?text=Sin+Imagen'}}" alt="Evento"
                     class="modal-image">
                 <button class="modal-close" onclick="closeModal(this.closest('.modal'))">×</button>
             </div>
@@ -138,6 +138,12 @@
                                     >
                                         Inscripción pendiente (Cancelar)
                                     </button>
+                                @elseif($rechazado)
+                                    <div class="flex justify-center items-center py-6">
+                                        <p class="text-xl font-semibold text-red-600 bg-red-100 px-6 py-3 rounded-lg shadow-sm">
+                                            Tu solicitud fue rechazada
+                                        </p>
+                                    </div>
                                 @else
                                     <button 
                                         type="button"
@@ -173,7 +179,7 @@
                         <div class="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300 cursor-pointer group"
                             wire:click="sesion({{$sesion->id}})">
                             <!-- Imagen -->
-                            <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&h=500&fit=crop"
+                            <img src="{{$sesion->main_image ?? 'https://via.placeholder.com/800x500?text=Sin+Imagen'}}"
                                 alt="{{ $sesion->title }}"
                                 class="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105">
 
@@ -243,7 +249,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <img id="event-image"
-                    src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&h=500&fit=crop" alt="sesion"
+                    src="{{$records_sesion->main_image ?? 'https://via.placeholder.com/800x500?text=Sin+Imagen'}}" alt="sesion"
                     class="modal-image">
                 <button class="modal-close" onclick="closeModal(this.closest('.modal'))">×</button>
             </div>
@@ -307,6 +313,8 @@
                                 Eres el ponente de esta sesión
                             </p>
                         </div>
+                    @elseif($rechazado)
+                    {{-- no muestra nada --}}
                     @else
                         {{-- Filtro para saber si el usuario está inscrito en el evento --}}
                         @if ($is_registered_evento && $pendiente === false)
@@ -430,7 +438,7 @@
                     wire:click="sesiones({{ $event->id }})">
 
                     <!-- Imagen -->
-                    <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&h=500&fit=crop"
+                    <img src="{{$event->main_image ?? 'https://via.placeholder.com/800x500?text=Sin+Imagen'}}"
                         alt="{{ $event->title }}"
                         class="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105">
 
