@@ -70,7 +70,7 @@ Con métodos:
 -   `edit($id)`: formulario de edición
 -   `update(Request $request, $id)`: actualizar registro (con subida de archivos)
 -   `destroy($id)`: eliminar registro (con eliminación de archivos)
--   Mensajes flash `with('success')` / `with('error')`
+-   Mensajes `$this->dispatch("message-success", "");` / `$this->dispatch("message-error", "");`
 -   Uso de transacciones DB
 
 ---
@@ -106,14 +106,22 @@ Route::middleware(['auth', 'admin'])->group(function () {
 
 ```js
 document.addEventListener("livewire:initialized", function () {
-    Livewire.on("cerrar-modal", function () {
-        $(".modal").modal("hide");
+    Livewire.on("cerrar-modal", function (modal) {
+        let modalElement = document.getElementById(modal[0].modal);
+        if (modalElement) {
+            closeModal(modalElement);
+        }
     });
-    Livewire.on("abrir-modal", function () {
-        $(".modal").modal("show");
-    });
-    Livewire.on("refresh", function () {
-        window.location.reload();
+
+    Livewire.on("abrir-modal", function (modal) {
+        let modalElement = document.getElementById(modal[0].modal);
+        if (modalElement) {
+            openModal(modalElement);
+            let modelDialog = modalElement.querySelector(".modal-dialog");
+            if (modelDialog) {
+                modelDialog.scrollTop = 0;
+            }
+        }
     });
 });
 
