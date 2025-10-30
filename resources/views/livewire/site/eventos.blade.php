@@ -3,7 +3,7 @@
 
 
 <main>
-    <div class="loading" wire:loading.attr="show" show="false">
+    <div class="loading" wire:loading.attr="show" show="false" wire:target.except="search">
         <div class="loader"></div>
         <p class="loading-text">Cargando...</p>
     </div>
@@ -426,7 +426,10 @@
             </div>
         </div>
         <!-- Grid de Cards -->
-        <div class="container mx-auto px-4 py-12">
+        <div class="container mx-auto px-4 py-12 relative">
+            <div class="loading-search" wire:loading>
+                <div class="loader"></div>
+            </div>
             <!-- Título de Sección -->
             <div class="mb-8">
                 <h2 class="text-3xl font-bold text-gray-800 ">Todos los Eventos</h2>
