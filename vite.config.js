@@ -3,6 +3,9 @@ import laravel from "laravel-vite-plugin";
 import tailwindcss from "@tailwindcss/vite";
 
 export default defineConfig({
+    build: {
+        chunkSizeWarningLimit: 3000, // tamaño en kB
+    },
     plugins: [
         laravel({
             input: [

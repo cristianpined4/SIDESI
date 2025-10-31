@@ -15,6 +15,7 @@ use App\Models\Eventos;
 use App\Models\Imagenes;
 use App\Models\User;
 use App\Models\SessionesEvento;
+use App\Models\InscripcionesEvento;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\File;
 
@@ -52,13 +53,16 @@ class EventosController extends Component
         'require_approval' => '',
     ];
     public $records_sesiones;
+    public $records_users_event;
     public $file;          // archivo temporal
     public $file2;          // archivo temporal
     public $search = '';
     public $search_sesiones = '';
     public $paginate = 10;
     public bool $loading = false;
-
+    public $orden = 'desc';      // 'asc' o 'desc'
+    public $modalidad = '';      // '', 'presencial', 'virtual'
+    public $estado = ''; // '', 'activo', 'inactivo'
     public function paginationView()
     {
         return 'vendor.livewire.tailwind';
@@ -71,44 +75,63 @@ class EventosController extends Component
                 return redirect()->route('login');
             }
         }
+        $this->records_users_event = collect();
         $this->records_sesiones = collect();
     }
 
-    public function render()
-    {
-        $query = Eventos::query();
+public function render()
+{
+    $query = Eventos::query();
 
-        if (!empty($this->search)) {
-            foreach ((new Eventos())->getFillable() as $field) {
-                $query->orWhere($field, 'like', '%' . $this->search . '%');
-            }
-        }
-
-        $records = $query->orderBy('id', 'asc')->paginate($this->paginate);
-        $driver = DB::getDriverName();
-
-        if ($driver === 'pgsql') {
-            $concatExpression = "TRIM(name || ' ' || lastname)";
-        } else {
-            $concatExpression = "TRIM(CONCAT_WS(' ', name, lastname))";
-        }
-
-        $recordsUsers = User::selectRaw("id, {$concatExpression} as name, is_active")
-            ->whereIn('role_id', [1, 2])
-            ->where('is_active', true)
-            ->orderBy('name')
-            ->get();
-
-        $recordsPonentes = User::selectRaw("id, {$concatExpression} as name, is_active")
-            ->whereIn('role_id', [1, 2, 3, 4])
-            ->where('is_active', true)
-            ->orderBy('name')
-            ->get();
-
-        return view('livewire.admin.eventos', compact('records', 'recordsUsers', 'recordsPonentes'))
-            ->extends('layouts.admin')
-            ->section('content');
+    // Búsqueda
+    if (!empty($this->search)) {
+        $searchTerm = '%' . $this->search . '%';
+        $query->where(function ($q) use ($searchTerm) {
+            $q->where('title', 'like', $searchTerm)
+              ->orWhere('description', 'like', $searchTerm)
+              ->orWhere('location', 'like', $searchTerm)
+              ->orWhere('contact_email', 'like', $searchTerm);
+        });
     }
+
+    // Filtro por modalidad
+    if (!empty($this->modalidad)) {
+        $query->where('mode', $this->modalidad);
+    }
+    // Filtro por estado (activo/inactivo)
+    if ($this->estado === 'activo') {
+        $query->where('is_active', true);
+    } elseif ($this->estado === 'inactivo') {
+        $query->where('is_active', false);
+    }
+
+    // Orden por fecha de inicio
+    $query->orderBy('start_time', $this->orden);
+
+    $records = $query->paginate($this->paginate);
+
+    // Usuarios y ponentes (sin cambios)
+    $driver = DB::getDriverName();
+    if ($driver === 'pgsql') {
+        $concatExpression = "TRIM(name || ' ' || lastname)";
+    } else {
+        $concatExpression = "TRIM(CONCAT_WS(' ', name, lastname))";
+    }
+    $recordsUsers = User::selectRaw("id, {$concatExpression} as name, is_active")
+        ->whereIn('role_id', [1, 2])
+        ->where('is_active', true)
+        ->orderBy('name')
+        ->get();
+    $recordsPonentes = User::selectRaw("id, {$concatExpression} as name, is_active")
+        ->whereIn('role_id', [1, 2, 3, 4])
+        ->where('is_active', true)
+        ->orderBy('name')
+        ->get();
+
+    return view('livewire.admin.eventos', compact('records', 'recordsUsers', 'recordsPonentes'))
+        ->extends('layouts.admin')
+        ->section('content');
+}
 
     public function abrirModal($idModal = 'modal-home', $initVoid = true, $newSession = false)
     {
@@ -135,9 +158,11 @@ class EventosController extends Component
         $this->dispatch("abrir-modal", ['modal' => $idModal]);
     }
 
-    public function cerrarModal($idModal = 'modal-home')
+    public function cerrarModal($idModal = 'modal-home', $initVoid = true)
     {
-        $this->resetUI();
+        if($initVoid){
+            $this->resetUI();
+        }
         $this->dispatch("cerrar-modal", ['modal' => $idModal]);
     }
 
@@ -536,6 +561,73 @@ class EventosController extends Component
         $this->abrirModal('Sesion-modal', false, true);
     }
 
+    public function participantesEventos($idEvento)
+    {
+        $this->records_users_event = User::join('inscripciones_eventos', 'users.id', '=', 'inscripciones_eventos.user_id')
+            ->where('inscripciones_eventos.evento_id', $idEvento)
+            ->select('users.*', 'inscripciones_eventos.status')
+            ->get();
+
+        if ($this->records_users_event === null) {
+            $this->records_users_event = collect();
+        }
+        
+        $this->record_id = $idEvento;
+        $this->abrirModal('participantes-evento-modal', false);
+    }
+
+    protected $listeners = ['confirmarAprobarParticipante', 'confirmarRechazarParticipante'];
+
+    // logica para aprobar los participante de los eventos
+    public function aprobarParticipante($idParticipante){ 
+        $this->cerrarModal('participantes-evento-modal', false);
+        $this->dispatch('confirmar-inscripcion', idEvento: $this->record_id, idSesion:null, idParticipante: $idParticipante, title: '¿Confirmar solicitud de inscripción?', text: '¿Está seguro que desea confirmar la solicitud de inscripción a este evento?', metodo: 'confirmarAprobarParticipante');
+    }
+
+    public function confirmarAprobarParticipante($idEvento, $idParticipante)
+    {
+        $inscripcion = InscripcionesEvento::where('evento_id', $idEvento)
+            ->where('user_id', $idParticipante)
+            ->first();
+
+        if ($inscripcion) {
+            $inscripcion->status = 'registrado'; 
+            $inscripcion->save();
+
+            $this->dispatch('inscripcion-message', $idEvento, 'Peticion de Inscripción Aprovada', 'participantesEventos');
+        } else {
+            $this->dispatch('alert', [
+                'type' => 'error',
+                'message' => 'No se encontró la inscripción del participante.'
+            ]);
+        }
+    }
+
+    // logica para Rechazar los participante de los eventos
+    public function rechazarParticipante($idParticipante){ 
+        $this->cerrarModal('participantes-evento-modal', false);
+        $this->dispatch('confirmar-cancelacion', idEvento: $this->record_id, idSesion:null, idParticipante: $idParticipante, title: 'Rechazar solicitud de inscripción?', text: '¿Está seguro que desea rechazar la solicitud de inscripción a este evento?', metodo: 'confirmarRechazarParticipante');
+    }
+
+    public function confirmarRechazarParticipante($idEvento, $idParticipante)
+    {
+        $inscripcion = InscripcionesEvento::where('evento_id', $idEvento)
+            ->where('user_id', $idParticipante)
+            ->first();
+
+        if ($inscripcion) {
+            $inscripcion->status = 'rechazado'; 
+            $inscripcion->save();
+
+            $this->dispatch('inscripcion-message', $idEvento, 'Peticion de Inscripción Rechazada', 'participantesEventos');
+        } else {
+            $this->dispatch('alert', [
+                'type' => 'error',
+                'message' => 'No se encontró la inscripción del participante.'
+            ]);
+        }
+    }
+
     #[On("delete")]
     public function destroy($id)
     {
@@ -616,6 +708,7 @@ class EventosController extends Component
         $this->record_id = null;
         $this->record_sesion_id = null;
         $this->records_sesiones = collect();
+        $this->records_users_event = collect();
         $this->fields = [
             'title' => '',
             'description' => '',

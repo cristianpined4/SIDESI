@@ -183,6 +183,7 @@
                         aria-label="Cerrar" onclick="closeModal(this.closest('.modal'))">
                         &times;
                     </button>
+                    
                 </div>
 
                 <!-- Barra superior de acciones -->
@@ -191,7 +192,9 @@
                         <input type="text" placeholder="Buscar..."
                             class="form-input w-full border border-gray-300 rounded-md focus:border-blue-500 focus:ring focus:ring-blue-200 transition"
                             wire:model.live.debounce.500ms="search_sesiones">
+                            
                     </div>
+                    
                     <button
                         class="btn btn-primary bg-blue-600 hover:bg-blue-700 text-white font-medium px-3 py-1.5 text-sm rounded-md shadow-sm transition"
                         wire:click="abrirModal('Sesion-modal-form',false,true)">
@@ -404,11 +407,200 @@
         </div>
     </div>
     <!-- Fin modal de sesion formulario -->
+
+    <!-- Modal de participantes en el evento -->
+    <div id="participantes-evento-modal" style="z-index: 1" class="modal" wire:ignore.self>
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable flex justify-center items-center"
+            style="max-width: 80%;padding: 0;">
+            <div class="modal-content w-full h-[80vh] flex flex-col rounded-xl shadow-lg overflow-hidden">
+
+                <!-- Header -->
+                <div class="modal-header bg-gradient-to-r text-white flex justify-between items-center">
+                    <h5 class="modal-title text-lg font-semibold px-6 py-3">Usuarios registrados al evento</h5>
+                    <button type="button"
+                        class="btn-close text-white text-2xl font-bold leading-none opacity-80 hover:opacity-100"
+                        aria-label="Cerrar" onclick="closeModal(this.closest('.modal'))">
+                        &times;
+                    </button>
+                    
+                </div>
+
+                <!-- Barra superior de acciones -->
+                <div class="flex flex-col md:flex-row justify-between items-center gap-4 px-6 py-3 border-b bg-gray-50">
+                    <div class="w-full md:w-1/2">
+                        <input type="text" placeholder="Buscar..."
+                            class="form-input w-full border border-gray-300 rounded-md focus:border-blue-500 focus:ring focus:ring-blue-200 transition"
+                            wire:model.live.debounce.500ms="search_sesiones">
+                            
+                    </div>
+                    
+                    {{-- <button
+                        class="btn btn-primary bg-blue-600 hover:bg-blue-700 text-white font-medium px-3 py-1.5 text-sm rounded-md shadow-sm transition"
+                        wire:click="abrirModal('Sesion-modal-form',false,true)">
+                        + Nueva Sesión
+                    </button> --}}
+                </div>
+
+                <!-- Contenido -->
+                <div class="modal-body flex-1 overflow-y-auto p-4">
+                    <div class="overflow-x-auto rounded-lg shadow-md bg-white">
+                        <table class="min-w-full text-left text-sm text-gray-700 border border-gray-200">
+                            <thead class="bg-gray-100 text-gray-800 uppercase text-xs font-semibold">
+                                <tr>
+                                    <th class="px-6 py-3 border-b">#</th>
+                                    <th class="px-6 py-3 border-b">Nombre</th>
+                                    <th class="px-6 py-3 border-b">Apellido</th>
+                                    <th class="px-6 py-3 border-b">Correo</th>
+                                    <th class="px-6 py-3 border-b">Teléfono</th>
+                                    <th class="px-6 py-3 border-b">Institución</th>
+                                    <th class="px-6 py-3 border-b">Estado</th>
+                                    <th class="px-6 py-3 border-b">Accion</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($records_users_event as $index => $user)
+                                    @if($user->status !== 'rechazado')
+
+                                        <tr class="hover:bg-gray-50">
+                                            <td class="px-6 py-3 border-b">{{ $index + 1 }}</td>
+                                            <td class="px-6 py-3 border-b">{{ $user?->name }}</td>
+                                            <td class="px-6 py-3 border-b">{{ $user?->lastname }}</td>
+                                            <td class="px-6 py-3 border-b">{{ $user?->email }}</td>
+                                            <td class="px-6 py-3 border-b">{{ $user?->phone ?? '—' }}</td>
+                                            <td class="px-6 py-3 border-b">{{ $user?->institution ?? '—' }}</td>
+                                            <td class="px-6 py-3 border-b text-center">
+                                                @switch($user?->status)
+                                                    @case('aprobado')
+                                                        <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-semibold">
+                                                            Aprobado
+                                                        </span>
+                                                        @break
+
+                                                    @case('pendiente')
+                                                        <span class="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-xs font-semibold">
+                                                            Pendiente
+                                                        </span>
+                                                        @break
+
+                                                    @case('rechazado')
+                                                        <span class="bg-red-100 text-red-700 px-3 py-1 rounded-full text-xs font-semibold">
+                                                            Rechazado
+                                                        </span>
+                                                        @break
+
+                                                    @case('cancelado')
+                                                        <span class="bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-xs font-semibold">
+                                                            Cancelado
+                                                        </span>
+                                                        @break
+
+                                                    @default
+                                                        <span class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-semibold">
+                                                            Registrado
+                                                        </span>
+                                                @endswitch
+                                            </td>
+                                            <td class="px-4 py-3 flex space-x-2 items-center">
+                                            @switch($user?->status)
+                                                @case('aprobado')
+
+                                                @break
+                                                @case('pendiente')
+                                                    <button
+                                                        class="bg-green-500 text-white px-3 py-1 rounded-md hover:bg-green-600 transition text-sm cursor-pointer"
+                                                        wire:click="aprobarParticipante({{$user->id}})">
+                                                        Aprobar
+                                                    </button>
+                                                    <button
+                                                        class="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600 transition text-sm cursor-pointer"
+                                                        wire:click="rechazarParticipante({{$user->id}})">
+                                                        Rechazar
+                                                    </button>
+                                                @break
+                                                @case('registrado')
+                                                    <button
+                                                        class="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600 transition text-sm cursor-pointer"
+                                                        wire:click="rechazarParticipante({{$user->id}})">
+                                                        Rechazar
+                                                    </button>
+                                                    <button
+                                                        class="bg-cyan-500 text-white px-3 py-1 rounded-md hover:bg-cyan-600 transition text-sm cursor-pointer"
+                                                        wire:click="">
+                                                        Imprimir 
+                                                    </button>
+                                                @break
+
+                                            @endswitch
+                                            </td>
+                                        </tr>
+                                    @else
+                                    {{-- no se mostraran los usuarios rechazados --}}
+                                    @endif
+                                @empty
+                                    <tr>
+                                        <td colspan="6" class="px-6 py-4 text-center text-gray-500">
+                                            No hay usuarios inscritos en este evento.
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <div class="modal-footer bg-gray-50 border-t px-6 py-3 flex justify-end">
+                    <button type="button"
+                        class="btn btn-primary   bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md"
+                        onclick="closeModal(this.closest('.modal'))">
+                        Cerrar
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <!-- Fin Modal de participantes en el evento -->
+
     <!-- Contenido - inicio -->
     <div class="flex justify-between items-end flex-wrap gap-4">
         <div class="flex items-start gap-4 flex-col" style="max-width: 800px;width: 100%;">
             <h2 class="text-xl font-semibold">Módulo Eventos</h2>
             <input type="text" placeholder="Buscar..." class="form-input" wire:model.live.debounce.500ms="search">
+            <!-- Filtros adicionales -->
+            <div class="flex flex-wrap gap-4 mt-4">
+                <!-- Filtro: Orden -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Fechas</label>
+                    <select wire:model.live="orden"
+                        class="form-select block w-full border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200">
+                        <option value="desc">Primeras Fechas</option>
+                        <option value="asc">Ultimas Fechas<option>
+                    </select>
+                </div>
+
+                <!-- Filtro: Modalidad -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Modalidad</label>
+                    <select wire:model.live="modalidad"
+                        class="form-select block w-full border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200">
+                        <option value="">Todas</option>
+                        <option value="presencial">Presencial</option>
+                        <option value="virtual">Virtual</option>
+                    </select>
+                </div>
+
+                <!-- Filtro: Estado -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Estado</label>
+                    <select wire:model.live="estado"
+                        class="form-select block w-full border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200">
+                        <option value="">Todos</option>
+                        <option value="activo">Activo</option>
+                        <option value="inactivo">Inactivo</option>
+                    </select>
+                </div>
+            </div>
         </div>
         <button class="btn btn-primary" style="max-width: 200px;" wire:click="abrirModal('modal-home')">
             Nuevo Evento
@@ -480,6 +672,11 @@
                             style="max-width: 200px;" wire:click="sesiones('{{$evento->id}}')">
                             Sesiones
                         </button>
+                        <button
+                            class="bg-cyan-500 text-white px-3 py-1 rounded-md hover:bg-cyan-600 transition text-sm cursor-pointer"
+                            style="max-width: 200px;" wire:click="participantesEventos('{{$evento->id}}')">
+                            Participantes
+                        </button>
                     </td>
                 </tr>
                 @endforeach
@@ -491,7 +688,7 @@
     </div>
     <!-- Contenido - fin -->
 </main>
-
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     document.addEventListener('livewire:initialized', function() {
             let is_paid = document.getElementById('is_paid');
@@ -502,6 +699,65 @@
                 if (modalElement) {
                     closeModal(modalElement);
                 }
+            });
+
+            Livewire.on('inscripcion-message', (data) => {
+
+                const idEvento = data[0];
+                const message = data[1];
+                const metodo = data[2];
+
+                Swal.fire('Éxito', message, 'success').then(() => {
+                    @this.call(metodo, idEvento);
+                });
+            });
+
+            Livewire.on('confirmar-inscripcion', ({
+                idEvento, idParticipante, idSesion, title, text, metodo
+            }) => {
+                Swal.fire({
+                    title: title,
+                    text: text,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Sí',
+                    cancelButtonText: 'No',
+                    customClass: {
+                        container: 'swal2-container z-[9999]'
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        if (idEvento !== null) {
+                            Livewire.dispatch(metodo, { idEvento, idParticipante });
+                        } else if (idSesion !== null) {
+                            Livewire.dispatch(metodo, { idSesion, idParticipante });
+                        }
+                    }
+                });
+            });
+
+            Livewire.on('confirmar-cancelacion', ({
+                idEvento, idParticipante, idSesion, title, text, metodo
+            }) => {
+                Swal.fire({
+                    title: title,
+                    text: text,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Sí',
+                    cancelButtonText: 'No',
+                    customClass: {
+                        container: 'swal2-container z-[9999]'
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        if (idEvento !== null) {
+                            Livewire.dispatch(metodo, { idEvento, idParticipante });
+                        } else if (idSesion !== null) {
+                            Livewire.dispatch(metodo, { idSesion, idParticipante });
+                        }
+                    }
+                });
             });
 
             Livewire.on('abrir-modal', function(modal) {

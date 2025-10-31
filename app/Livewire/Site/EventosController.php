@@ -26,33 +26,57 @@ class EventosController extends Component
     public $records_ponente;
     public $is_registered_evento;
     public $is_registered_sesion;
+    public $is_organizer;
+    public $is_ponente;
     public $pendiente;
+    public $rechazado;
     public $fields = [];   // inputs normales
     public $file;          // archivo temporal
     public $search = '';
     public $paginate = 10;
-
+    public $modalidad = '';
+    public $tab = 'proximos';
     public function paginationView()
     {
         return 'vendor.livewire.tailwind';
     }
 
-    public function render()
-    {
-        $query = Eventos::query();
+public function render()
+{
+    $query = Eventos::query();
 
-        if (!empty($this->search)) {
-            foreach ((new Eventos())->getFillable() as $field) {
-                $query->orWhere($field, 'like', '%' . $this->search . '%');
-            }
-        }
-
-        $records = $query->orderBy('id', 'desc')->paginate($this->paginate);
-
-        return view('livewire.site.eventos', compact('records'))
-            ->extends('layouts.site')
-            ->section('content');
+    // Búsqueda
+    if (!empty($this->search)) {
+        $term = '%' . $this->search . '%';
+        $query->where(function ($q) use ($term) {
+            $q->where('title', 'like', $term)
+              ->orWhere('description', 'like', $term)
+              ->orWhere('location', 'like', $term)
+              ->orWhere('contact_email', 'like', $term);
+        });
     }
+
+    // Filtro por modalidad (solo si se seleccionó algo)
+    if (!empty($this->modalidad)) {
+        $query->where('mode', $this->modalidad);
+    }
+
+    // ⚠️ TEMPORAL: COMENTA ESTO PARA VER TODOS LOS EVENTOS
+ 
+    if ($this->tab === 'proximos') {
+        $query->where('start_time', '>=', now());
+    } else {
+        $query->where('start_time', '<', now());
+    }
+
+
+    // Ordenar por fecha de inicio (más recientes primero)
+    $records = $query->orderBy('start_time', 'desc')->paginate($this->paginate);
+
+    return view('livewire.site.eventos', compact('records'))
+        ->extends('layouts.site')
+        ->section('content');
+}
 
     public function abrirModal($idModal = 'modal-home', $initVoid = true)
     {
@@ -218,8 +242,12 @@ class EventosController extends Component
             // Detectar si el usuario está inscrito a el evento
             $this->is_registered_evento = (bool) $inscripcion;
 
+            //detectar si el usuario es el organizador
+            $this->is_organizer = $item->organizer_id === Auth::id();
+
             // Detectar si la inscripción está pendiente (solo si existe)
             $this->pendiente = $inscripcion && $inscripcion->status === 'pendiente';
+            $this->rechazado = $inscripcion && $inscripcion->status === 'rechazado';
         }
 
         $this->abrirModal('event-modal', false);
@@ -244,6 +272,9 @@ class EventosController extends Component
 
             // Detectar si el usuario está inscrito a el evento
             $this->is_registered_sesion = (bool) $inscripcion;
+
+            // Detectar si el usuario es ponente
+            $this->is_ponente = $ponente->id === Auth::id();
 
             // Detectar si la inscripción está pendiente (solo si existe)
             // $this->pendiente = $inscripcion && $inscripcion->status === 'pendiente';
@@ -458,6 +489,10 @@ class EventosController extends Component
         $this->records_ponente = collect();
         $this->is_registered_evento = false;
         $this->is_registered_sesion = false;
+        $this->is_organizer = false;
+        $this->is_ponente = false;
+        $this->pendiente = false;
+        $this->rechazado = false;
         $this->fields = [];
         $this->file = null;
         $this->resetErrorBag();

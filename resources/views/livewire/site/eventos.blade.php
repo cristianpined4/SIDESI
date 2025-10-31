@@ -43,7 +43,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <img id="event-image"
-                    src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&h=500&fit=crop" alt="Evento"
+                    src="{{$records_event->main_image ?? 'https://via.placeholder.com/800x500?text=Sin+Imagen'}}" alt="Evento"
                     class="modal-image">
                 <button class="modal-close" onclick="closeModal(this.closest('.modal'))">×</button>
             </div>
@@ -115,29 +115,58 @@
                 </div>
 
                 @auth
-                {{-- filtro para saber si esta activo o si estan permitidas las inscripciones --}}
-                @if($records_event?->is_active && $records_event?->inscriptions_enabled)
-                {{-- ¿el usuario esta inscrito en el evento? --}}
-                @if ($is_registered_evento)
-                @if ($pendiente){{-- si la inscripcion esta pendiente --}}
-                <button type="button"
-                    class="btn bg-yellow-500 text-white px-4 py-2 rounded-md cursor-not-allowed opacity-75"
-                    wire:click="cancelarInscripcion({{ $records_event?->id }})">
-                    Inscripción pendiente (Cancelar)
-                </button>
-                @else
-                <button type="button" class="btn bg-gray-400 text-white px-4 py-2 rounded-md hover:bg-gray-500"
-                    wire:click="cancelarInscripcion({{ $records_event?->id }})">
-                    Ya inscrito (Cancelar)
-                </button>
-                @endif
-                @else {{--boton para inscribirse--}}
-                <button type="button" class="btn bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md"
-                    wire:click="inscribir({{ $records_event?->id }})">
-                    Inscribirse
-                </button>
-                @endif
-                @endif
+                    {{-- Si el usuario es organizador --}}
+                    @if ($is_organizer)
+                        <div class="flex justify-center items-center py-6">
+                            <p class="text-xl font-semibold text-green-600 bg-green-100 px-6 py-3 rounded-lg shadow-sm">
+                                Eres el organizador de este evento
+                            </p>
+                        </div>
+                    @else
+                        {{-- Si el evento está activo y permite inscripciones --}}
+                        @if ($records_event?->is_active && $records_event?->inscriptions_enabled)
+                            
+                            {{-- ¿El usuario está inscrito en el evento? --}}
+                            @if ($is_registered_evento)
+
+                                {{-- Si la inscripción está pendiente --}}
+                                @if ($pendiente)
+                                    <button 
+                                        type="button"
+                                        class="btn bg-yellow-500 text-white px-4 py-2 rounded-md cursor-not-allowed opacity-75"
+                                        wire:click="cancelarInscripcion({{ $records_event?->id }})"
+                                    >
+                                        Inscripción pendiente (Cancelar)
+                                    </button>
+                                @elseif($rechazado)
+                                    <div class="flex justify-center items-center py-6">
+                                        <p class="text-xl font-semibold text-red-600 bg-red-100 px-6 py-3 rounded-lg shadow-sm">
+                                            Tu solicitud fue rechazada
+                                        </p>
+                                    </div>
+                                @else
+                                    <button 
+                                        type="button"
+                                        class="btn bg-gray-400 text-white px-4 py-2 rounded-md hover:bg-gray-500"
+                                        wire:click="cancelarInscripcion({{ $records_event?->id }})"
+                                    >
+                                        Ya inscrito (Cancelar)
+                                    </button>
+                                @endif
+
+                            @else
+                                {{-- Botón para inscribirse --}}
+                                <button 
+                                    type="button"
+                                    class="btn bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md"
+                                    wire:click="inscribir({{ $records_event?->id }})"
+                                >
+                                    Inscribirse
+                                </button>
+                            @endif
+
+                        @endif
+                    @endif
                 @endauth
 
                 <h2 class="modal-title mt-10">Sesiones</h2>
@@ -150,7 +179,7 @@
                         <div class="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300 cursor-pointer group"
                             wire:click="sesion({{$sesion->id}})">
                             <!-- Imagen -->
-                            <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&h=500&fit=crop"
+                            <img src="{{$sesion->main_image ?? 'https://via.placeholder.com/800x500?text=Sin+Imagen'}}"
                                 alt="{{ $sesion->title }}"
                                 class="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105">
 
@@ -220,7 +249,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <img id="event-image"
-                    src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&h=500&fit=crop" alt="sesion"
+                    src="{{$records_sesion->main_image ?? 'https://via.placeholder.com/800x500?text=Sin+Imagen'}}" alt="sesion"
                     class="modal-image">
                 <button class="modal-close" onclick="closeModal(this.closest('.modal'))">×</button>
             </div>
@@ -277,21 +306,39 @@
                 </div>
 
                 @auth
-                {{-- filtro para saber si esta activo o si estan permitidas las inscripciones --}}
-                @if($is_registered_evento)
-                {{-- ¿el usuario esta inscrito en la sesion? --}}
-                @if ($is_registered_sesion)
-                <button type="button" class="btn bg-gray-400 text-white px-4 py-2 rounded-md hover:bg-gray-500"
-                    wire:click="cancelarInscripcionSesion({{ $records_sesion?->id }})">
-                    Ya inscrito (Cancelar)
-                </button>
-                @else {{--boton para inscribirse--}}
-                <button type="button" class="btn bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md"
-                    wire:click="inscribirSesion({{ $records_sesion?->id }})">
-                    Inscribirse
-                </button>
-                @endif
-                @endif
+                    {{-- Si el usuario es ponente --}}
+                    @if ($is_ponente)
+                        <div class="flex justify-center items-center py-6">
+                            <p class="text-xl font-semibold text-blue-600 bg-blue-100 px-6 py-3 rounded-lg shadow-sm">
+                                Eres el ponente de esta sesión
+                            </p>
+                        </div>
+                    @elseif($rechazado)
+                    {{-- no muestra nada --}}
+                    @else
+                        {{-- Filtro para saber si el usuario está inscrito en el evento --}}
+                        @if ($is_registered_evento && $pendiente === false)
+                            {{-- ¿El usuario está inscrito en la sesión? --}}
+                            @if ($is_registered_sesion)
+                                <button 
+                                    type="button"
+                                    class="btn bg-gray-400 text-white px-4 py-2 rounded-md hover:bg-gray-500"
+                                    wire:click="cancelarInscripcionSesion({{ $records_sesion?->id }})"
+                                >
+                                    Ya inscrito (Cancelar)
+                                </button>
+                            @else
+                                {{-- Botón para inscribirse a la sesión --}}
+                                <button 
+                                    type="button"
+                                    class="btn bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md"
+                                    wire:click="inscribirSesion({{ $records_sesion?->id }})"
+                                >
+                                    Inscribirse
+                                </button>
+                            @endif
+                        @endif
+                    @endif
                 @endauth
             </div>
         </div>
@@ -330,29 +377,7 @@
                 </div>
 
                 <!-- Filtro Tipo de Evento -->
-                <div class="w-full lg:w-auto">
-                    <div class="relative">
-                        <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none"
-                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z">
-                            </path>
-                        </svg>
-                        <select wire:model.live="tipo_evento"
-                            class="w-full lg:w-56 pl-12 pr-10 py-3 border border-gray-300 rounded-lg bg-white text-gray-700 appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                            <option value="">Tipo de evento</option>
-                            <option value="congreso">Congreso</option>
-                            <option value="taller">Taller</option>
-                            <option value="seminario">Seminario</option>
-                            <option value="conferencia">Conferencia</option>
-                        </select>
-                        <svg class="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none"
-                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7">
-                            </path>
-                        </svg>
-                    </div>
-                </div>
+              
 
                 <!-- Filtro Modalidad -->
                 <div class="w-full lg:w-auto">
@@ -413,7 +438,7 @@
                     wire:click="sesiones({{ $event->id }})">
 
                     <!-- Imagen -->
-                    <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&h=500&fit=crop"
+                    <img src="{{$event->main_image ?? 'https://via.placeholder.com/800x500?text=Sin+Imagen'}}"
                         alt="{{ $event->title }}"
                         class="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105">
 

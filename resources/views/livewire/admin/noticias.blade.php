@@ -114,7 +114,7 @@
     <!-- Encabezado y acciones -->
     <div class="flex justify-between items-end flex-wrap gap-4">
         <div class="flex items-start gap-4 flex-col" style="max-width: 800px;width: 100%;">
-            <h2 class="text-xl font-semibold">Módulo Contenidos</h2>
+            <h2 class="text-xl font-semibold">Módulo Noticias</h2>
             <input type="text" placeholder="Buscar..." class="form-input" wire:model.live.debounce.500ms="search">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-3 w-full">
                 <div>
