@@ -43,9 +43,9 @@
         <div class="modal-content">
             <div class="modal-header">
                 <img id="event-image"
-                    src="{{$records_event->main_image ?? 'https://via.placeholder.com/800x500?text=Sin+Imagen'}}" alt="Evento"
+                    src="{{$records_event?->main_image ?? 'https://via.placeholder.com/800x500?text=Sin+Imagen'}}" alt="Evento"
                     class="modal-image">
-                <button class="modal-close" onclick="closeModal(this.closest('.modal'))">×</button>
+                <button class="modal-close" wire:click="cerrarModal('event-modal', false)">×</button>
             </div>
             <div class="modal-body">
                 <div class="modal-meta">
@@ -179,7 +179,7 @@
                         <div class="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300 cursor-pointer group"
                             wire:click="sesion({{$sesion->id}})">
                             <!-- Imagen -->
-                            <img src="{{$sesion->main_image ?? 'https://via.placeholder.com/800x500?text=Sin+Imagen'}}"
+                            <img src="{{$sesion?->main_image ?? 'https://via.placeholder.com/800x500?text=Sin+Imagen'}}"
                                 alt="{{ $sesion->title }}"
                                 class="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105">
 
@@ -249,9 +249,9 @@
         <div class="modal-content">
             <div class="modal-header">
                 <img id="event-image"
-                    src="{{$records_sesion->main_image ?? 'https://via.placeholder.com/800x500?text=Sin+Imagen'}}" alt="sesion"
+                    src="{{$records_sesion?->main_image ?? 'https://via.placeholder.com/800x500?text=Sin+Imagen'}}" alt="sesion"
                     class="modal-image">
-                <button class="modal-close" onclick="closeModal(this.closest('.modal'))">×</button>
+                <button class="modal-close" wire:click="cerrarModal('sesion-modal', false)">×</button>
             </div>
             <div class="modal-body">
                 <div class="modal-meta">
@@ -441,7 +441,7 @@
                     wire:click="sesiones({{ $event->id }})">
 
                     <!-- Imagen -->
-                    <img src="{{$event->main_image ?? 'https://via.placeholder.com/800x500?text=Sin+Imagen'}}"
+                    <img src="{{$event?->main_image ?? 'https://via.placeholder.com/800x500?text=Sin+Imagen'}}"
                         alt="{{ $event->title }}"
                         class="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105">
 
@@ -589,6 +589,32 @@
                     }
                 }
             });
+        });
+
+        document.addEventListener('click', function(event) {
+            // Obtener todos los modales visibles
+            const modals = document.querySelectorAll('.modal');
+            
+            // Encontrar el modal más superficial (último abierto)
+            let topModal = null;
+            modals.forEach(modal => {
+                if (modal.style.display === 'flex' || modal.hasAttribute('show')) {
+                    topModal = modal;
+                }
+            });
+            
+            // Si hay un modal abierto
+            if (topModal) {
+                const modalContent = topModal.querySelector('.modal-content, .modal-dialog');
+                
+                // Verificar si el click fue fuera del modal-content
+                // Y que no sea en un botón de cerrar
+                if (modalContent && 
+                    !modalContent.contains(event.target) && 
+                    !event.target.closest('.modal-close, .btn-close, .btn-secondary')) {
+                    closeModal(topModal);
+                }
+            }
         });
     });
 

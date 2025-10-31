@@ -60,8 +60,6 @@ public function render()
     if (!empty($this->modalidad)) {
         $query->where('mode', $this->modalidad);
     }
-
-    // ⚠️ TEMPORAL: COMENTA ESTO PARA VER TODOS LOS EVENTOS
  
     if ($this->tab === 'proximos') {
         $query->where('start_time', '>=', now());
@@ -89,10 +87,13 @@ public function render()
         $this->dispatch("abrir-modal", ['modal' => $idModal]);
     }
 
-    public function cerrarModal($idModal = 'modal-home')
+    public function cerrarModal($idModal = 'modal-home', $resetUi = true)
     {
-        //$this->resetUI();
         $this->dispatch("cerrar-modal", ['modal' => $idModal]);
+        
+        if($resetUi){
+            $this->resetUI();
+        }
     }
 
     public function store()
@@ -291,7 +292,7 @@ public function render()
             return;
         }
         
-        $this->cerrarModal('event-modal');
+        $this->cerrarModal('event-modal', false);
         if($this->records_event->is_paid){
             $this->dispatch('confirmar-inscripcion', idEvento: $idEvento, idSesion:null, title: '¿Confirmar solicitud de inscripción?', text: '¿Está seguro que desea confirmar su solicitud de inscripción a este evento?', metodo: 'Confirmarinscribir');
         }else{
@@ -307,8 +308,8 @@ public function render()
             return;
         }
         
-        $this->cerrarModal('event-modal');
-        $this->cerrarModal('sesion-modal');
+        $this->cerrarModal('event-modal', false);
+        $this->cerrarModal('sesion-modal', false);
 
         $this->dispatch('confirmar-inscripcion', idEvento: null, idSesion:$idSesion, title: '¿Confirmar inscripción?', text: '¿Está seguro que desea confirmar su inscripción a esta sesion?', metodo: 'ConfirmarinscribirSesion');
     }
@@ -333,7 +334,7 @@ public function render()
 
             DB::commit();
 
-            $this->cerrarModal('event-modal');
+            $this->cerrarModal('event-modal', false);
             if($evento->is_paid){
                 $this->dispatch('inscripcion-message', $idEvento, 'Peticion de Inscripción exitosa', 'sesiones');
             }else{
@@ -358,7 +359,7 @@ public function render()
 
             DB::commit();
 
-            $this->cerrarModal('sesion-modal');
+            $this->cerrarModal('sesion-modal', false);
 
             $this->dispatch('inscripcion-message', $this->record_id, 'Inscripción exitosa', 'sesiones');
         } catch (\Throwable $th) {
@@ -383,7 +384,7 @@ public function render()
             $this->dispatch('message-error', 'No tienes una inscripción activa en este evento.');
             return;
         }
-        $this->cerrarModal('event-modal');
+        $this->cerrarModal('event-modal', false);
 
         if($this->records_event->is_paid){
             $this->dispatch('confirmar-cancelacion', idEvento: $idEvento, idSesion: null, title: '¿Cancelar solicitud de inscripción?', text: '¿Está seguro que desea cancelar su solicitud de inscripción a este evento?', metodoCancelacion:'confirmarCancelacionFinal', metodo:'sesiones');
@@ -400,8 +401,8 @@ public function render()
             return;
         }
         
-        $this->cerrarModal('event-modal');
-        $this->cerrarModal('sesion-modal');
+        $this->cerrarModal('event-modal', false);
+        $this->cerrarModal('sesion-modal', false);
 
 
         $this->dispatch('confirmar-cancelacion', idEvento: null, idSesion: $idSesion, title: '¿Cancelar inscripción?', text: '¿Está seguro que desea cancelar su inscripción a esta sesion?', metodoCancelacion:'confirmarCancelacionFinalSesion', metodo:'sesion');
