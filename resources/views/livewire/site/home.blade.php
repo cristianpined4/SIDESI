@@ -448,43 +448,15 @@
 
             </div>
             <div class="grid lg:grid-cols-3 gap-8">
-                <div data-slot="card"
-                    class="bg-card text-card-foreground flex flex-col gap-6 rounded-xl py-6 border-0 shadow-sm hover:shadow-md transition-all cursor-pointer lg:col-span-2 lg:row-span-1">
-                    <div data-slot="card-header"
-                        class="@container/card-header grid auto-rows-min grid-rows-[auto_auto] items-start gap-1.5 px-6 has-data-[slot=card-action]:grid-cols-[1fr_auto] [.border-b]:pb-6">
-                        <div class="flex items-center justify-between mb-2">
-                            <span data-slot="badge"
-                                class="inline-flex items-center justify-center rounded-md border px-2 py-0.5 text-xs font-medium w-fit whitespace-nowrap shrink-0 [&amp;&gt;svg]:size-3 gap-1 [&amp;&gt;svg]:pointer-events-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive transition-[color,box-shadow] overflow-hidden border-transparent bg-secondary text-secondary-foreground [a&amp;]:hover:bg-secondary/90">Convocatoria</span>
-                            <div class="flex items-center text-sm text-muted-foreground">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                    stroke-linejoin="round" class="lucide lucide-calendar h-4 w-4 mr-1">
-                                    <path d="M8 2v4"></path>
-                                    <path d="M16 2v4"></path>
-                                    <rect width="18" height="18" x="3" y="4" rx="2"></rect>
-                                    <path d="M3 10h18"></path>
-                                </svg>15 de Marzo, 2024
-                            </div>
-                        </div>
-                        <div data-slot="card-title" class="font-semibold text-2xl text-balance">Convocatoria Abierta:
-                            Congreso
-                            Nacional de Ingeniería 2024</div>
-                    </div>
-                    <div data-slot="card-content" class="px-6">
-                        <div data-slot="card-description" class="text-muted-foreground text-base leading-relaxed">Se
-                            abre la
-                            convocatoria para participar en el evento más importante del año con ponencias magistrales y
-                            talleres
-                            especializados.</div>
-                    </div>
-                </div>
+                @foreach ($recordsNoticias as $noticia)
+    
                 <div data-slot="card"
                     class="bg-card text-card-foreground flex flex-col gap-6 rounded-xl py-6 border-0 shadow-sm hover:shadow-md transition-all cursor-pointer">
                     <div data-slot="card-header"
                         class="@container/card-header grid auto-rows-min grid-rows-[auto_auto] items-start gap-1.5 px-6 has-data-[slot=card-action]:grid-cols-[1fr_auto] [.border-b]:pb-6">
                         <div class="flex items-center justify-between mb-2">
                             <span data-slot="badge"
-                                class="inline-flex items-center justify-center rounded-md border px-2 py-0.5 text-xs font-medium w-fit whitespace-nowrap shrink-0 [&amp;&gt;svg]:size-3 gap-1 [&amp;&gt;svg]:pointer-events-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive transition-[color,box-shadow] overflow-hidden border-transparent bg-secondary text-secondary-foreground [a&amp;]:hover:bg-secondary/90">Educación</span>
+                                class="inline-flex items-center justify-center rounded-md border px-2 py-0.5 text-xs font-medium w-fit whitespace-nowrap shrink-0 [&amp;&gt;svg]:size-3 gap-1 [&amp;&gt;svg]:pointer-events-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive transition-[color,box-shadow] overflow-hidden border-transparent bg-secondary text-secondary-foreground [a&amp;]:hover:bg-secondary/90">{{ $noticia->getCategoryLabelAttribute() }}</span>
                             <div class="flex items-center text-sm text-muted-foreground">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -493,59 +465,17 @@
                                     <path d="M16 2v4"></path>
                                     <rect width="18" height="18" x="3" y="4" rx="2"></rect>
                                     <path d="M3 10h18"></path>
-                                </svg>12 de Marzo, 2024
+                                </svg>{{ $noticia->getDateAttribute()   }}
                             </div>
                         </div>
-                        <div data-slot="card-title" class="font-semibold text-xl text-balance">Nuevos Cursos de
-                            Certificación
-                            Profesional</div>
+                        <div data-slot="card-title" class="font-semibold text-xl text-balance">{{ $noticia->title }}</div>
                     </div>
                     <div data-slot="card-content" class="px-6">
-                        <div data-slot="card-description" class="text-muted-foreground text-base leading-relaxed">Amplía
-                            tus
-                            competencias con nuestros nuevos programas de certificación en tecnologías emergentes.</div>
+                        <div data-slot="card-description" class="text-muted-foreground text-base leading-relaxed">{{ $noticia->description }}</div>
                     </div>
                 </div>
-                <div data-slot="card"
-                    class="bg-card text-card-foreground flex flex-col gap-6 rounded-xl py-6 border-0 shadow-sm hover:shadow-md transition-all cursor-pointer">
-                    <div data-slot="card-header"
-                        class="@container/card-header grid auto-rows-min grid-rows-[auto_auto] items-start gap-1.5 px-6 has-data-[slot=card-action]:grid-cols-[1fr_auto] [.border-b]:pb-6">
-                        <div class="flex items-center justify-between mb-2">
-                            <span data-slot="badge"
-                                class="inline-flex items-center justify-center rounded-md border px-2 py-0.5 text-xs font-medium w-fit whitespace-nowrap shrink-0 [&amp;&gt;svg]:size-3 gap-1 [&amp;&gt;svg]:pointer-events-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive transition-[color,box-shadow] overflow-hidden border-transparent bg-secondary text-secondary-foreground [a&amp;]:hover:bg-secondary/90">Empleo</span>
-                            <div class="flex items-center text-sm text-muted-foreground">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                    stroke-linejoin="round" class="lucide lucide-calendar h-4 w-4 mr-1">
-                                    <path d="M8 2v4"></path>
-                                    <path d="M16 2v4"></path>
-                                    <rect width="18" height="18" x="3" y="4" rx="2"></rect>
-                                    <path d="M3 10h18"></path>
-                                </svg>10 de Marzo, 2024
-                            </div>
-                        </div>
-                        <div data-slot="card-title" class="font-semibold text-xl text-balance">Bolsa de Empleo:
-                            Oportunidades
-                            para Egresados</div>
-                    </div>
-                    <div data-slot="card-content" class="px-6">
-                        <div data-slot="card-description" class="text-muted-foreground text-base leading-relaxed">Nuevas
-                            ofertas
-                            laborales disponibles para recién graduados y profesionales con experiencia.</div>
-                    </div>
-                </div>
-            </div>
-            <div class="text-center mt-8 sm:hidden"><button data-slot="button"
-                    class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg:not([class*=&#x27;size-&#x27;])]:size-4 shrink-0 [&amp;_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50 h-9 px-4 py-2 has-[&gt;svg]:px-3">Ver
-                    Todas las Noticias
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                        class="lucide lucide-arrow-right ml-2 h-4 w-4">
-                        <path d="M5 12h14"></path>
-                        <path d="m12 5 7 7-7 7"></path>
-                    </svg>
-                </button>
-            </div>
+                
+                @endforeach
         </div>
     </section>
     <!-- Contenido - fin -->

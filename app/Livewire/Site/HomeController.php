@@ -6,14 +6,16 @@ use Livewire\Attributes\On;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Livewire\WithFileUploads;
+use App\Models\Contenidos;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 class HomeController extends Component
 {
     use WithPagination, WithFileUploads;
-
+    
     public $record_id;
+    public $recordsNoticias= [];
     public $fields = [];   // inputs normales
     public $file;          // archivo temporal
     public $search = '';
@@ -26,19 +28,15 @@ class HomeController extends Component
 
     public function render()
     {
-        /* $query = Home::query();
-
-        if (!empty($this->search)) {
-            foreach ((new Home())->getFillable() as $field) {
-                $query->orWhere($field, 'like', '%' . $this->search . '%');
-            }
-        }
-
-        $records = $query->orderBy('id', 'desc')->paginate($this->paginate); */
-
-        return view('livewire.site.home'/* , compact('records') */)
-            ->extends('layouts.site')
-            ->section('content');
+        $this->recordsNoticias = Contenidos::orderBy('created_at', 'desc')
+            ->take(3)
+            ->get();
+        // dd($this->recordsNoticias);
+        return view('livewire.site.home', [
+            'recordsNoticias' => $this->recordsNoticias
+        ])
+        ->extends('layouts.site')
+        ->section('content');
     }
 
     public function abrirModal($idModal = 'modal-home')
@@ -173,6 +171,7 @@ class HomeController extends Component
     public function resetUI()
     {
         $this->record_id = null;
+        $this->recordsNoticias = Collect();
         $this->fields = [];
         $this->file = null;
         $this->resetErrorBag();
