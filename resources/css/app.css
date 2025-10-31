@@ -580,3 +580,4 @@ input[type="file"].form-control::file-selector-button:focus {
   background-color: #007bff;
   color: #fff;
 }
+.avatar_edit { width: 30px !important; height: 30px !important; }
