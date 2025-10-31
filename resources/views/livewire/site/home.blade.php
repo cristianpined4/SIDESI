@@ -1,6 +1,11 @@
 @section('title', "SIDESI - Sistema de Desarrollo de Estudiantes de Ingeniería")
 
-<main>
+<main style="width: 100%;">
+    <div class="loading" wire:loading.attr="show" show="false">
+        <div class="loader"></div>
+        <p class="loading-text">Cargando...</p>
+    </div>
+
     <!-- modales -->
     <div id="modal-home" class="modal" wire:ignore.self>
         <div class="modal-dialog">
@@ -149,7 +154,9 @@
             </div>
             <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                 <div data-slot="card"
-                    class="bg-card text-card-foreground flex flex-col gap-6 rounded-xl py-6 border-0 shadow-sm hover:shadow-md transition-shadow">
+                    onclick="redirectCard('/eventos', this)"
+                    class="bg-card text-card-foreground flex flex-col gap-6 rounded-xl py-6 border-0 shadow-sm hover:shadow-md transition-shadow cursor-pointer select-none hover:shadow-md hover:border-primary/20 active:scale-[0.98] transition-all
+">
                     <div data-slot="card-header"
                         class="@container/card-header grid auto-rows-min grid-rows-[auto_auto] items-start gap-1.5 px-6 has-data-[slot=card-action]:grid-cols-[1fr_auto] [.border-b]:pb-6">
                         <div class="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
@@ -164,18 +171,41 @@
                         </div>
                         <div data-slot="card-title" class="font-semibold text-xl">Gestión de Eventos</div>
                     </div>
-                    <div data-slot="card-content" class="px-6">
+                    <div onclick="window.location.href='/eventos'"
+                        data-slot="card-content" class="px-6">
                         <div data-slot="card-description" class="text-muted-foreground text-base leading-relaxed">
                             Organiza y
                             participa en talleres, conferencias y actividades académicas con inscripción automática.
                         </div>
                     </div>
                 </div>
+                <script>
+                    function redirectCard(url, card) {
+                        // Efecto visual de selección
+                        card.classList.add('ring-2', 'ring-primary/40', 'opacity-80');
+
+                        // Activa el loader existente
+                        const loader = document.querySelector('.loading');
+                        if (loader) {
+                            loader.setAttribute('show', 'true');
+                            loader.style.display = 'flex'; // asegura que se vea si estaba oculto por CSS
+                        }
+
+                        // Redirige después de una breve pausa
+                        setTimeout(() => {
+                            window.location.href = url;
+                        }, 400);
+                    }
+                </script>
+
                 <div data-slot="card"
-                    class="bg-card text-card-foreground flex flex-col gap-6 rounded-xl py-6 border-0 shadow-sm hover:shadow-md transition-shadow">
+                    onclick="redirectCard('/documentos', this)"
+                    class="bg-card text-card-foreground flex flex-col gap-6 rounded-xl py-6 border-0 shadow-sm hover:shadow-md hover:border-primary/20 transition-shadow cursor-pointer select-none active:scale-[0.98] transition-all">
+
                     <div data-slot="card-header"
                         class="@container/card-header grid auto-rows-min grid-rows-[auto_auto] items-start gap-1.5 px-6 has-data-[slot=card-action]:grid-cols-[1fr_auto] [.border-b]:pb-6">
-                        <div class="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
+
+                        <div class="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4 transition-colors group-hover:bg-primary/20">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                 stroke-linejoin="round" class="lucide lucide-file-text h-6 w-6 text-primary">
@@ -188,20 +218,43 @@
                         </div>
                         <div data-slot="card-title" class="font-semibold text-xl">Centro de Documentos</div>
                     </div>
+
                     <div data-slot="card-content" class="px-6">
-                        <div data-slot="card-description" class="text-muted-foreground text-base leading-relaxed">Accede
-                            a
-                            planes de estudio, reglamentos, guías y material académico actualizado.</div>
+                        <div data-slot="card-description" class="text-muted-foreground text-base leading-relaxed">
+                            Accede a planes de estudio, reglamentos, guías y material académico actualizado.
+                        </div>
                     </div>
                 </div>
+
+                <script>
+                    function redirectCard(url, card) {
+                        // Efecto visual en la card seleccionada
+                        card.classList.add('ring-2', 'ring-primary/40', 'opacity-80');
+
+                        // Mostrar loader existente
+                        const loader = document.querySelector('.loading');
+                        if (loader) {
+                            loader.setAttribute('show', 'true');
+                            loader.style.display = 'flex';
+                        }
+                        setTimeout(() => {
+                            window.location.href = url;
+                        }, 400);
+                    }
+                </script>
+
                 <div data-slot="card"
-                    class="bg-card text-card-foreground flex flex-col gap-6 rounded-xl py-6 border-0 shadow-sm hover:shadow-md transition-shadow">
+                    onclick="redirectCard('/eventos', this)"
+                    class="bg-card text-card-foreground flex flex-col gap-6 rounded-xl py-6 border-0 shadow-sm hover:shadow-md hover:border-primary/20 transition-shadow cursor-pointer select-none active:scale-[0.98] transition-all">
+
                     <div data-slot="card-header"
                         class="@container/card-header grid auto-rows-min grid-rows-[auto_auto] items-start gap-1.5 px-6 has-data-[slot=card-action]:grid-cols-[1fr_auto] [.border-b]:pb-6">
-                        <div class="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round" class="lucide lucide-users h-6 w-6 text-primary">
+
+                        <div class="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4 transition-colors group-hover:bg-primary/20">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                class="lucide lucide-users h-6 w-6 text-primary">
                                 <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
                                 <circle cx="9" cy="7" r="4"></circle>
                                 <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
@@ -212,18 +265,42 @@
                     </div>
                     <div data-slot="card-content" class="px-6">
                         <div data-slot="card-description" class="text-muted-foreground text-base leading-relaxed">
-                            Conecta con
-                            estudiantes, docentes y egresados en una plataforma integrada.</div>
+                            Conecta con estudiantes, docentes y egresados en una plataforma integrada.
+                        </div>
                     </div>
                 </div>
+
+                <script>
+                    function redirectCard(url, card) {
+                        // Agrega efecto visual de selección
+                        card.classList.add('ring-2', 'ring-primary/40', 'opacity-80');
+
+                        // Muestra el loader global existente
+                        const loader = document.querySelector('.loading');
+                        if (loader) {
+                            loader.setAttribute('show', 'true');
+                            loader.style.display = 'flex';
+                        }
+
+                        // Redirige después de un breve retardo
+                        setTimeout(() => {
+                            window.location.href = url;
+                        }, 400);
+                    }
+                </script>
+
                 <div data-slot="card"
-                    class="bg-card text-card-foreground flex flex-col gap-6 rounded-xl py-6 border-0 shadow-sm hover:shadow-md transition-shadow">
+                    onclick="redirectCard('/eventos', this)"
+                    class="bg-card text-card-foreground flex flex-col gap-6 rounded-xl py-6 border-0 shadow-sm hover:shadow-md hover:border-primary/20 transition-shadow cursor-pointer select-none active:scale-[0.98] transition-all">
+
                     <div data-slot="card-header"
                         class="@container/card-header grid auto-rows-min grid-rows-[auto_auto] items-start gap-1.5 px-6 has-data-[slot=card-action]:grid-cols-[1fr_auto] [.border-b]:pb-6">
-                        <div class="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round" class="lucide lucide-credit-card h-6 w-6 text-primary">
+
+                        <div class="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4 transition-colors group-hover:bg-primary/20">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                class="lucide lucide-credit-card h-6 w-6 text-primary">
                                 <rect width="20" height="14" x="2" y="5" rx="2"></rect>
                                 <line x1="2" x2="22" y1="10" y2="10"></line>
                             </svg>
@@ -232,53 +309,120 @@
                     </div>
                     <div data-slot="card-content" class="px-6">
                         <div data-slot="card-description" class="text-muted-foreground text-base leading-relaxed">
-                            Realiza pagos
-                            seguros para eventos y servicios con comprobantes electrónicos.</div>
+                            Realiza pagos seguros para eventos y servicios con comprobantes electrónicos.
+                        </div>
                     </div>
                 </div>
+
+                <script>
+                    function redirectCard(url, card) {
+                        // Efecto visual de selección
+                        card.classList.add('ring-2', 'ring-primary/40', 'opacity-80');
+
+                        // Mostrar el loader de Livewire existente
+                        const loader = document.querySelector('.loading');
+                        if (loader) {
+                            loader.setAttribute('show', 'true');
+                            loader.style.display = 'flex';
+                        }
+
+                        setTimeout(() => {
+                            window.location.href = url;
+                        }, 400);
+                    }
+                </script>
                 <div data-slot="card"
-                    class="bg-card text-card-foreground flex flex-col gap-6 rounded-xl py-6 border-0 shadow-sm hover:shadow-md transition-shadow">
+                    onclick="redirectCard('/eventos', this)"
+                    class="bg-card text-card-foreground flex flex-col gap-6 rounded-xl py-6 border-0 shadow-sm hover:shadow-md hover:border-primary/20 transition-shadow cursor-pointer select-none active:scale-[0.98] transition-all">
+
                     <div data-slot="card-header"
                         class="@container/card-header grid auto-rows-min grid-rows-[auto_auto] items-start gap-1.5 px-6 has-data-[slot=card-action]:grid-cols-[1fr_auto] [.border-b]:pb-6">
-                        <div class="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round" class="lucide lucide-award h-6 w-6 text-primary">
+
+                        <div class="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4 transition-colors group-hover:bg-primary/20">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                class="lucide lucide-award h-6 w-6 text-primary">
                                 <path
                                     d="m15.477 12.89 1.515 8.526a.5.5 0 0 1-.81.47l-3.58-2.687a1 1 0 0 0-1.197 0l-3.586 2.686a.5.5 0 0 1-.81-.469l1.514-8.526">
                                 </path>
                                 <circle cx="12" cy="8" r="6"></circle>
                             </svg>
                         </div>
+
                         <div data-slot="card-title" class="font-semibold text-xl">Certificaciones</div>
                     </div>
+
                     <div data-slot="card-content" class="px-6">
-                        <div data-slot="card-description" class="text-muted-foreground text-base leading-relaxed">Obtén
-                            certificados digitales verificables con códigos QR para tus logros académicos.</div>
+                        <div data-slot="card-description" class="text-muted-foreground text-base leading-relaxed">
+                            Obtén certificados digitales verificables con códigos QR para tus logros académicos.
+                        </div>
                     </div>
                 </div>
+
+                <script>
+                    function redirectCard(url, card) {
+                        // Efecto visual de selección
+                        card.classList.add('ring-2', 'ring-primary/40', 'opacity-80');
+
+                        // Mostrar loader global (Livewire)
+                        const loader = document.querySelector('.loading');
+                        if (loader) {
+                            loader.setAttribute('show', 'true');
+                            loader.style.display = 'flex';
+                        }
+
+                        setTimeout(() => {
+                            window.location.href = url;
+                        }, 400);
+                    }
+                </script>
+
                 <div data-slot="card"
-                    class="bg-card text-card-foreground flex flex-col gap-6 rounded-xl py-6 border-0 shadow-sm hover:shadow-md transition-shadow">
+                    onclick="redirectCard('/noticias', this)"
+                    class="bg-card text-card-foreground flex flex-col gap-6 rounded-xl py-6 border-0 shadow-sm hover:shadow-md hover:border-primary/20 transition-shadow cursor-pointer select-none active:scale-[0.98] transition-all">
+
                     <div data-slot="card-header"
                         class="@container/card-header grid auto-rows-min grid-rows-[auto_auto] items-start gap-1.5 px-6 has-data-[slot=card-action]:grid-cols-[1fr_auto] [.border-b]:pb-6">
-                        <div class="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round" class="lucide lucide-search h-6 w-6 text-primary">
+
+                        <div class="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4 transition-colors group-hover:bg-primary/20">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                class="lucide lucide-search h-6 w-6 text-primary">
                                 <circle cx="11" cy="11" r="8"></circle>
                                 <path d="m21 21-4.3-4.3"></path>
                             </svg>
                         </div>
+
                         <div data-slot="card-title" class="font-semibold text-xl">Búsqueda Avanzada</div>
                     </div>
+
                     <div data-slot="card-content" class="px-6">
                         <div data-slot="card-description" class="text-muted-foreground text-base leading-relaxed">
-                            Encuentra
-                            rápidamente noticias, eventos, documentos y oportunidades profesionales.</div>
+                            Encuentra rápidamente noticias, eventos, documentos y oportunidades profesionales.
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
+
+                <script>
+                    function redirectCard(url, card) {
+                        // Efecto visual al seleccionar la card
+                        card.classList.add('ring-2', 'ring-primary/40', 'opacity-80');
+
+                        // Activar el loader Livewire existente
+                        const loader = document.querySelector('.loading');
+                        if (loader) {
+                            loader.setAttribute('show', 'true');
+                            loader.style.display = 'flex';
+                        }
+
+                        setTimeout(() => {
+                            window.location.href = url;
+                        }, 400);
+                    }
+                </script>
+
     </section>
     <section class="py-24 bg-background">
         <div class="container mx-auto px-4">
