@@ -31,6 +31,5 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/eventos', App\Livewire\Admin\EventosController::class)->name('eventos');
     Route::get('/documentos', App\Livewire\Admin\DocumentosController::class)->name('documentos');
     Route::get('/noticias', App\Livewire\Admin\NoticiasController::class)->name('noticias');
-    Route::get('/configuraciones', App\Livewire\Admin\ConfiguracionController::class)->name('configuraciones');
   });
 });
