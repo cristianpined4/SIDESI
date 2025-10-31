@@ -50,7 +50,7 @@ public function render()
         $term = '%' . $this->search . '%';
         $query->where(function ($q) use ($term) {
             $q->where('title', 'like', $term)
-              ->orWhere('description', 'like', $term)
+            //   ->orWhere('description', 'like', $term)
               ->orWhere('location', 'like', $term)
               ->orWhere('contact_email', 'like', $term);
         });
