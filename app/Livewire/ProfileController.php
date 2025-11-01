@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Site;
+namespace App\Livewire;
 
 use Livewire\Component;
 use Livewire\WithFileUploads;
@@ -41,7 +41,7 @@ class ProfileController extends Component
             return redirect()->route('login');
         }
         // Seleccionar layout según rol
-        $this->layout = in_array((int)($user->role_id ?? 0), [1, 2]) ? 'layouts.admin' : 'layouts.site';
+        $this->layout = in_array((int) ($user->role_id ?? 0), [1, 2]) && request()->routeIs('admin.*') ? 'layouts.admin' : 'layouts.site';
 
         $this->fields['name'] = $user->name;
         $this->fields['lastname'] = $user->lastname;
@@ -67,7 +67,11 @@ class ProfileController extends Component
                 Rule::unique('users', 'email')->ignore($userId),
             ],
             'fields.username' => [
-                'required', 'string', 'min:3', 'max:50', 'regex:/^[a-zA-Z0-9._]+$/u',
+                'required',
+                'string',
+                'min:3',
+                'max:50',
+                'regex:/^[a-zA-Z0-9._]+$/u',
                 Rule::unique('users', 'username')->ignore($userId),
             ],
             'fields.phone' => 'nullable|string|max:30',
@@ -122,8 +126,8 @@ class ProfileController extends Component
             $h = imagesy($src);
             // Crop centrado a cuadrado
             $side = min($w, $h);
-            $srcX = (int)(($w - $side) / 2);
-            $srcY = (int)(($h - $side) / 2);
+            $srcX = (int) (($w - $side) / 2);
+            $srcY = (int) (($h - $side) / 2);
             $crop = imagecreatetruecolor($side, $side);
             imagecopyresampled($crop, $src, 0, 0, $srcX, $srcY, $side, $side, $side, $side);
             imagedestroy($src);
@@ -162,7 +166,9 @@ class ProfileController extends Component
         $this->validate([
             'passwords.current' => 'required',
             'passwords.new' => [
-                'required', 'min:8', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-={}\[\]:;"\'`~<>,.?/\\]).+$/'
+                'required',
+                'min:8',
+                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-={}\[\]:;"\'`~<>,.?/\\]).+$/'
             ],
             'passwords.confirm' => 'required|same:passwords.new',
         ], [
@@ -188,7 +194,10 @@ class ProfileController extends Component
             $currentId = request()->session()->getId();
             DB::table('sessions')->where('user_id', $user->id)->where('id', '!=', $currentId)->delete();
             // Notificar por correo
-            try { $user->notify(new PasswordChanged()); } catch (\Throwable $e) {}
+            try {
+                $user->notify(new PasswordChanged());
+            } catch (\Throwable $e) {
+            }
             $this->passwords = ['current' => '', 'new' => '', 'confirm' => ''];
             $this->dispatch('message-success', 'Contraseña actualizada correctamente');
         } catch (\Throwable $th) {
@@ -222,7 +231,7 @@ class ProfileController extends Component
 
     public function render()
     {
-        return view('livewire.site.profile-controller')
+        return view('livewire.profile-controller')
             ->extends($this->layout)
             ->section('content');
     }

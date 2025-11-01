@@ -13,14 +13,14 @@ Route::get('/register', App\Livewire\Admin\Auth\RegisterController::class)->name
 Route::get('/contactos', App\Livewire\Site\ContactoController::class)->name('site.contactos');
 Route::get('/documentos', App\Livewire\Site\DocumentosController::class)->name('site.documentos');
 Route::get('/eventos', App\Livewire\Site\EventosController::class)->name('site.eventos');
-Route::get('/perfil', App\Livewire\Site\ProfileController::class)->name('profile');
+Route::get('/perfil', App\Livewire\ProfileController::class)->name('profile');
 
 
 /* Rutas del admin */
 Route::middleware(['auth'])->group(function () {
   Route::get('/logout', [App\Livewire\Admin\Auth\LoginController::class, 'logout'])->name('logout');
   Route::post('/logout', [App\Livewire\Admin\Auth\LoginController::class, 'logout'])->name('logout');
-  
+
   Route::prefix('admin')->name('admin.')->group(function () {
     // Redirección base
     Route::redirect('/', '/admin/dashboard');
@@ -31,5 +31,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/eventos', App\Livewire\Admin\EventosController::class)->name('eventos');
     Route::get('/documentos', App\Livewire\Admin\DocumentosController::class)->name('documentos');
     Route::get('/noticias', App\Livewire\Admin\NoticiasController::class)->name('noticias');
+    Route::get('/perfil', App\Livewire\ProfileController::class)->name('profile');
   });
 });

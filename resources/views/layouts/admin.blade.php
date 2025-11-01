@@ -51,13 +51,13 @@
               {{ Auth::user()->role->name }}
             </span>
           </div>
-            @php
-            $meta = auth()->user()->metadata ?? [];
-            $avatarPath = is_array($meta) && isset($meta['avatar']) ? $meta['avatar'] : null;
-            $avatarUrl = $avatarPath ? asset($avatarPath) : 'https://ui-avatars.com/api/?name=' . urlencode(auth()->user()->name . ' ' . auth()->user()->lastname) . '&background=E5E7EB&color=111827';
-            @endphp
-          <img src="{{ $avatarUrl }}" alt="Avatar"
-            class="h-9 w-9 rounded-full object-cover ring-1 ring-slate-200" />
+          @php
+          $meta = auth()->user()->metadata ?? [];
+          $avatarPath = is_array($meta) && isset($meta['avatar']) ? $meta['avatar'] : null;
+          $avatarUrl = $avatarPath ? asset($avatarPath) : 'https://ui-avatars.com/api/?name=' .
+          urlencode(auth()->user()->name . ' ' . auth()->user()->lastname) . '&background=E5E7EB&color=111827';
+          @endphp
+          <img src="{{ $avatarUrl }}" alt="Avatar" class="h-9 w-9 rounded-full object-cover ring-1 ring-slate-200" />
 
           <svg class="w-4 h-4 text-slate-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
             stroke="currentColor">
@@ -68,7 +68,9 @@
         <!-- Dropdown (incluye Cerrar sesión) -->
         <div id="userDropdown"
           class="absolute right-0 mt-2 w-56 bg-white border border-gray-100 rounded-xl shadow-lg overflow-hidden hidden z-50">
-          <a href="/perfil" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md" style="cursor: pointer;">Perfil</a>
+          <a href="{{ route('admin.profile') }}"
+            class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md"
+            style="cursor: pointer;">Perfil</a>
           <form method="POST" action="{{ route('logout') }}">
             @csrf
             <button type="submit" class="w-full text-left block px-4 py-2.5 text-sm text-red-600 hover:bg-gray-50">
