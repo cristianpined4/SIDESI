@@ -76,11 +76,12 @@
             @else
             <!-- Menú de usuario -->
             <div class="relative hidden lg:flex" x-data="{ menuVisible: false }">
-            @php
-            $meta = auth()->user()->metadata ?? [];
-            $avatarPath = is_array($meta) && isset($meta['avatar']) ? $meta['avatar'] : null;
-            $avatarUrl = $avatarPath ? asset($avatarPath) : 'https://ui-avatars.com/api/?name=' . urlencode(auth()->user()->name . ' ' . auth()->user()->lastname) . '&background=E5E7EB&color=111827';
-            @endphp
+              @php
+              $meta = auth()->user()->metadata ?? [];
+              $avatarPath = is_array($meta) && isset($meta['avatar']) ? $meta['avatar'] : null;
+              $avatarUrl = $avatarPath ? asset($avatarPath) : 'https://ui-avatars.com/api/?name=' .
+              urlencode(auth()->user()->name . ' ' . auth()->user()->lastname) . '&background=E5E7EB&color=111827';
+              @endphp
               <button @click="menuVisible = !menuVisible" class="flex items-center space-x-2 focus:outline-none">
                 <img src="{{ $avatarUrl }}" alt="Avatar" class="h-8 w-8 rounded-full object-cover">
                 <span class="text-sm font-medium text-gray-800" style="text-align: left !important;">
@@ -106,8 +107,8 @@
 
                 <div class="py-1">
                   {{-- Perfil --}}
-                  <a href="/perfil" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md"
-                    style="cursor: pointer;">
+                  <a href="{{ route('profile') }}"
+                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md" style="cursor: pointer;">
                     Perfil
                   </a>
 
@@ -198,7 +199,8 @@
 
                   <div class="py-1">
                     {{-- Perfil --}}
-                    <a href="/perfil" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md"
+                    <a href="{{ route('profile') }}"
+                      class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md"
                       style="cursor: pointer;">
                       Perfil
                     </a>

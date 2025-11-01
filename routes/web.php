@@ -21,7 +21,7 @@ Route::get('/perfil', App\Livewire\Site\PerfilController::class)->name('profile'
 Route::middleware(['auth'])->group(function () {
   Route::get('/logout', [App\Livewire\Admin\Auth\LoginController::class, 'logout'])->name('logout');
   Route::post('/logout', [App\Livewire\Admin\Auth\LoginController::class, 'logout'])->name('logout');
-  
+
   Route::prefix('admin')->name('admin.')->group(function () {
     // Redirección base
     Route::redirect('/', '/admin/dashboard');
