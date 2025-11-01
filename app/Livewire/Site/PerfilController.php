@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire;
+namespace App\Livewire\Site;
 
 use Livewire\Component;
 use Livewire\WithFileUploads;
@@ -166,13 +166,7 @@ class PerfilController extends Component
         $this->validate([
             'passwords.current' => 'required',
             'passwords.new' => [
-<<<<<<<< HEAD:app/Livewire/Site/PerfilController.php
                 'required', 'min:8', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-={}\[\]:;"\'`~<>,.?\/]).+$/'
-========
-                'required',
-                'min:8',
-                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-={}\[\]:;"\'`~<>,.?/\\]).+$/'
->>>>>>>> bf57ac28fa4d652b664c990805211cae3e51d8a4:app/Livewire/ProfileController.php
             ],
             'passwords.confirm' => 'required|same:passwords.new',
         ], [
@@ -235,11 +229,7 @@ class PerfilController extends Component
 
     public function render()
     {
-<<<<<<<< HEAD:app/Livewire/Site/PerfilController.php
         return view('livewire.site.perfil')
-========
-        return view('livewire.profile-controller')
->>>>>>>> bf57ac28fa4d652b664c990805211cae3e51d8a4:app/Livewire/ProfileController.php
             ->extends($this->layout)
             ->section('content');
     }
