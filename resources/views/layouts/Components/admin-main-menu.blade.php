@@ -15,6 +15,6 @@
     <a @if(Route::is('admin.usuarios')) class="active" @endif href="{{route('admin.usuarios')}}">Usuarios</a>
   </li>
   <li class="nav-tab">
-    <a>Bolsa de Empleo</a>
+    <a @if(Route::is('admin.ofertas')) class="active" @endif href="{{route('admin.ofertas')}}">Bolsa de Empleo</a>
   </li>
 </ul>

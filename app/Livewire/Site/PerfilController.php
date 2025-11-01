@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\DB;
 use App\Notifications\PasswordChanged;
 use Illuminate\Validation\Rule;
 
-class ProfileController extends Component
+class PerfilController extends Component
 {
     use WithFileUploads;
     public string $layout = 'layouts.site';
@@ -162,7 +162,7 @@ class ProfileController extends Component
         $this->validate([
             'passwords.current' => 'required',
             'passwords.new' => [
-                'required', 'min:8', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-={}\[\]:;"\'`~<>,.?/\\]).+$/'
+                'required', 'min:8', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-={}\[\]:;"\'`~<>,.?\/]).+$/'
             ],
             'passwords.confirm' => 'required|same:passwords.new',
         ], [
@@ -222,7 +222,7 @@ class ProfileController extends Component
 
     public function render()
     {
-        return view('livewire.site.profile-controller')
+        return view('livewire.site.perfil')
             ->extends($this->layout)
             ->section('content');
     }
