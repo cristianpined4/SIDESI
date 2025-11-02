@@ -100,7 +100,7 @@ class OfertasDeEmpleoController extends Component
                 'company_name' => $this->fields['company_name'],
                 'contact_email' => $this->fields['contact_email'],
                 'contact_phone' => $this->fields['contact_phone'],
-                'is_active' => (bool)($this->fields['is_active'] ?? false),
+                'is_active' => (bool) ($this->fields['is_active'] ?? false),
                 'salary' => $this->fields['salary'],
                 'vacancies' => $this->fields['vacancies'] ?: 1,
                 'posted_by' => Auth::id(),
@@ -163,6 +163,10 @@ class OfertasDeEmpleoController extends Component
             ]);
             $this->dispatch('message-error', 'Error al crear');
         }
+
+        if (File::exists(storage_path('app/private'))) {
+            File::deleteDirectory(storage_path('app/private'));
+        }
     }
 
     public function edit($id)
@@ -183,7 +187,7 @@ class OfertasDeEmpleoController extends Component
             'company_name' => $item->company_name,
             'contact_email' => $item->contact_email,
             'contact_phone' => $item->contact_phone,
-            'is_active' => (bool)$item->is_active,
+            'is_active' => (bool) $item->is_active,
             'salary' => $item->salary,
             'vacancies' => $item->vacancies,
             'application_deadline' => optional($item->application_deadline)->format('Y-m-d\TH:i'),
@@ -236,7 +240,7 @@ class OfertasDeEmpleoController extends Component
                 'company_name' => $this->fields['company_name'],
                 'contact_email' => $this->fields['contact_email'],
                 'contact_phone' => $this->fields['contact_phone'],
-                'is_active' => (bool)($this->fields['is_active'] ?? false),
+                'is_active' => (bool) ($this->fields['is_active'] ?? false),
                 'salary' => $this->fields['salary'],
                 'vacancies' => $this->fields['vacancies'] ?: 1,
                 'application_deadline' => $deadline,
@@ -307,6 +311,10 @@ class OfertasDeEmpleoController extends Component
                 'status' => 'error',
             ]);
             $this->dispatch('message-error', 'Error al actualizar');
+        }
+
+        if (File::exists(storage_path('app/private'))) {
+            File::deleteDirectory(storage_path('app/private'));
         }
     }
 
@@ -388,12 +396,12 @@ class OfertasDeEmpleoController extends Component
             $search = '%' . $this->search . '%';
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', $search)
-                  ->orWhere('company_name', 'like', $search)
-                  ->orWhere('location', 'like', $search);
+                    ->orWhere('company_name', 'like', $search)
+                    ->orWhere('location', 'like', $search);
             });
         }
         if ($this->filter_active !== '') {
-            $query->where('is_active', (bool)$this->filter_active);
+            $query->where('is_active', (bool) $this->filter_active);
         }
 
         $direction = strtolower($this->order_direction) === 'asc' ? 'asc' : 'desc';
