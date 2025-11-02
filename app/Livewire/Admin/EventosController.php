@@ -16,8 +16,15 @@ use App\Models\Imagenes;
 use App\Models\User;
 use App\Models\SessionesEvento;
 use App\Models\InscripcionesEvento;
+use App\Models\Certificados;
+use Carbon\Carbon;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\File;
+use Endroid\QrCode\Builder\Builder;
+use Endroid\QrCode\Encoding\Encoding;
+use Endroid\QrCode\ErrorCorrectionLevel;
+use Endroid\QrCode\RoundBlockSizeMode;
+use Endroid\QrCode\Writer\PngWriter;
 
 class EventosController extends Component
 {
@@ -79,59 +86,59 @@ class EventosController extends Component
         $this->records_sesiones = collect();
     }
 
-public function render()
-{
-    $query = Eventos::query();
+    public function render()
+    {
+        $query = Eventos::query();
 
-    // Búsqueda
-    if (!empty($this->search)) {
-        $searchTerm = '%' . $this->search . '%';
-        $query->where(function ($q) use ($searchTerm) {
-            $q->where('title', 'like', $searchTerm)
-              ->orWhere('description', 'like', $searchTerm)
-              ->orWhere('location', 'like', $searchTerm)
-              ->orWhere('contact_email', 'like', $searchTerm);
-        });
+        // Búsqueda
+        if (!empty($this->search)) {
+            $searchTerm = '%' . $this->search . '%';
+            $query->where(function ($q) use ($searchTerm) {
+                $q->where('title', 'like', $searchTerm)
+                    ->orWhere('description', 'like', $searchTerm)
+                    ->orWhere('location', 'like', $searchTerm)
+                    ->orWhere('contact_email', 'like', $searchTerm);
+            });
+        }
+
+        // Filtro por modalidad
+        if (!empty($this->modalidad)) {
+            $query->where('mode', $this->modalidad);
+        }
+        // Filtro por estado (activo/inactivo)
+        if ($this->estado === 'activo') {
+            $query->where('is_active', true);
+        } elseif ($this->estado === 'inactivo') {
+            $query->where('is_active', false);
+        }
+
+        // Orden por fecha de inicio
+        $query->orderBy('start_time', $this->orden);
+
+        $records = $query->paginate($this->paginate);
+
+        // Usuarios y ponentes (sin cambios)
+        $driver = DB::getDriverName();
+        if ($driver === 'pgsql') {
+            $concatExpression = "TRIM(name || ' ' || lastname)";
+        } else {
+            $concatExpression = "TRIM(CONCAT_WS(' ', name, lastname))";
+        }
+        $recordsUsers = User::selectRaw("id, {$concatExpression} as name, is_active")
+            ->whereIn('role_id', [1, 2])
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get();
+        $recordsPonentes = User::selectRaw("id, {$concatExpression} as name, is_active")
+            ->whereIn('role_id', [1, 2, 3, 4])
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get();
+
+        return view('livewire.admin.eventos', compact('records', 'recordsUsers', 'recordsPonentes'))
+            ->extends('layouts.admin')
+            ->section('content');
     }
-
-    // Filtro por modalidad
-    if (!empty($this->modalidad)) {
-        $query->where('mode', $this->modalidad);
-    }
-    // Filtro por estado (activo/inactivo)
-    if ($this->estado === 'activo') {
-        $query->where('is_active', true);
-    } elseif ($this->estado === 'inactivo') {
-        $query->where('is_active', false);
-    }
-
-    // Orden por fecha de inicio
-    $query->orderBy('start_time', $this->orden);
-
-    $records = $query->paginate($this->paginate);
-
-    // Usuarios y ponentes (sin cambios)
-    $driver = DB::getDriverName();
-    if ($driver === 'pgsql') {
-        $concatExpression = "TRIM(name || ' ' || lastname)";
-    } else {
-        $concatExpression = "TRIM(CONCAT_WS(' ', name, lastname))";
-    }
-    $recordsUsers = User::selectRaw("id, {$concatExpression} as name, is_active")
-        ->whereIn('role_id', [1, 2])
-        ->where('is_active', true)
-        ->orderBy('name')
-        ->get();
-    $recordsPonentes = User::selectRaw("id, {$concatExpression} as name, is_active")
-        ->whereIn('role_id', [1, 2, 3, 4])
-        ->where('is_active', true)
-        ->orderBy('name')
-        ->get();
-
-    return view('livewire.admin.eventos', compact('records', 'recordsUsers', 'recordsPonentes'))
-        ->extends('layouts.admin')
-        ->section('content');
-}
 
     public function abrirModal($idModal = 'modal-home', $initVoid = true, $newSession = false)
     {
@@ -160,7 +167,7 @@ public function render()
 
     public function cerrarModal($idModal = 'modal-home', $initVoid = true)
     {
-        if($initVoid){
+        if ($initVoid) {
             $this->resetUI();
         }
         $this->dispatch("cerrar-modal", ['modal' => $idModal]);
@@ -565,13 +572,14 @@ public function render()
     {
         $this->records_users_event = User::join('inscripciones_eventos', 'users.id', '=', 'inscripciones_eventos.user_id')
             ->where('inscripciones_eventos.evento_id', $idEvento)
+            ->where('inscripciones_eventos.status', '!=', 'rechazado')
             ->select('users.*', 'inscripciones_eventos.status')
             ->get();
 
         if ($this->records_users_event === null) {
             $this->records_users_event = collect();
         }
-        
+
         $this->record_id = $idEvento;
         $this->abrirModal('participantes-evento-modal', false);
     }
@@ -579,9 +587,10 @@ public function render()
     protected $listeners = ['confirmarAprobarParticipante', 'confirmarRechazarParticipante'];
 
     // logica para aprobar los participante de los eventos
-    public function aprobarParticipante($idParticipante){ 
+    public function aprobarParticipante($idParticipante)
+    {
         $this->cerrarModal('participantes-evento-modal', false);
-        $this->dispatch('confirmar-inscripcion', idEvento: $this->record_id, idSesion:null, idParticipante: $idParticipante, title: '¿Confirmar solicitud de inscripción?', text: '¿Está seguro que desea confirmar la solicitud de inscripción a este evento?', metodo: 'confirmarAprobarParticipante');
+        $this->dispatch('confirmar-inscripcion', idEvento: $this->record_id, idSesion: null, idParticipante: $idParticipante, title: '¿Confirmar solicitud de inscripción?', text: '¿Está seguro que desea confirmar la solicitud de inscripción a este evento?', metodo: 'confirmarAprobarParticipante');
     }
 
     public function confirmarAprobarParticipante($idEvento, $idParticipante)
@@ -591,7 +600,7 @@ public function render()
             ->first();
 
         if ($inscripcion) {
-            $inscripcion->status = 'registrado'; 
+            $inscripcion->status = 'registrado';
             $inscripcion->save();
 
             $this->dispatch('inscripcion-message', $idEvento, 'Peticion de Inscripción Aprovada', 'participantesEventos');
@@ -604,9 +613,10 @@ public function render()
     }
 
     // logica para Rechazar los participante de los eventos
-    public function rechazarParticipante($idParticipante){ 
+    public function rechazarParticipante($idParticipante)
+    {
         $this->cerrarModal('participantes-evento-modal', false);
-        $this->dispatch('confirmar-cancelacion', idEvento: $this->record_id, idSesion:null, idParticipante: $idParticipante, title: 'Rechazar solicitud de inscripción?', text: '¿Está seguro que desea rechazar la solicitud de inscripción a este evento?', metodo: 'confirmarRechazarParticipante');
+        $this->dispatch('confirmar-cancelacion', idEvento: $this->record_id, idSesion: null, idParticipante: $idParticipante, title: 'Rechazar solicitud de inscripción?', text: '¿Está seguro que desea rechazar la solicitud de inscripción a este evento?', metodo: 'confirmarRechazarParticipante');
     }
 
     public function confirmarRechazarParticipante($idEvento, $idParticipante)
@@ -616,7 +626,7 @@ public function render()
             ->first();
 
         if ($inscripcion) {
-            $inscripcion->status = 'rechazado'; 
+            $inscripcion->status = 'rechazado';
             $inscripcion->save();
 
             $this->dispatch('inscripcion-message', $idEvento, 'Peticion de Inscripción Rechazada', 'participantesEventos');
@@ -1111,6 +1121,119 @@ public function render()
                 'status' => 'error',
             ]);
             $this->dispatch("message-error", "Error al eliminar la sesión");
+        }
+    }
+
+    public function generarDiplomasAll($idEvento)
+    {
+        $data = [];
+        try {
+            DB::beginTransaction();
+            $evento = Eventos::find($idEvento);
+            if (!$evento) {
+                throw new \Exception('Evento no encontrado');
+            }
+
+            $participantes = User::join('inscripciones_eventos', 'users.id', '=', 'inscripciones_eventos.user_id')
+                ->where('inscripciones_eventos.evento_id', $idEvento)
+                ->whereNotIn('inscripciones_eventos.status', ['cancelado', 'rechazado', 'pendiente'])
+                ->select('users.*', 'inscripciones_eventos.status')
+                ->get();
+
+            if ($participantes->isEmpty()) {
+                throw new \Exception('No se encontraron participantes registrados para el evento');
+            }
+
+            foreach ($participantes as $participante) {
+                /* verificar si el participante ya tiene un certificado */
+                $existingCertificate = Certificados::where('user_id', $participante->id)
+                    ->where('evento_id', $idEvento)
+                    ->first();
+
+                if ($existingCertificate) {
+                    // Crear el código QR
+                    $result = (new Builder(
+                        writer: new PngWriter(),
+                        data: $existingCertificate->url,
+                        encoding: new Encoding('UTF-8'),
+                        errorCorrectionLevel: ErrorCorrectionLevel::Low,
+                        size: 150,
+                        margin: 5,
+                        roundBlockSizeMode: RoundBlockSizeMode::Margin,
+                    ))->build();
+
+                    // Convertir a Base64 para usar en PDF o Blade
+                    $codigoQr = $result->getDataUri();
+
+                    $data[] = [
+                        'recipient_name' => $participante->name . ' ' . $participante->lastname,
+                        'event_name' => $evento->title,
+                        'date' => Carbon::parse($evento->end_time)->format('Y-m-d'),
+                        'url' => $existingCertificate->url,
+                        'qr_code' => $codigoQr,
+                        'code' => $existingCertificate->codigo_qr,
+                    ];
+                } else {
+                    /* generar certificado */
+                    $uniqueCode = Str::uuid()->toString();
+                    $certificateUrl = route('ver-certificado', ['code' => $uniqueCode]);
+
+                    // Crear el código QR
+                    $result = (new Builder(
+                        writer: new PngWriter(),
+                        data: $certificateUrl,
+                        encoding: new Encoding('UTF-8'),
+                        errorCorrectionLevel: ErrorCorrectionLevel::Low,
+                        size: 150,
+                        margin: 5,
+                        roundBlockSizeMode: RoundBlockSizeMode::Margin,
+                    ))->build();
+
+                    // Convertir a Base64 para usar en PDF o Blade
+                    $codigoQr = $result->getDataUri();
+
+                    Certificados::create([
+                        'user_id' => $participante->id,
+                        'evento_id' => $idEvento,
+                        'emitido_en' => now(),
+                        'url' => $certificateUrl,
+                        'codigo_qr' => $uniqueCode,
+                        'is_valid' => true,
+                    ]);
+
+                    $data[] = [
+                        'recipient_name' => $participante->name . ' ' . $participante->lastname,
+                        'event_name' => $evento->title,
+                        'date' => Carbon::parse($evento->end_time)->format('Y-m-d'),
+                        'url' => $certificateUrl,
+                        'qr_code' => $codigoQr,
+                        'code' => $uniqueCode,
+                    ];
+                }
+            }
+            DB::commit();
+            LogsSistema::create([
+                'action' => 'generate diplomas',
+                'user_id' => auth()->id(),
+                'ip_address' => request()->ip(),
+                'description' => 'Generación de diplomas para el evento con ID ' . $idEvento,
+                'target_table' => (new Eventos())->getTable(),
+                'target_id' => $idEvento,
+                'status' => 'success',
+            ]);
+            $this->dispatch("generate-diplomas", $data);
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            LogsSistema::create([
+                'action' => 'error al generar diplomas',
+                'user_id' => auth()->id(),
+                'ip_address' => request()->ip(),
+                'description' => 'Error al generar diplomas para el evento con ID ' . $idEvento . ': ' . $th->getMessage(),
+                'target_table' => (new Eventos())->getTable(),
+                'target_id' => $idEvento,
+                'status' => 'error',
+            ]);
+            $this->dispatch("message-error", "Error al generar los diplomas");
         }
     }
 }
