@@ -156,7 +156,7 @@
         <table class="table min-w-full bg-white border border-gray-200 rounded-lg shadow-sm">
             <thead class="bg-gray-100 text-gray-600 uppercase text-xs font-semibold">
                 <tr>
-                    <th class="px-4 py-3 text-left"></th>
+                    <th class="px-4 py-3 text-left" style="width: 100px"></th>
                     <th class="px-4 py-3 text-left">Título</th>
                     <th class="px-4 py-3 text-left">Descripción</th>
                     <th class="px-4 py-3 text-left">Tipo</th>
@@ -168,7 +168,7 @@
             <tbody class="text-gray-700 text-sm">
                 @foreach ($records as $noticia)
                 <tr class="border-b hover:bg-gray-50">
-                    <td class="px-4 py-3">
+                    <td class="px-4 py-3" style="width: 100px">
                         @if ($noticia->main_image)
                         <img src="{{ $noticia->main_image }}" alt="{{ $noticia->title }}"
                             class="w-12 h-12 object-cover rounded">
