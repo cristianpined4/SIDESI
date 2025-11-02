@@ -1,9 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Livewire\Site\ContactoController;
-use App\Livewire\Site\EventosController;
-
 
 /* Rutas del sitio */
 Route::get('/', App\Livewire\Site\HomeController::class)->name('home-site');
@@ -15,6 +12,9 @@ Route::get('/documentos', App\Livewire\Site\DocumentosController::class)->name('
 Route::get('/eventos', App\Livewire\Site\EventosController::class)->name('site.eventos');
 Route::get('/perfil', App\Livewire\PerfilController::class)->name('profile');
 Route::get('/ofertas', App\Livewire\Site\OfertasEmpleoController::class)->name('site.ofertas');
+Route::get('/certificado/{code}', function ($code) {
+  return "Certificado {$code}";
+})->name('ver-certificado');
 
 
 
