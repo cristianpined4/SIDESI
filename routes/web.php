@@ -15,6 +15,8 @@ Route::get('/contactos', App\Livewire\Site\ContactoController::class)->name('sit
 Route::get('/documentos', App\Livewire\Site\DocumentosController::class)->name('site.documentos');
 Route::get('/eventos', App\Livewire\Site\EventosController::class)->name('site.eventos');
 Route::get('/perfil', App\Livewire\PerfilController::class)->name('profile');
+Route::get('/ofertas', App\Livewire\Site\Ofertas_EmpleoController::class)->name('site.ofertas');
+
 
 
 /* Rutas del admin */
