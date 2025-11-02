@@ -297,7 +297,7 @@
                   class="text-sm text-muted-foreground hover:text-primary transition-colors">Certificaciones</a>
               </li>
               <li>
-                <a href="/empleo" class="text-sm text-muted-foreground hover:text-primary transition-colors">Bolsa de
+                <a href="/ofertas" class="text-sm text-muted-foreground hover:text-primary transition-colors">Bolsa de
                   Empleo</a>
               </li>
             </ul>

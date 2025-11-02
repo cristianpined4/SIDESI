@@ -17,6 +17,8 @@ Route::get('/certificado/{code}', function ($code) {
   return "Certificado {$code}";
 })->name('ver-certificado');
 
+
+
 /* Rutas del admin */
 Route::middleware(['auth'])->group(function () {
   Route::get('/logout', [App\Livewire\Admin\Auth\LoginController::class, 'logout'])->name('logout');
