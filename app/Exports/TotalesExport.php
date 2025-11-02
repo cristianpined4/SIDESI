@@ -55,6 +55,16 @@ class TotalesExport implements FromArray, WithHeadings
                 ? Carbon::parse(DB::table('documentos')->max('updated_at'))->format('d-m-Y h:i A')
                 : '—',
             ],
+            [
+                'Ofertas de Empleo',
+                DB::table('ofertas_de_empleos')->count(),
+                DB::table('ofertas_de_empleos')->where('is_active', true)->count(),
+                DB::table('ofertas_de_empleos')->where('is_active', false)->count(),
+                DB::table('ofertas_de_empleos')->where('is_active', true)->count() > 0 ? 'Activo' : 'Inactivo',
+                optional(DB::table('ofertas_de_empleos')->max('updated_at'))
+                ? Carbon::parse(DB::table('ofertas_de_empleos')->max('updated_at'))->format('d-m-Y h:i A')
+                : '—',
+            ],
         ];
     }
 
