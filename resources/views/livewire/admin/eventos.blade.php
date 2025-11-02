@@ -507,7 +507,16 @@
                                     <td class="px-4 py-3 flex space-x-2 items-center">
                                         @switch($user?->status)
                                         @case('aprobado')
-
+                                        <button
+                                            class="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600 transition text-sm cursor-pointer"
+                                            wire:click="rechazarParticipante({{$user->id}})">
+                                            Rechazar
+                                        </button>
+                                        <button
+                                            class="bg-cyan-500 text-white px-3 py-1 rounded-md hover:bg-cyan-600 transition text-sm cursor-pointer"
+                                            wire:click="">
+                                            Imprimir
+                                        </button>
                                         @break
                                         @case('pendiente')
                                         <button
@@ -539,7 +548,7 @@
                                 </tr>
                                 @empty
                                 <tr>
-                                    <td colspan="6" class="px-6 py-4 text-center text-gray-500">
+                                    <td colspan="9" class="px-6 py-4 text-center text-gray-500">
                                         No hay usuarios inscritos en este evento.
                                     </td>
                                 </tr>
@@ -791,7 +800,7 @@
             color: #000;
             font-size: 14px;
             line-height: 1.6;
-            margin: 30px 0;
+            margin: 20px 0;
             text-align: justify;
             font-weight: 500;
         }
