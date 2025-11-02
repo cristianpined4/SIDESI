@@ -308,7 +308,7 @@
                                 @endif
                             </td>
                             <td class="px-4 py-3">
-                                <a href="{{ route('admin.' . strtolower($item['name'])) }}"
+                                <a href="{{ route('admin.' . strtolower($item['slug'])) }}"
                                     class="text-blue-500 hover:underline text-xs">
                                     Ver Módulo
                                 </a>

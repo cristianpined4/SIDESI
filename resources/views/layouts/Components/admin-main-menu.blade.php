@@ -9,12 +9,12 @@
     <a @if(Route::is('admin.noticias')) class="active" @endif href="{{route('admin.noticias')}}">Noticias</a>
   </li>
   <li class="nav-tab">
+    <a @if(Route::is('admin.ofertas')) class="active" @endif href="{{route('admin.ofertas')}}">Bolsa de Empleo</a>
+  </li>
+  <li class="nav-tab">
     <a @if(Route::is('admin.documentos')) class="active" @endif href="{{route('admin.documentos')}}">Documentos</a>
   </li>
   <li class="nav-tab">
     <a @if(Route::is('admin.usuarios')) class="active" @endif href="{{route('admin.usuarios')}}">Usuarios</a>
-  </li>
-  <li class="nav-tab">
-    <a @if(Route::is('admin.ofertas')) class="active" @endif href="{{route('admin.ofertas')}}">Bolsa de Empleo</a>
   </li>
 </ul>

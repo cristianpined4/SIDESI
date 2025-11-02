@@ -232,6 +232,7 @@ class DashboardController extends Component
             'pagos' => 'fa-coins',
             'redes_sociales' => 'fa-share-alt',
             'Dashboard' => 'fa-tachometer-alt',
+            'ofertas_de_empleos' => 'fa-briefcase',
         ];
 
         $colors = [
@@ -274,6 +275,10 @@ class DashboardController extends Component
             'Dashboard' => [
                 'text' => '#9333EA', // purple-600
                 'bg' => '#F3E8FF', // purple-100
+            ],
+            'ofertas_de_empleos' => [
+                'text' => '#3D14B8FF',
+                'bg' => '#E0D7FF',
             ],
 
             // Casos vacíos o desconocidos
@@ -330,6 +335,8 @@ class DashboardController extends Component
             'roles' => ['text' => '#7C3AED', 'bg' => '#EDE9FE'], // violet
             'pagos' => ['text' => '#E11D48', 'bg' => '#FFE4E6'], // rose
             'redes_sociales' => ['text' => '#0EA5E9', 'bg' => '#E0F2FE'], // sky
+            'Dashboard' => ['text' => '#9333EA', 'bg' => '#F3E8FF'], // purple
+            'ofertas_de_empleos' => ['text' => '#3D14B8FF', 'bg' => '#E0D7FF'],
         ];
 
         // Elegir uno al azar
@@ -370,6 +377,7 @@ class DashboardController extends Component
         $this->totales = [
             [
                 'name' => 'Eventos',
+                'slug' => 'eventos',
                 'icon' => 'fa-calendar',
                 'count' => DB::table('eventos')->count(),
                 'count_active' => DB::table('eventos')->where('is_active', true)->count(),
@@ -381,6 +389,7 @@ class DashboardController extends Component
             ],
             [
                 'name' => 'Usuarios',
+                'slug' => 'usuarios',
                 'icon' => 'fa-users',
                 'count' => DB::table('users')->count(),
                 'count_active' => DB::table('users')->where('is_active', true)->count(),
@@ -392,6 +401,7 @@ class DashboardController extends Component
             ],
             [
                 'name' => 'Noticias',
+                'slug' => 'noticias',
                 'icon' => 'fa-newspaper',
                 'count' => DB::table('contenidos')->count(),
                 'count_active' => DB::table('contenidos')->where('status', 'published')->count(),
@@ -403,6 +413,7 @@ class DashboardController extends Component
             ],
             [
                 'name' => 'Documentos',
+                'slug' => 'documentos',
                 'icon' => 'fa-file-alt',
                 'count' => DB::table('documentos')->count(),
                 'count_active' => DB::table('documentos')->where('visibility', 'publico')->count(),
@@ -411,6 +422,18 @@ class DashboardController extends Component
                 'border' => '#ef4444',
                 'last_updated_max' => DB::table('documentos')->max('updated_at'),
                 'have_items_active' => DB::table('documentos')->where('visibility', 'publico')->count() > 0,
+            ],
+            [
+                'name' => 'Ofertas de Empleo',
+                'slug' => 'ofertas',
+                'icon' => 'fa-briefcase',
+                'count' => DB::table('ofertas_de_empleos')->count(),
+                'count_active' => DB::table('ofertas_de_empleos')->where('is_active', true)->count(),
+                'count_inactive' => DB::table('ofertas_de_empleos')->where('is_active', false)->count(),
+                'color' => 'purple',
+                'border' => '#8b5cf6',
+                'last_updated_max' => DB::table('ofertas_de_empleos')->max('updated_at'),
+                'have_items_active' => DB::table('ofertas_de_empleos')->where('is_active', true)->count() > 0,
             ],
         ];
 
