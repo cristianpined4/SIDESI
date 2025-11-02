@@ -14,7 +14,7 @@ Route::get('/register', App\Livewire\Admin\Auth\RegisterController::class)->name
 Route::get('/contactos', App\Livewire\Site\ContactoController::class)->name('site.contactos');
 Route::get('/documentos', App\Livewire\Site\DocumentosController::class)->name('site.documentos');
 Route::get('/eventos', App\Livewire\Site\EventosController::class)->name('site.eventos');
-Route::get('/perfil', App\Livewire\Site\PerfilController::class)->name('profile');
+Route::get('/perfil', App\Livewire\PerfilController::class)->name('profile');
 
 
 /* Rutas del admin */
@@ -33,5 +33,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/documentos', App\Livewire\Admin\DocumentosController::class)->name('documentos');
     Route::get('/noticias', App\Livewire\Admin\NoticiasController::class)->name('noticias');
     Route::get('/ofertas', App\Livewire\Admin\OfertasDeEmpleoController::class)->name('ofertas');
+    Route::get('/perfil', App\Livewire\PerfilController::class)->name('profile');
   });
 });

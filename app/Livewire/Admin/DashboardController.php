@@ -62,33 +62,69 @@ class DashboardController extends Component
 
         // Filtro según el periodo seleccionado
         if ($this->periodo === 'diario') {
-            // Últimos 30 días del mes actual
-            $query->whereBetween('created_at', [now()->startOfMonth(), now()->endOfMonth()]);
+            // 📅 Últimos 30 días
+            $inicio = now()->subDays(29)->startOfDay();
+            $fin = now()->endOfDay();
 
-            // Ajustar expresión según el motor
+            $query->whereBetween('created_at', [$inicio, $fin]);
+
+            // Detectar motor de base de datos
             $driver = DB::getDriverName();
             $v = $driver === 'pgsql'
-                ? "EXTRACT(DAY FROM created_at)::text || '/' || EXTRACT(MONTH FROM created_at)::text"
-                : "CONCAT(DAY(created_at), '/', MONTH(created_at))";
+                ? "TO_CHAR(created_at, 'DD/MM')"
+                : "DATE_FORMAT(created_at, '%d/%m')";
 
-            // Obtener conteo por día/mes
+            // 🔢 Obtener conteo agrupado por día
             $logs = $query->selectRaw("$v as dia, COUNT(*) as total")
-                ->whereYear('created_at', now()->year)
                 ->groupBy('dia')
-                ->orderByRaw("MIN(created_at)")
+                ->orderByRaw("MIN(created_at)") // mantiene el orden cronológico
                 ->pluck('total', 'dia');
 
-            // 🔧 Reformatear claves a DD/MesAbrev conservando valores
+            // 📆 Reformatear a DD/MesAbrev (ej: 01/Nov)
             $formateados = collect();
             foreach ($logs as $clave => $valor) {
                 [$dia, $mesNum] = explode('/', $clave);
                 $dia = str_pad($dia, 2, '0', STR_PAD_LEFT);
+
+                // Nombres abreviados de los meses
+                $mesesString = [
+                    1 => 'Ene',
+                    2 => 'Feb',
+                    3 => 'Mar',
+                    4 => 'Abr',
+                    5 => 'May',
+                    6 => 'Jun',
+                    7 => 'Jul',
+                    8 => 'Ago',
+                    9 => 'Sep',
+                    10 => 'Oct',
+                    11 => 'Nov',
+                    12 => 'Dic',
+                ];
+
                 $mesAbrev = $mesesString[(int) $mesNum] ?? $mesNum;
-                $formateados[$dia . '/' . $mesAbrev] = $valor;
+                $formateados["$dia/$mesAbrev"] = $valor;
             }
 
-            // 🔢 Asegurar orden correcto por fecha
-            $ordenados = $formateados->sortKeys();
+            // 🧭 Reordenar según fecha real
+            $ordenados = $formateados->sortBy(function ($_, $key) {
+                [$dia, $mesAbrev] = explode('/', $key);
+                $meses = [
+                    'Ene' => 1,
+                    'Feb' => 2,
+                    'Mar' => 3,
+                    'Abr' => 4,
+                    'May' => 5,
+                    'Jun' => 6,
+                    'Jul' => 7,
+                    'Ago' => 8,
+                    'Sep' => 9,
+                    'Oct' => 10,
+                    'Nov' => 11,
+                    'Dic' => 12,
+                ];
+                return sprintf('%04d-%02d-%02d', now()->year, $meses[$mesAbrev], $dia);
+            });
 
             return [
                 'meses' => $ordenados->keys()->values(),

@@ -406,14 +406,13 @@
 
         try {
             // Captura con html2canvas
-            // Captura con html2canvas
             const canvas = await html2canvas(elemento, {
                 scale: 1.5, // ajusta según necesidad
                 backgroundColor: '#ffffff',
                 logging: false,
                 useCORS: true
             });
-            const imgData = canvas.toDataURL('image/png');
+            const imgData = canvas.toDataURL('image/png',0.8);
 
             // Crear PDF
             const pdf = new jsPDF('p', 'mm', 'a4');

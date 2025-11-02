@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Site;
+namespace App\Livewire;
 
 use Livewire\Component;
 use Livewire\WithFileUploads;
@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 use App\Notifications\PasswordChanged;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\File;
 
 class PerfilController extends Component
 {
@@ -41,7 +42,7 @@ class PerfilController extends Component
             return redirect()->route('login');
         }
         // Seleccionar layout según rol
-        $this->layout = in_array((int) ($user->role_id ?? 0), [1, 2]) ? 'layouts.admin' : 'layouts.site';
+        $this->layout = in_array((int) ($user->role_id ?? 0), [1, 2]) && request()->routeIs('admin.*') ? 'layouts.admin' : 'layouts.site';
 
         $this->fields['name'] = $user->name;
         $this->fields['lastname'] = $user->lastname;
@@ -159,6 +160,10 @@ class PerfilController extends Component
         } catch (\Throwable $th) {
             $this->dispatch('message-error', 'No se pudo actualizar la foto');
         }
+
+        if (File::exists(storage_path('app/private'))) {
+            File::deleteDirectory(storage_path('app/private'));
+        }
     }
 
     public function updatePassword()
@@ -166,7 +171,9 @@ class PerfilController extends Component
         $this->validate([
             'passwords.current' => 'required',
             'passwords.new' => [
-                'required', 'min:8', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-={}\[\]:;"\'`~<>,.?\/]).+$/'
+                'required',
+                'min:8',
+                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-={}\[\]:;"\'`~<>,.?\/]).+$/'
             ],
             'passwords.confirm' => 'required|same:passwords.new',
         ], [
@@ -229,7 +236,7 @@ class PerfilController extends Component
 
     public function render()
     {
-        return view('livewire.site.perfil')
+        return view('livewire.perfil')
             ->extends($this->layout)
             ->section('content');
     }
