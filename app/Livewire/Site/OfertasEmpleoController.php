@@ -6,11 +6,15 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\OfertasDeEmpleo;
 
-class Ofertas_EmpleoController extends Component
+class OfertasEmpleoController extends Component
 {
     use WithPagination;
 
     public $currentSearchTerm = '';
+    protected $queryString = [
+        'currentSearchTerm' => ['except' => ''],
+    ];
+
     public $paginate = 20;
 
     public function getOffers()
