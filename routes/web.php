@@ -8,14 +8,13 @@ use App\Livewire\Site\EventosController;
 /* Rutas del sitio */
 Route::get('/', App\Livewire\Site\HomeController::class)->name('home-site');
 Route::get('/noticias', App\Livewire\Site\NewsListController::class)->name('news-list');
-Route::get('/ofertas', App\Livewire\Site\Ofertas_EmpleoController::class)->name('site.ofertas');
 Route::get('/login', App\Livewire\Admin\Auth\LoginController::class)->name('login');
 Route::get('/register', App\Livewire\Admin\Auth\RegisterController::class)->name('register');
 Route::get('/contactos', App\Livewire\Site\ContactoController::class)->name('site.contactos');
 Route::get('/documentos', App\Livewire\Site\DocumentosController::class)->name('site.documentos');
 Route::get('/eventos', App\Livewire\Site\EventosController::class)->name('site.eventos');
 Route::get('/perfil', App\Livewire\PerfilController::class)->name('profile');
-Route::get('/ofertas', App\Livewire\Site\Ofertas_EmpleoController::class)->name('site.ofertas');
+Route::get('/ofertas', App\Livewire\Site\OfertasEmpleoController::class)->name('site.ofertas');
 
 
 
