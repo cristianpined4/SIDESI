@@ -68,7 +68,6 @@ class TotalesExport implements FromArray, WithHeadings
         ];
     }
 
-
     public function headings(): array
     {
         return ['Nombre Módulo', 'Cantidad Total', 'Cantidad Activos', 'Cantidad Inactivos', 'Estado', 'Última Actualización'];

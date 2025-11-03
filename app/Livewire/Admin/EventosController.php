@@ -570,6 +570,7 @@ class EventosController extends Component
 
     public function participantesEventos($idEvento)
     {
+        $this->records_users_event = collect();
         $this->records_users_event = User::join('inscripciones_eventos', 'users.id', '=', 'inscripciones_eventos.user_id')
             ->where('inscripciones_eventos.evento_id', $idEvento)
             ->where('inscripciones_eventos.status', '!=', 'rechazado')
@@ -1234,6 +1235,129 @@ class EventosController extends Component
                 'status' => 'error',
             ]);
             $this->dispatch("message-error", "Error al generar los diplomas");
+        } finally {
+            $this->records_users_event = User::join('inscripciones_eventos', 'users.id', '=', 'inscripciones_eventos.user_id')
+                ->where('inscripciones_eventos.evento_id', $idEvento)
+                ->where('inscripciones_eventos.status', '!=', 'rechazado')
+                ->select('users.*', 'inscripciones_eventos.status')
+                ->get();
+        }
+    }
+
+    public function generarDiplomaIndividual($idEvento, $idParticipante)
+    {
+        $data = [];
+        try {
+            DB::beginTransaction();
+            $evento = Eventos::find($idEvento);
+            if (!$evento) {
+                throw new \Exception('Evento no encontrado');
+            }
+
+            $participante = User::find($idParticipante);
+            if (!$participante) {
+                throw new \Exception('Participante no encontrado');
+            }
+
+            /* verificar si el participante ya tiene un certificado */
+            $existingCertificate = Certificados::where('user_id', $participante->id)
+                ->where('evento_id', $idEvento)
+                ->first();
+
+            if ($existingCertificate) {
+                // Crear el código QR
+                $result = (new Builder(
+                    writer: new PngWriter(),
+                    data: $existingCertificate->url,
+                    encoding: new Encoding('UTF-8'),
+                    errorCorrectionLevel: ErrorCorrectionLevel::Low,
+                    size: 150,
+                    margin: 5,
+                    roundBlockSizeMode: RoundBlockSizeMode::Margin,
+                ))->build();
+
+                // Convertir a Base64 para usar en PDF o Blade
+                $codigoQr = $result->getDataUri();
+
+                $data[] = [
+                    'recipient_name' => $participante->name . ' ' . $participante->lastname,
+                    'event_name' => $evento->title,
+                    'date' => Carbon::parse($evento->end_time)->format('Y-m-d'),
+                    'url' => $existingCertificate->url,
+                    'qr_code' => $codigoQr,
+                    'code' => $existingCertificate->codigo_qr,
+                ];
+            } else {
+                /* generar certificado */
+                $uniqueCode = Str::uuid()->toString();
+                $certificateUrl = route('ver-certificado', ['code' => $uniqueCode]);
+
+                // Crear el código QR
+                $result = (new Builder(
+                    writer: new PngWriter(),
+                    data: $certificateUrl,
+                    encoding: new Encoding('UTF-8'),
+                    errorCorrectionLevel: ErrorCorrectionLevel::Low,
+                    size: 150,
+                    margin: 5,
+                    roundBlockSizeMode: RoundBlockSizeMode::Margin,
+                ))->build();
+
+                // Convertir a Base64 para usar en PDF o Blade
+                $codigoQr = $result->getDataUri();
+
+                Certificados::create([
+                    'user_id' => $participante->id,
+                    'evento_id' => $idEvento,
+                    'emitido_en' => now(),
+                    'url' => $certificateUrl,
+                    'codigo_qr' => $uniqueCode,
+                    'is_valid' => true,
+                ]);
+
+                $data[] = [
+                    'recipient_name' => $participante->name . ' ' . $participante->lastname,
+                    'event_name' => $evento->title,
+                    'date' => Carbon::parse($evento->end_time)->format('Y-m-d'),
+                    'url' => $certificateUrl,
+                    'qr_code' => $codigoQr,
+                    'code' => $uniqueCode,
+                ];
+            }
+
+            DB::commit();
+
+            LogsSistema::create([
+                'action' => 'generate diploma individual',
+                'user_id' => auth()->id(),
+                'ip_address' => request()->ip(),
+                'description' => 'Generación de diploma para el participante con ID ' . $idParticipante . ' en el evento con ID ' . $idEvento,
+                'target_table' => (new Eventos())->getTable(),
+                'target_id' => $idEvento,
+                'status' => 'success',
+            ]);
+
+            $this->dispatch("generate-diploma-individual", $data, $idParticipante);
+        } catch (\Throwable $th) {
+            DB::rollBack();
+
+            LogsSistema::create([
+                'action' => 'error al generar diploma individual',
+                'user_id' => auth()->id(),
+                'ip_address' => request()->ip(),
+                'description' => 'Error al generar diploma para el participante con ID ' . $idParticipante . ' en el evento con ID ' . $idEvento . ': ' . $th->getMessage(),
+                'target_table' => (new Eventos())->getTable(),
+                'target_id' => $idEvento,
+                'status' => 'error',
+            ]);
+
+            $this->dispatch("message-error", "Error al generar el certificado");
+        } finally {
+            $this->records_users_event = User::join('inscripciones_eventos', 'users.id', '=', 'inscripciones_eventos.user_id')
+                ->where('inscripciones_eventos.evento_id', $idEvento)
+                ->where('inscripciones_eventos.status', '!=', 'rechazado')
+                ->select('users.*', 'inscripciones_eventos.status')
+                ->get();
         }
     }
 }

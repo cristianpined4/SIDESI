@@ -513,8 +513,9 @@
                                             Rechazar
                                         </button>
                                         <button
-                                            class="bg-cyan-500 text-white px-3 py-1 rounded-md hover:bg-cyan-600 transition text-sm cursor-pointer"
-                                            wire:click="">
+                                            class="bg-cyan-500 text-white px-3 py-1 rounded-md hover:bg-cyan-600 transition text-sm cursor-pointer btn-diploma"
+                                            data-participante="{{$user->id}}"
+                                            wire:click="generarDiplomaIndividual('{{ $record_id }}','{{ $user->id }}')">
                                             Imprimir
                                         </button>
                                         @break
@@ -537,12 +538,12 @@
                                             Rechazar
                                         </button>
                                         <button
-                                            class="bg-cyan-500 text-white px-3 py-1 rounded-md hover:bg-cyan-600 transition text-sm cursor-pointer"
-                                            wire:click="">
+                                            class="bg-cyan-500 text-white px-3 py-1 rounded-md hover:bg-cyan-600 transition text-sm cursor-pointer btn-diploma"
+                                            data-participante="{{$user->id}}"
+                                            wire:click="generarDiplomaIndividual('{{ $record_id }}','{{ $user->id }}')">
                                             Imprimir
                                         </button>
                                         @break
-
                                         @endswitch
                                     </td>
                                 </tr>
@@ -1291,6 +1292,33 @@
                     Alert(
                         'Error',
                         'Ocurrió un error al generar los diplomas. Por favor, inténtalo de nuevo.',
+                        'error'
+                    );
+                } finally {
+                    btn.disabled = false;
+                    btn.innerHTML = originalText;
+                }
+            });
+
+            Livewire.on('generate-diploma-individual', async (data) => {
+                let id_participante = parseInt(data[1] ?? 0);
+                data = data[0] ?? [];
+                const btn = document.querySelector('.btn-diploma[data-participante="' + id_participante + '"]');
+                let originalText = btn.innerHTML;
+                btn.disabled = true;
+                btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Generando...`;
+                try {
+                    await generateDiplomas(data);
+                    Alert(
+                        '¡Éxito!',
+                        'El diploma se ha generado correctamente.',
+                        'success'
+                    );
+                } catch (error) {
+                    console.error('Error generating diploma:', error);
+                    Alert(
+                        'Error',
+                        'Ocurrió un error al generar el diploma. Por favor, inténtalo de nuevo.',
                         'error'
                     );
                 } finally {
