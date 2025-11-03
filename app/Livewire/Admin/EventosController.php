@@ -630,6 +630,14 @@ class EventosController extends Component
             $inscripcion->status = 'rechazado';
             $inscripcion->save();
 
+            $certificado = Certificados::where('evento_id', $idEvento)
+                ->where('user_id', $idParticipante)
+                ->first();
+            if ($certificado) {
+                $certificado->is_valid = false;
+                $certificado->save();
+            }
+
             $this->dispatch('inscripcion-message', $idEvento, 'Peticion de Inscripción Rechazada', 'participantesEventos');
         } else {
             $this->dispatch('alert', [
@@ -1169,7 +1177,7 @@ class EventosController extends Component
                     $data[] = [
                         'recipient_name' => $participante->name . ' ' . $participante->lastname,
                         'event_name' => $evento->title,
-                        'date' => Carbon::parse($evento->end_time)->format('Y-m-d'),
+                        'date' => Carbon::parse($evento->end_time)->locale('es')->isoFormat('D [de] MMMM [de] YYYY'),
                         'url' => $existingCertificate->url,
                         'qr_code' => $codigoQr,
                         'code' => $existingCertificate->codigo_qr,
@@ -1205,7 +1213,7 @@ class EventosController extends Component
                     $data[] = [
                         'recipient_name' => $participante->name . ' ' . $participante->lastname,
                         'event_name' => $evento->title,
-                        'date' => Carbon::parse($evento->end_time)->format('Y-m-d'),
+                        'date' => Carbon::parse($evento->end_time)->locale('es')->isoFormat('D [de] MMMM [de] YYYY'),
                         'url' => $certificateUrl,
                         'qr_code' => $codigoQr,
                         'code' => $uniqueCode,
@@ -1282,7 +1290,7 @@ class EventosController extends Component
                 $data[] = [
                     'recipient_name' => $participante->name . ' ' . $participante->lastname,
                     'event_name' => $evento->title,
-                    'date' => Carbon::parse($evento->end_time)->format('Y-m-d'),
+                    'date' => Carbon::parse($evento->end_time)->locale('es')->isoFormat('D [de] MMMM [de] YYYY'),
                     'url' => $existingCertificate->url,
                     'qr_code' => $codigoQr,
                     'code' => $existingCertificate->codigo_qr,
@@ -1318,7 +1326,7 @@ class EventosController extends Component
                 $data[] = [
                     'recipient_name' => $participante->name . ' ' . $participante->lastname,
                     'event_name' => $evento->title,
-                    'date' => Carbon::parse($evento->end_time)->format('Y-m-d'),
+                    'date' => Carbon::parse($evento->end_time)->locale('es')->isoFormat('D [de] MMMM [de] YYYY'),
                     'url' => $certificateUrl,
                     'qr_code' => $codigoQr,
                     'code' => $uniqueCode,

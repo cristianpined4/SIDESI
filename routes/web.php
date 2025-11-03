@@ -12,11 +12,7 @@ Route::get('/documentos', App\Livewire\Site\DocumentosController::class)->name('
 Route::get('/eventos', App\Livewire\Site\EventosController::class)->name('site.eventos');
 Route::get('/perfil', App\Livewire\PerfilController::class)->name('profile');
 Route::get('/ofertas', App\Livewire\Site\OfertasEmpleoController::class)->name('site.ofertas');
-Route::get('/certificado/{code}', function ($code) {
-  return "Certificado {$code}";
-})->name('ver-certificado');
-
-
+Route::get('/certificado/{code}', App\Livewire\Site\VerCertificadosController::class)->name('ver-certificado');
 
 /* Rutas del admin */
 Route::middleware(['auth'])->group(function () {

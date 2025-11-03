@@ -174,7 +174,7 @@
             <div class="bg-white border border-gray-200 shadow-md rounded-lg p-4">
                 <div class="flex justify-between items-center mb-4">
                     <h4 class="text-lg font-semibold text-gray-800">Actividad Reciente</h4>
-                    <a href="#" class="text-blue-500 text-sm hover:underline">Ver todo</a>
+                    <span></span>
                 </div>
                 <div class="space-y-3">
                     @forelse($last10Logs as $act)
@@ -199,7 +199,7 @@
             <div class="bg-white border border-gray-200 shadow-md rounded-lg p-4">
                 <div class="flex justify-between items-center mb-4">
                     <h4 class="text-lg font-semibold text-gray-800">Eventos Próximos</h4>
-                    <a href="#" class="text-blue-500 text-sm hover:underline">Ver todos</a>
+                    <a href="{{ route('admin.eventos') }}" class="text-blue-500 text-sm hover:underline">Ver todos</a>
                 </div>
                 <div class="space-y-3">
                     @forelse($last10Eventos as $evt)

@@ -36,14 +36,23 @@ class MakeAdminLivewire extends Command
             $this->info("Controlador creado: Admin/{$name}Controller");
         }
 
-        // 3. Modificar la vista Livewire para usar layout de admin
-        $viewPath = resource_path("views/livewire/admin/" . strtolower($name) . ".blade.php");
+        // 3. Buscar vista generada por Livewire (correctamente en kebab-case)
+        $viewFile = $this->toKebabCase($name) . '.blade.php';
+        $viewPath = resource_path("views/livewire/admin/{$viewFile}");
+
         if (File::exists($viewPath)) {
             File::put($viewPath, $this->viewStub($name));
-            $this->info("Vista modificada con layout de admin: livewire/admin/{$name}.blade.php");
+            $this->info("Vista modificada con layout de admin: livewire/admin/{$viewFile}");
+        } else {
+            $this->error("⚠️ No se encontró la vista generada: {$viewPath}");
         }
 
         $this->info("Componente Admin/$name generado correctamente 🚀");
+    }
+
+    private function toKebabCase($string)
+    {
+        return strtolower(preg_replace('/(?<!^)[A-Z]/', '-$0', $string));
     }
 
     /**
@@ -432,6 +441,6 @@ class MakeAdminLivewire extends Command
      */
     private function toSnakeCase($string)
     {
-        return strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', $string));
+        return strtolower(preg_replace('/(?<!^)[A-Z]/', '-$0', $string));
     }
 }

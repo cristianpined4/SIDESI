@@ -4,21 +4,25 @@
 <head>
   <meta charSet="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="_next\static\css\13259dc9ccfa6acd.css" data-precedence="next" />
-  <link rel="stylesheet" href="_next\static\css\c193e56bda037bc1.css" data-precedence="next" />
-  <link rel="preload" as="script" fetchPriority="low" href="_next/static/chunks/webpack-2dda156b45d185bd.js" />
-  <script src="_next/static/chunks/fd9d1056-b88f8a4cc02eef8b.js" async=""></script>
-  <script src="_next/static/chunks/117-032e20e470d8ca46.js" async=""></script>
-  <script src="_next/static/chunks/main-app-74eb6bc1050af1ab.js" async=""></script>
-  <script src="_next/static/chunks/425-387fdc495ccd3415.js" async=""></script>
-  <script src="_next/static/chunks/app/page-84a62db6747b31db.js" async=""></script>
-  <script src="_next/static/chunks/app/layout-64ee0ccc90ccaaab.js" async=""></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
+    integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="{{ url('/_next/static/css/13259dc9ccfa6acd.css') }}" data-precedence="next" />
+  <link rel="stylesheet" href="{{ url('/_next/static/css/c193e56bda037bc1.css') }}" data-precedence="next" />
+  <link rel="preload" as="script" fetchPriority="low"
+    href="{{ url('/_next/static/chunks/webpack-2dda156b45d185bd.js') }}" />
+  <script src="{{ url('/_next/static/chunks/fd9d1056-b88f8a4cc02eef8b.js') }}" async=""></script>
+  <script src="{{ url('/_next/static/chunks/117-032e20e470d8ca46.js') }}" async=""></script>
+  <script src="{{ url('/_next/static/chunks/main-app-74eb6bc1050af1ab.js') }}" async=""></script>
+  <script src="{{ url('/_next/static/chunks/425-387fdc495ccd3415.js') }}" async=""></script>
+  <script src="{{ url('/_next/static/chunks/app/page-84a62db6747b31db.js') }}" async=""></script>
+  <script src="{{ url('/_next/static/chunks/app/layout-64ee0ccc90ccaaab.js') }}" async=""></script>
   <title>{{ ($title = trim($__env->yieldContent('title'))) }}{{ $title && !str_contains($title, '-') &&
     !str_contains(strtoupper($title), 'SIDESI') ? ' - SIDESI' : '' }}</title>
   <meta name="description"
     content="@yield('meta_description', 'Plataforma oficial de SIDESI para gestión académica, eventos y desarrollo estudiantil')" />
   <meta name="generator" content="v0.app" />
-  <script src="_next/static/chunks/polyfills-42372ed130431b0a.js" noModule=""></script>
+  <script src="{{ url('/_next/static/chunks/polyfills-42372ed130431b0a.js') }}" noModule=""></script>
   @livewireStyles
   <!-- Scripts -->
   @vite(['resources/css/app.css', 'resources/css/app-site.css', 'resources/js/app.js', 'resources/js/app-site.js'])

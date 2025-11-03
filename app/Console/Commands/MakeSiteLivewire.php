@@ -36,14 +36,23 @@ class MakeSiteLivewire extends Command
             $this->info("Controlador creado: Site/{$name}Controller");
         }
 
-        // 3. Modificar la vista Livewire para usar layout de site
-        $viewPath = resource_path("views/livewire/site/" . strtolower($name) . ".blade.php");
+        // 3. Buscar la vista generada correctamente (en kebab-case)
+        $viewFile = $this->toKebabCase($name) . '.blade.php';
+        $viewPath = resource_path("views/livewire/site/{$viewFile}");
+
         if (File::exists($viewPath)) {
             File::put($viewPath, $this->viewStub($name));
-            $this->info("Vista modificada con layout de site: livewire/site/{$name}.blade.php");
+            $this->info("Vista modificada con layout de site: livewire/site/{$viewFile}");
+        } else {
+            $this->error("⚠️ No se encontró la vista generada en: {$viewPath}");
         }
 
         $this->info("Componente Site/$name generado correctamente 🚀");
+    }
+
+    private function toKebabCase($string)
+    {
+        return strtolower(preg_replace('/(?<!^)[A-Z]/', '-$0', $string));
     }
 
     /**
@@ -399,6 +408,6 @@ PHP;
      */
     private function toSnakeCase($string)
     {
-        return strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', $string));
+        return strtolower(preg_replace('/(?<!^)[A-Z]/', '-$0', $string));
     }
 }

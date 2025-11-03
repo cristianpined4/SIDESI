@@ -1110,30 +1110,13 @@
                     word.charAt(0).toLocaleUpperCase('es-ES') + word.slice(1)
                 );
 
-        const formatDate = (isoDate) => {
-            const meses = [
-                "enero", "febrero", "marzo", "abril", "mayo", "junio",
-                "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"
-            ];
-            const d = new Date(isoDate);
-            return `${d.getDate()} de ${meses[d.getMonth()]} de ${d.getFullYear()}`;
-        };
-
-        function autoFitRecipientName(element, maxFontSize = 56, minFontSize = 20) {
-            const containerWidth = element.clientWidth;
-            element.style.fontSize = `${maxFontSize}px`;
-            const scaleFactor = containerWidth / element.scrollWidth;
-            const newFontSize = Math.max(minFontSize, Math.min(maxFontSize, maxFontSize * scaleFactor));
-            element.style.fontSize = `${newFontSize}px`;
-        }
-
         for (let i = 0; i < dataArray.length; i++) {
             const { recipient_name, event_name, date, qr_code, code } = dataArray[i];
 
             const template = document.querySelector(".diploma-container").cloneNode(true);
             template.querySelector(".recipient-name").textContent = capitalizeName(recipient_name);
             template.querySelector(".event_name").textContent = event_name;
-            template.querySelector(".date").textContent = formatDate(date);
+            template.querySelector(".date").textContent = date;
             template.querySelector(".qr-code img").src = qr_code;
             template.querySelector(".unique_code .code").textContent = code;
 
@@ -1159,9 +1142,9 @@
             document.body.removeChild(template);
         }
 
-        const eventSlug = dataArray[0].event_name.toLowerCase().replaceAll("-", " ").replace(/\s+/g, '-');
+        const eventSlug = dataArray[0].event_name.toLowerCase().replaceAll("-", " ").replace(/[^\w\s]/gi, '').replace(/\s+/g, '_');
         const dateNow = new Date();
-        const formattedDate = `${dateNow.getFullYear()}-${dateNow.getMonth() + 1}-${dateNow.getDate()}`;
+        const formattedDate = `${dateNow.getFullYear()}-${dateNow.getMonth() + 1}-${("0" + dateNow.getDate()).slice(-2)}`;
         pdf.save(namefile || `diplomas_${eventSlug}_numitems_${dataArray.length}_date_${formattedDate}.pdf`);
     }
 
@@ -1308,7 +1291,10 @@
                 btn.disabled = true;
                 btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Generando...`;
                 try {
-                    await generateDiplomas(data);
+                    let eventoSlug = data[0].event_name.toLowerCase().replaceAll("-", " ").replace(/[^\w\s]/gi, '').replace(/\s+/g, '_');
+                    const dateNow = new Date();
+                    const formattedDate = `${dateNow.getFullYear()}-${dateNow.getMonth() + 1}-${("0" + dateNow.getDate()).slice(-2)}`;
+                    await generateDiplomas(data, `diploma_${eventoSlug}_${data[0].recipient_name.toLowerCase().replaceAll("-", " ").replace(/\s+/g, '-')}_date_${formattedDate}.pdf`);
                     Alert(
                         '¡Éxito!',
                         'El diploma se ha generado correctamente.',
