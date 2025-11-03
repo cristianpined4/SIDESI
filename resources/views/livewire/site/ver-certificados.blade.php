@@ -18,6 +18,20 @@
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
         }
 
+        .diploma-container::before {
+            content: "DUPLICADO";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-25deg);
+            font-size: 10vw;
+            color: rgba(145, 145, 145, 0.5);
+            font-weight: 900;
+            white-space: nowrap;
+            pointer-events: none;
+            user-select: none;
+        }
+
         /* Decoraciones geométricas */
         .diploma-container .corner-decoration {
             position: absolute;
@@ -258,10 +272,16 @@
 
     <!-- Mensaje principal -->
     <div class="text-center mb-10">
-        <h2 class="text-3xl font-extrabold text-green-600 mb-2">🎓 Certificado Válido</h2>
-        <p class="text-gray-700 text-lg">
+        <h2 class="text-3xl font-extrabold text-green-600 mb-8">🎓 Certificado Válido</h2>
+        <p class="text-gray-700 text-lg max-w-7xl mx-auto">
             El código <strong class="font-semibold text-gray-900">{{ $certificate->code }}</strong>
-            corresponde a un certificado emitido correctamente.
+            corresponde a un certificado emitido oficialmente por la
+            <span class="font-semibold text-blue-700">Asociación de Estudiantes de Ingeniería en Sistemas Informáticos
+                (ASEIS)</span>
+            y por la
+            <span class="font-semibold text-blue-700">Facultad Multidisciplinaria Oriental (FMO)</span>
+            de la
+            <span class="font-semibold text-blue-700">Universidad de El Salvador (UES)</span>.
         </p>
     </div>
 
