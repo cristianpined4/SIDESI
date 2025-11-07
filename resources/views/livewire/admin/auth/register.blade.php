@@ -22,7 +22,7 @@
       </div>
 
       {{-- Formulario --}}
-      <form class="space-y-6">
+      <form class="space-y-6" wire:submit.prevent="register">
 
         {{-- Nombre / Apellido --}}
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -155,7 +155,7 @@
         </div>
 
         {{-- Botón --}}
-        <button type="button" wire:click="register"
+        <button type="submit"
           class="w-full h-12 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-base font-medium transition-colors shadow-sm">
           Crear cuenta
         </button>

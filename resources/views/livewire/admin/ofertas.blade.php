@@ -47,8 +47,10 @@
 
                         <div class="form-group mb-2">
                             <label class="form-label">Teléfono de contacto</label>
-                            <input wire:model="fields.contact_phone" type="text" placeholder="Número de contacto"
-                                class="form-control @error('fields.contact_phone') was-validated is-invalid @enderror">
+                            <input id="phone" wire:model="fields.contact_phone" type="text" placeholder="Número de contacto"
+                                class="form-control @error('fields.contact_phone') was-validated is-invalid @enderror"
+                                onkeypress="return /[0-9]/.test(String.fromCharCode(event.which || event.keyCode));">
+                                
                             <div class="invalid-feedback">@error('fields.contact_phone') {{$message}} @enderror</div>
                         </div>
 

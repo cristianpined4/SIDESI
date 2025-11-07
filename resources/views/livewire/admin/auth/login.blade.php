@@ -22,7 +22,7 @@
       </div>
 
       {{-- Formulario --}}
-      <form onsubmit="login(event)" class="space-y-6">
+      <form wire:submit.prevent="login" class="space-y-6">
         <div>
           <label for="loginEmail" class="block text-sm font-medium text-zinc-700 mb-2">Usuario</label>
           <input id="loginEmail" type="text" placeholder="usuario o correo" wire:model="username" class="w-full h-12 rounded-xl border border-zinc-200 bg-white px-4 text-zinc-900 text-base
@@ -54,7 +54,7 @@
           </label>
         </div>
 
-        <button type="button" wire:click="login"
+       <button type="submit"
           class="w-full h-12 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-base font-medium transition-colors shadow-sm">
           Iniciar Sesión
         </button>
