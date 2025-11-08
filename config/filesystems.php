@@ -86,7 +86,12 @@ return [
     */
 
     'links' => [
-        public_path('img') => storage_path('app/images'),
+        //public_path('img') => storage_path('app/images'),
+        public_path('img/eventos') => storage_path('app/images/eventos'),
+        public_path('img/empleos') => storage_path('app/images/empleos'),
+        public_path('img/avatars') => storage_path('app/images/avatars'),
+        public_path('img/noticias') => storage_path('app/images/noticias'),
+        public_path('img/sesiones') => storage_path('app/images/sesiones'),
         public_path('certificates') => storage_path('app/certificates'),
         public_path('documents') => storage_path('app/documents'),
     ],
