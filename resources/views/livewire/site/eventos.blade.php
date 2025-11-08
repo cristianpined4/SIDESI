@@ -231,7 +231,7 @@
                                     {{ $sesion->description }}
                                 </p>
 
-                                <div class="flex items-center justify-between text-sm text-gray-500 mt-2">
+                                {{-- <div class="flex items-center justify-between text-sm text-gray-500 mt-2">
                                     <span class="flex items-center gap-1">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400"
                                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -241,7 +241,7 @@
                                         </svg>
                                         {{ $sesion->location ?: 'Por definir' }}
                                     </span>
-                                </div>
+                                </div> --}}
                             </div>
                         </div>
                         {{-- Fin cards de sesiones --}}
