@@ -7,6 +7,9 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
     integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw=="
     crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="icon" type="image/png" href="{{ asset('images/logosidesii2.png') }}" />
+  <link rel="apple-touch-icon" type="image/png" href="{{ asset('images/logosidesii2.png') }}" />
+  <link rel="shortcut icon" href="{{ asset('images/logosidesii2.png') }}" />
   <link rel="stylesheet" href="{{ url('/_next/static/css/13259dc9ccfa6acd.css') }}" data-precedence="next" />
   <link rel="stylesheet" href="{{ url('/_next/static/css/c193e56bda037bc1.css') }}" data-precedence="next" />
   <link rel="preload" as="script" fetchPriority="low"

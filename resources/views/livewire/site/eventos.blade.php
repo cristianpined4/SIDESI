@@ -115,6 +115,8 @@
                 </div>
 
                 @auth
+                {{-- verificar si aun no ha pasado el evento --}}
+                @if (now()->lessThanOrEqualTo(\Carbon\Carbon::parse($records_event?->end_time)))
                 {{-- Si el usuario es organizador --}}
                 @if ($is_organizer)
                 <div class="flex justify-center items-center py-6">
@@ -153,8 +155,16 @@
                 @if ($records_event?->is_paid)
                 {{-- Botón para inscribirse en evento pagado --}}
                 <button wire:click="pagarEventoEInscribirConWompi({{ $records_event?->id }})"
-                    class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
-                    Pagar con Wompi ${{ number_format($records_event?->price, 2, '.', ',') }}
+                    class="flex items-center gap-2 bg-[#335DFF] hover:bg-[#264DDA] text-white font-semibold px-5 py-2.5 rounded-lg shadow-md transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-blue-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-white" fill="currentColor"
+                        viewBox="0 0 24 24">
+                        <path
+                            d="M12 1C6.48 1 2 3.58 2 6.5v5c0 4.22 4.03 8.27 9.55 11.25.29.15.63.15.92 0C17.97 19.77 22 15.72 22 11.5v-5C22 3.58 17.52 1 12 1zm0 19.47C8.03 18.01 4 14.36 4 11.5v-5C4 4.47 7.58 3 12 3s8 1.47 8 3.5v5c0 2.86-4.03 6.51-8 8.97z" />
+                        <path
+                            d="M10.9 14.32 8.28 11.7a1 1 0 0 1 1.42-1.4l1.8 1.79 3.8-3.79a1 1 0 1 1 1.4 1.42l-4.5 4.5a1 1 0 0 1-1.4 0z" />
+                    </svg>
+                    <span>Pagar con <strong>Wompi</strong> ${{ number_format($records_event?->price, 2, '.', ',')
+                        }}</span>
                 </button>
                 @else
                 {{-- Botón para inscribirse --}}
@@ -166,6 +176,13 @@
                 @endif
 
                 @endif
+                @endif
+                @else
+                <div class="flex justify-center items-center py-6">
+                    <p class="text-xl font-semibold text-red-600 bg-red-100 px-6 py-3 rounded-lg shadow-sm">
+                        Este evento ya ha finalizado
+                    </p>
+                </div>
                 @endif
                 @endauth
 
@@ -306,7 +323,7 @@
                 </div>
 
                 @auth
-                {{-- Si el usuario es ponente --}}
+                @if(now()->lessThanOrEqualTo(\Carbon\Carbon::parse($records_sesion?->end_time)))
                 @if ($is_ponente)
                 <div class="flex justify-center items-center py-6">
                     <p class="text-xl font-semibold text-blue-600 bg-blue-100 px-6 py-3 rounded-lg shadow-sm">
@@ -314,18 +331,14 @@
                     </p>
                 </div>
                 @elseif($rechazado)
-                {{-- no muestra nada --}}
                 @else
-                {{-- Filtro para saber si el usuario está inscrito en el evento --}}
                 @if ($is_registered_evento && $pendiente === false)
-                {{-- ¿El usuario está inscrito en la sesión? --}}
                 @if ($is_registered_sesion)
                 <button type="button" class="btn bg-gray-400 text-white px-4 py-2 rounded-md hover:bg-gray-500"
                     wire:click="cancelarInscripcionSesion({{ $records_sesion?->id }})">
                     Ya inscrito (Cancelar)
                 </button>
                 @else
-                {{-- Botón para inscribirse a la sesión --}}
                 <button type="button" class="btn bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md"
                     wire:click="inscribirSesion({{ $records_sesion?->id }})">
                     Inscribirse
@@ -333,11 +346,34 @@
                 @endif
                 @endif
                 @endif
+                @else
+                <div class="flex justify-center items-center py-6">
+                    <p class="text-xl font-semibold text-red-600 bg-red-100 px-6 py-3 rounded-lg shadow-sm">
+                        Esta sesión ya ha finalizado
+                    </p>
+                </div>
+                @endif
                 @endauth
             </div>
         </div>
     </div>
     <!-- Fin Modal para Detalles de la sesion -->
+
+    @if (session('success'))
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            Alert('¡Éxito!', '{{ session('success') }}', 'success');
+        });
+    </script>
+    @endif
+
+    @if (session('error'))
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            Alert('Error', '{{ session('error') }}', 'error');
+        });
+    </script>
+    @endif
 
     <!-- fin modales -->
 

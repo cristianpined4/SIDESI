@@ -368,10 +368,10 @@ class EventosController extends Component
             $inscripcion->save();
 
             // 2️⃣ Crear o actualizar registro de pago
-            $pago = Pago::updateOrCreate([
+            $pago = Pago::create([
+                'inscripcion_id' => $inscripcion->id,
+                'evento_id' => $evento->id,
                 'user_id' => $user->id,
-                'evento_id' => $idEvento,
-            ], [
                 'amount' => $evento->price,
                 'currency' => 'USD',
                 'payment_method' => 'wompi',
