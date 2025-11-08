@@ -93,7 +93,8 @@
                 <img src="{{ $avatarUrl }}" alt="Avatar" class="h-8 w-8 rounded-full object-cover">
                 <span class="text-sm font-medium text-gray-800"
                   style="text-align: left !important;white-space: nowrap;">
-                  {{ Auth::user()->name }} {{ Auth::user()->lastname}}<br>
+                  {{ Str::of(Auth::user()->name)->explode(' ')->first() }} {{ Str::of(Auth::user()->lastname)->explode('
+                  ')->first() }}<br>
                   <span class="text-xs font-normal text-gray-500">{{ Auth::user()->role->name }}</span>
                 </span>
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
@@ -186,7 +187,8 @@
                     alt="Avatar" class="h-8 w-8 rounded-full object-cover">
                   <span class="text-sm font-medium text-gray-800"
                     style="text-align: left !important;white-space: nowrap;">
-                    {{ Auth::user()->name }} {{ Auth::user()->lastname}}<br>
+                    {{ Str::of(Auth::user()->name)->explode(' ')->first() }} {{
+                    Str::of(Auth::user()->lastname)->explode(' ')->first() }}<br>
                     <span class="text-xs font-normal text-gray-500">{{ Auth::user()->role->name }}</span>
                   </span>
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"

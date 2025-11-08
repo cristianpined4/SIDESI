@@ -177,6 +177,7 @@ class WompiWebhookController extends Controller
                 ]);
 
                 session()->flash('success', 'Pago confirmado e inscripción completada correctamente.');
+                session()->flash('evento_id_inscripto', $inscripcion->evento_id);
             } else {
                 $pago->update(['status' => strtolower($estado)]);
                 session()->flash('error', 'El pago no fue aprobado. Estado: ' . ucfirst(strtolower($estado)));
@@ -209,7 +210,17 @@ class WompiWebhookController extends Controller
                 ]);
 
                 session()->flash('success', 'Pago aprobado parcialmente a la espera de confirmación.');
+                session()->flash('evento_id_inscripto', $inscripcion->evento_id);
             } else {
+                LogsSistema::create([
+                    'action' => 'hash inválido en callback wompi',
+                    'user_id' => auth()->id() ?? null,
+                    'ip_address' => request()->ip() ?? null,
+                    'description' => "Hash inválido en callback para pago ID {$pagoId}.",
+                    'target_table' => (new Pago())->getTable(),
+                    'target_id' => $pagoId,
+                    'status' => 'error',
+                ]);
                 session()->flash('error', 'Error al procesar el pago: ' . $th->getMessage());
             }
 

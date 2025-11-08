@@ -12,6 +12,7 @@ use App\Models\Eventos;
 use App\Models\SessionesEvento;
 use App\Models\InscripcionesEvento;
 use App\Models\InscripcionesSesion;
+use App\Models\LogsSistema;
 use App\Models\User;
 use App\Models\Pagos as Pago;
 use Illuminate\Support\Facades\Auth;
@@ -360,14 +361,14 @@ class EventosController extends Component
 
             $evento = Eventos::findOrFail($idEvento);
 
-            // 1️⃣ Crear inscripción en estado pendiente si el evento es de pago
+            // Crear inscripción en estado pendiente si el evento es de pago
             $inscripcion = new InscripcionesEvento();
             $inscripcion->user_id = $user->id;
             $inscripcion->evento_id = $idEvento;
             $inscripcion->status = boolval($evento->is_paid) ? 'pendiente' : 'registrado';
             $inscripcion->save();
 
-            // 2️⃣ Crear o actualizar registro de pago
+            // Crear o actualizar registro de pago
             $pago = Pago::create([
                 'inscripcion_id' => $inscripcion->id,
                 'evento_id' => $evento->id,
@@ -379,7 +380,7 @@ class EventosController extends Component
             ]);
 
             /**
-             * 3️⃣ Obtener token de acceso desde Wompi
+             * Obtener token de acceso desde Wompi
              */
             $tokenResponse = Http::asForm()->post('https://id.wompi.sv/connect/token', [
                 'grant_type' => 'client_credentials',
@@ -389,13 +390,24 @@ class EventosController extends Component
             ]);
 
             if ($tokenResponse->failed()) {
+                $this->cerrarModal('event-modal', false);
                 throw new \Exception('Error al obtener token de Wompi: ' . $tokenResponse->body());
             }
 
             $accessToken = $tokenResponse->json('access_token');
 
+            $imagenProducto = $evento?->main_image ?? url('/images/sin-imagen.png');
+            if (request()->getHost() === 'localhost') {
+                $imagenProducto = 'https://sidesi.fusionartsv.com/images/sin-imagen.png';
+            } else {
+                $response = Http::head($imagenProducto);
+                if (!$response->ok()) {
+                    $imagenProducto = url('/images/sin-imagen.png');
+                }
+            }
+
             /**
-             * 4️⃣ Crear enlace de pago con estructura completa según documentación
+             * Crear enlace de pago con estructura completa según documentación
              */
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $accessToken,
@@ -415,7 +427,7 @@ class EventosController extends Component
 
                         "infoProducto" => [
                             "descripcionProducto" => "Pago del evento {$evento->title} en la plataforma SIDESI",
-                            "urlImagenProducto" => $evento?->main_image ?? url('/images/imagen_placeholder.avif'),
+                            "urlImagenProducto" => $imagenProducto,
                         ],
 
                         "configuracion" => [
@@ -451,22 +463,34 @@ class EventosController extends Component
                     ]);
 
             if ($response->failed()) {
+                $this->cerrarModal('event-modal', false);
                 throw new \Exception('Error al crear enlace de pago: ' . $response->body());
             }
 
             $data = $response->json();
 
             if (empty($data['urlEnlace'])) {
+                $this->cerrarModal('event-modal', false);
                 throw new \Exception('No se recibió el enlace de pago desde Wompi.');
             }
 
             DB::commit();
 
-            // 5️⃣ Redirigir al usuario al enlace de pago
+            // Redirigir al usuario al enlace de pago
             return redirect()->away($data['urlEnlace']);
 
         } catch (\Throwable $th) {
             DB::rollBack();
+            $this->cerrarModal('event-modal', false);
+            LogsSistema::create([
+                'action' => "Error al crear enlace de pago",
+                'user_id' => auth()->id(),
+                'ip_address' => request()->ip(),
+                'description' => 'Error al procesar pago para inscripción en evento ID ' . $idEvento . ': ' . $th->getMessage() . ' para el usuario ID ' . $user->id,
+                'target_table' => 'inscripciones_eventos',
+                'target_id' => null,
+                'status' => 'error',
+            ]);
             $this->dispatch('message-error', 'Error al procesar pago: ' . $th->getMessage());
         }
     }

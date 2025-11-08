@@ -381,6 +381,14 @@
     </script>
     @endif
 
+    @if (session('evento_id_inscripto'))
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            @this.call('sesiones', {{ session('evento_id_inscripto') }});
+        });
+    </script>
+    @endif
+
     <!-- fin modales -->
 
     <!-- Contenido - inicio -->
