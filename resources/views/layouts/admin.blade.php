@@ -47,7 +47,7 @@
           class="flex items-center gap-2 rounded-md px-2 py-1.5 hover:bg-slate-100 transition"
           onclick="document.getElementById('userDropdown').classList.toggle('hidden')">
           <div class="hidden sm:flex flex-col items-end">
-            <span class="text-sm font-medium text-slate-800">
+            <span class="text-sm font-medium text-slate-800" style="white-space: nowrap;">
               {{ Auth::user()->name }} {{ Auth::user()->lastname }}
             </span>
             <span class="text-xs text-slate-500">

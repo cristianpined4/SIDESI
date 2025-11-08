@@ -91,7 +91,8 @@
               @endphp
               <button @click="menuVisible = !menuVisible" class="flex items-center space-x-2 focus:outline-none">
                 <img src="{{ $avatarUrl }}" alt="Avatar" class="h-8 w-8 rounded-full object-cover">
-                <span class="text-sm font-medium text-gray-800" style="text-align: left !important;">
+                <span class="text-sm font-medium text-gray-800"
+                  style="text-align: left !important;white-space: nowrap;">
                   {{ Auth::user()->name }} {{ Auth::user()->lastname}}<br>
                   <span class="text-xs font-normal text-gray-500">{{ Auth::user()->role->name }}</span>
                 </span>
@@ -183,7 +184,8 @@
                   <img
                     src="https://images.unsplash.com/photo-1499714608240-22fc6ad53fb2?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
                     alt="Avatar" class="h-8 w-8 rounded-full object-cover">
-                  <span class="text-sm font-medium text-gray-800" style="text-align: left !important;">
+                  <span class="text-sm font-medium text-gray-800"
+                    style="text-align: left !important;white-space: nowrap;">
                     {{ Auth::user()->name }} {{ Auth::user()->lastname}}<br>
                     <span class="text-xs font-normal text-gray-500">{{ Auth::user()->role->name }}</span>
                   </span>
