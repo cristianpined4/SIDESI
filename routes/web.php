@@ -34,6 +34,7 @@ Route::middleware(['auth'])->group(function () {
   });
 });
 
+/* Rutas de Wompi para pagos */
 Route::get('/payment/callback', [App\Http\Controllers\WompiWebhookController::class, 'callBack'])->name('wompi.callback');
 Route::post('/payment/webhook', [App\Http\Controllers\WompiWebhookController::class, 'handle'])->name('wompi.webhook');
 Route::get('/payment/return', [App\Http\Controllers\WompiWebhookController::class, 'return'])->name('wompi.retorno');
