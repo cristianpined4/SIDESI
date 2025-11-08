@@ -232,4 +232,24 @@ class WompiWebhookController extends Controller
             return redirect()->route('site.eventos');
         }
     }
+
+    public function return(Request $request)
+    {
+        $pagoId = $request->query('pago_id');
+        $inscripcionId = $request->query('inscripcion_id');
+        $pago = Pago::find($pagoId);
+        $inscripcion = InscripcionesEvento::find($inscripcionId);
+
+        // Verificar existencia
+        if ($pago) {
+            $pago->delete();
+        }
+        if ($inscripcion) {
+            $inscripcion->delete();
+        }
+
+        /* eliminar y mandar a evento_id_inscripto */
+        session()->flash('evento_id_inscripto', $inscripcion->evento_id);
+        return redirect()->route('site.eventos');
+    }
 }
