@@ -439,10 +439,7 @@ class EventosController extends Component
                             "esCantidadEditable" => false,
                             "cantidadPorDefecto" => 1,
                             "duracionInterfazIntentoMinutos" => 30,
-                            "urlRetorno" => route('wompi.callback', [
-                                'pago_id' => $pago->id,
-                                'inscripcion_id' => $inscripcion->id,
-                            ]),
+                            "urlRetorno" => route('site.eventos'),
                             "emailsNotificacion" => $user->email,
                             "urlWebhook" => route('wompi.webhook'),
                             "telefonosNotificacion" => "",
