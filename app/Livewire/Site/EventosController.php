@@ -415,7 +415,7 @@ class EventosController extends Component
 
                         "infoProducto" => [
                             "descripcionProducto" => "Pago del evento {$evento->title} en la plataforma SIDESI",
-                            "urlImagenProducto" => 'https://panel.wompi.sv/img/logo.svg' // $evento?->main_image ?? 'https://via.placeholder.com/800x500?text=Sin+Imagen',
+                            "urlImagenProducto" => $evento?->main_image ?? url('/images/imagen_placeholder.avif'),
                         ],
 
                         "configuracion" => [

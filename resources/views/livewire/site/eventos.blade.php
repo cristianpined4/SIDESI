@@ -345,6 +345,12 @@
                 </button>
                 @endif
                 @endif
+                @else
+                <div class="flex justify-center items-center py-6">
+                    <p class="text-xl font-semibold text-red-600 bg-red-100 px-6 py-3 rounded-lg shadow-sm">
+                        Tienes que estar inscrito en el evento para inscribirte en esta sesión
+                    </p>
+                </div>
                 @endif
                 @else
                 <div class="flex justify-center items-center py-6">
