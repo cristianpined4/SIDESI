@@ -115,6 +115,11 @@ class WompiWebhookController extends Controller
             return redirect()->route('site.eventos');
         }
 
+        if (!$hash) {
+            session()->flash('error', 'Verificación de seguridad fallida.');
+            return redirect()->route('site.eventos');
+        }
+
         // Verificar hash (identificadorEnlaceComercio = $pagoId)
         $hashValido = $this->verificarHashWompi(
             $pagoId,
