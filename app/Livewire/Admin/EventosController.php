@@ -197,7 +197,7 @@ class EventosController extends Component
         ];
 
         if ($this->fields['is_paid'] && ($this->fields['is_paid'] == '1' || $this->fields['is_paid'] == 1)) {
-            $rules['fields.price'] = 'required|numeric|min:0.01';
+            $rules['fields.price'] = 'required|numeric|min:1.00';
         } else {
             $rules['fields.price'] = 'nullable|numeric|min:0';
             $this->fields['price'] = 0;
@@ -387,7 +387,7 @@ class EventosController extends Component
         ];
 
         if ($this->fields['is_paid'] && ($this->fields['is_paid'] == '1' || $this->fields['is_paid'] == 1)) {
-            $rules['fields.price'] = 'required|numeric|min:0.01';
+            $rules['fields.price'] = 'required|numeric|min:1.00';
         } else {
             $rules['fields.price'] = 'nullable|numeric|min:0';
             $this->fields['price'] = 0;
