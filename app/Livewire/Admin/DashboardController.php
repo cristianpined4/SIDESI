@@ -355,7 +355,7 @@ class DashboardController extends Component
             return $eventos->map(function ($evento) {
                 $colors = $this->randomTailwindColor();
                 $hora = Carbon::parse($evento->start_time)->format('h:i A');
-                $fecha = Carbon::parse($evento->start_time)->locale('es')->format('d M');
+                $fecha = Carbon::parse($evento->start_time)->locale('es')->translatedFormat('d M');
 
                 return [
                     'titulo' => $evento->title,
