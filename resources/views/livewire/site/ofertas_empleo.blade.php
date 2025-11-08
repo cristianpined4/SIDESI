@@ -75,27 +75,30 @@
                         'salary' => $offer->salary ? number_format($offer->salary, 2) : null,
                         'vacancies' => $offer->vacancies,
                         'description' => $offer->description,
-                        'image' => $offer->main_image ?? 'https://via.placeholder.com/800x500?text=Sin+Imagen',
+                        'image' => $offer->main_image ?? url('/images/sin-imagen.png'),
                         'deadline' => optional($offer->application_deadline)->format('d/m/Y h:i A')
                     ]))">
 
-                    <img src="{{ $offer->main_image ?? 'https://via.placeholder.com/800x500?text=Sin+Imagen' }}"
-                        alt="{{ $offer->title }}"
+                    <img src="{{ $offer->main_image ?? url('/images/sin-imagen.png') }}" alt="{{ $offer->title }}"
                         class="w-full h-48 object-cover transition-transform duration-400 group-hover:scale-105">
 
                     <div class="p-6 flex flex-col gap-4">
                         <div class="flex items-center justify-between">
-                            <span class="inline-flex items-center justify-center rounded-md px-3 py-1 text-xs font-medium badge-info">
+                            <span
+                                class="inline-flex items-center justify-center rounded-md px-3 py-1 text-xs font-medium badge-info">
                                 {{ $offer->company_name }}
                             </span>
                             <div class="flex items-center text-sm text-gray-500">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar h-4 w-4 mr-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" class="lucide lucide-calendar h-4 w-4 mr-1">
                                     <path d="M8 2v4"></path>
                                     <path d="M16 2v4"></path>
                                     <rect width="18" height="18" x="3" y="4" rx="2"></rect>
                                     <path d="M3 10h18"></path>
                                 </svg>
-                                {{ optional($offer->application_deadline)->format('d/m/Y h:i A') ?? 'Sin fecha límite' }}
+                                {{ optional($offer->application_deadline)->format('d/m/Y h:i A') ?? 'Sin fecha límite'
+                                }}
                             </div>
                         </div>
 
@@ -114,9 +117,12 @@
                             <span class="ml-3 font-medium">Vacantes:</span> {{ $offer->vacancies }}
                         </div>
 
-                        <div class="flex items-center text-sm text-blue-600 font-medium group-hover:gap-2 transition-all mt-2">
+                        <div
+                            class="flex items-center text-sm text-blue-600 font-medium group-hover:gap-2 transition-all mt-2">
                             Ver detalles
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right h-4 w-4 ml-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" class="lucide lucide-arrow-right h-4 w-4 ml-1">
                                 <path d="M5 12h14"></path>
                                 <path d="m12 5 7 7-7 7"></path>
                             </svg>
@@ -128,7 +134,9 @@
             @else
             <div class="text-center py-16 w-4/5 max-w-7xl mx-auto">
                 <div class="h-16 w-16 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search h-8 w-8 text-gray-400">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="lucide lucide-search h-8 w-8 text-gray-400">
                         <circle cx="11" cy="11" r="8"></circle>
                         <path d="m21 21-4.3-4.3"></path>
                     </svg>
@@ -162,9 +170,13 @@
                 <p id="offer-modal-description" class="modal-description"></p>
 
                 <div class="modal-details">
-                    <div class="detail-item"><span class="detail-label">Ubicación:</span> <span id="offer-modal-location" class="detail-value"></span></div>
-                    <div class="detail-item"><span class="detail-label">Vacantes:</span> <span id="offer-modal-vacancies" class="detail-value"></span></div>
-                    <div class="detail-item" id="offer-modal-salary-row" style="display:none;"><span class="detail-label">Salario:</span> <span id="offer-modal-salary" class="detail-value"></span></div>
+                    <div class="detail-item"><span class="detail-label">Ubicación:</span> <span
+                            id="offer-modal-location" class="detail-value"></span></div>
+                    <div class="detail-item"><span class="detail-label">Vacantes:</span> <span
+                            id="offer-modal-vacancies" class="detail-value"></span></div>
+                    <div class="detail-item" id="offer-modal-salary-row" style="display:none;"><span
+                            class="detail-label">Salario:</span> <span id="offer-modal-salary"
+                            class="detail-value"></span></div>
                 </div>
 
                 <div class="modal-actions">

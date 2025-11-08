@@ -94,7 +94,7 @@ relevantes para la comunidad estudiantil de ingeniería.')
                         'title' => $news->title,
                         'description' => $news->description,
                         'details' => $news->details,
-                        'image' => $news->main_image ?? 'https://via.placeholder.com/800x500?text=Sin+Imagen',
+                        'image' => $news->main_image ?? url('/images/sin-imagen.png'),
                         'date' => $news->date,
                         /* 'location' => 'Por definir',
                         'time' => 'Próximamente',
@@ -102,8 +102,7 @@ relevantes para la comunidad estudiantil de ingeniería.')
                     ]))">
 
                     <!-- Imagen fija según categoría -->
-                    <img src="{{ $news->main_image ?? 'https://via.placeholder.com/800x500?text=Sin+Imagen' }}"
-                        alt="{{ $news->title }}"
+                    <img src="{{ $news->main_image ?? url('/images/sin-imagen.png') }}" alt="{{ $news->title }}"
                         class="w-full h-48 object-cover transition-transform duration-400 group-hover:scale-105">
 
                     <div class="p-6 flex flex-col gap-4">

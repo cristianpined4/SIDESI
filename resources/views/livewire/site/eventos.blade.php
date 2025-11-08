@@ -42,8 +42,7 @@
     <div id="event-modal" class="news-modal modal" wire:ignore.self>
         <div class="modal-content">
             <div class="modal-header">
-                <img id="event-image"
-                    src="{{$records_event?->main_image ?? 'https://via.placeholder.com/800x500?text=Sin+Imagen'}}"
+                <img id="event-image" src="{{$records_event?->main_image ?? url('/images/sin-imagen.png')}}"
                     alt="Evento" class="modal-image">
                 <button class="modal-close" wire:click="cerrarModal('event-modal', false)">×</button>
             </div>
@@ -196,7 +195,7 @@
                         <div class="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300 cursor-pointer group"
                             wire:click="sesion({{$sesion->id}})">
                             <!-- Imagen -->
-                            <img src="{{$sesion?->main_image ?? 'https://via.placeholder.com/800x500?text=Sin+Imagen'}}"
+                            <img src="{{$sesion?->main_image ?? url('/images/sin-imagen.png')}}"
                                 alt="{{ $sesion->title }}"
                                 class="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105">
 
@@ -265,8 +264,7 @@
     <div id="sesion-modal" class="news-modal modal" wire:ignore.self>
         <div class="modal-content">
             <div class="modal-header">
-                <img id="event-image"
-                    src="{{$records_sesion?->main_image ?? 'https://via.placeholder.com/800x500?text=Sin+Imagen'}}"
+                <img id="event-image" src="{{$records_sesion?->main_image ?? url('/images/sin-imagen.png')}}"
                     alt="sesion" class="modal-image">
                 <button class="modal-close" wire:click="cerrarModal('sesion-modal', false)">×</button>
             </div>
@@ -481,8 +479,7 @@
                     wire:click="sesiones({{ $event->id }})">
 
                     <!-- Imagen -->
-                    <img src="{{$event?->main_image ?? 'https://via.placeholder.com/800x500?text=Sin+Imagen'}}"
-                        alt="{{ $event->title }}"
+                    <img src="{{$event?->main_image ?? url('/images/sin-imagen.png')}}" alt="{{ $event->title }}"
                         class="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105">
 
                     <!-- Contenido -->
