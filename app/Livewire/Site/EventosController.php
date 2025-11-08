@@ -411,7 +411,7 @@ class EventosController extends Component
                             "permitirPagoEnCuotasAgricola" => false,
                         ],
 
-                        "cantidadMaximaCuotas" => "Tres",
+                        /*  "cantidadMaximaCuotas" => "Tres", */
 
                         "infoProducto" => [
                             "descripcionProducto" => "Pago del evento {$evento->title} en la plataforma SIDESI",
