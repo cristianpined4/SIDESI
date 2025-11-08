@@ -1,0 +1,63 @@
+{
+  "node_modules/canvg/lib/index.es.js": {
+    "file": "assets/index.es-Dibk50NH.js",
+    "name": "index.es",
+    "src": "node_modules/canvg/lib/index.es.js",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js"
+    ]
+  },
+  "node_modules/dompurify/dist/purify.es.mjs": {
+    "file": "assets/purify.es-B6FQ9oRL.js",
+    "name": "purify.es",
+    "src": "node_modules/dompurify/dist/purify.es.mjs",
+    "isDynamicEntry": true
+  },
+  "resources/css/app-admin.css": {
+    "file": "assets/app-admin-DA7KeeHV.css",
+    "src": "resources/css/app-admin.css",
+    "isEntry": true,
+    "names": [
+      "app-admin.css"
+    ]
+  },
+  "resources/css/app-site.css": {
+    "file": "assets/app-site-qcGy8SG_.css",
+    "src": "resources/css/app-site.css",
+    "isEntry": true,
+    "names": [
+      "app-site.css"
+    ]
+  },
+  "resources/css/app.css": {
+    "file": "assets/app-g0M-QaZF.css",
+    "src": "resources/css/app.css",
+    "isEntry": true,
+    "names": [
+      "app.css"
+    ]
+  },
+  "resources/js/app-admin.js": {
+    "file": "assets/app-admin-l0sNRNKZ.js",
+    "name": "app-admin",
+    "src": "resources/js/app-admin.js",
+    "isEntry": true
+  },
+  "resources/js/app-site.js": {
+    "file": "assets/app-site-l0sNRNKZ.js",
+    "name": "app-site",
+    "src": "resources/js/app-site.js",
+    "isEntry": true
+  },
+  "resources/js/app.js": {
+    "file": "assets/app-B-UjSkBD.js",
+    "name": "app",
+    "src": "resources/js/app.js",
+    "isEntry": true,
+    "dynamicImports": [
+      "node_modules/dompurify/dist/purify.es.mjs",
+      "node_modules/canvg/lib/index.es.js"
+    ]
+  }
+}
