@@ -48,8 +48,8 @@
           onclick="document.getElementById('userDropdown').classList.toggle('hidden')">
           <div class="hidden sm:flex flex-col items-end">
             <span class="text-sm font-medium text-slate-800" style="white-space: nowrap;">
-              {{ Str::of(Auth::user()->name)->explode(' ')->first() }} {{ Str::of(Auth::user()->lastname)->explode('
-              ')->first() }}
+              {{ Str::of(Auth::user()->name)->explode(' ')->first() }} {{ Str::of(Auth::user()->lastname)->explode(
+              ' ')->first() }}
             </span>
             <span class="text-xs text-slate-500">
               {{ Auth::user()->role->name }}

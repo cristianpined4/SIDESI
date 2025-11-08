@@ -382,11 +382,7 @@
     @endif
 
     @if (session('evento_id_inscripto'))
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            @this.call('sesiones', {{ session('evento_id_inscripto') }});
-        });
-    </script>
+    <div wire:init="sesiones({{ session('evento_id_inscripto') }})"></div>
     @endif
 
     <!-- fin modales -->
@@ -650,12 +646,13 @@
             // Si hay un modal abierto
             if (topModal) {
                 const modalContent = topModal.querySelector('.modal-content, .modal-dialog');
-                
                 // Verificar si el click fue fuera del modal-content
                 // Y que no sea en un botón de cerrar
                 if (modalContent && 
                     !modalContent.contains(event.target) && 
-                    !event.target.closest('.modal-close, .btn-close, .btn-secondary')) {
+                    !event.target.closest('.modal-close, .btn-close, .btn-secondary') &&
+                    !event.target.closest('.swal2-container')
+                ) {
                     closeModal(topModal);
                 }
             }
