@@ -120,6 +120,10 @@
                     class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md" style="cursor: pointer;">
                     Perfil
                   </a>
+                  <a href="{{ route('site.mis-eventos') }}"
+                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md" style="cursor: pointer;">
+                    Mis Eventos
+                  </a>
 
                   @if (in_array(Auth::user()->role_id, [1, 2]))
                   {{-- Panel de Administración --}}

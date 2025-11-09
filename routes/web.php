@@ -14,9 +14,10 @@ Route::get('/perfil', App\Livewire\PerfilController::class)->name('profile');
 Route::get('/ofertas', App\Livewire\Site\OfertasEmpleoController::class)->name('site.ofertas');
 Route::get('/certificado/{code}', App\Livewire\Site\VerCertificadosController::class)->name('ver-certificado');
 
-/* Rutas del admin */
+/* Rutas que requieren autenticación */
 Route::middleware(['auth'])->group(function () {
-  Route::get('/logout', [App\Livewire\Admin\Auth\LoginController::class, 'logout'])->name('logout');
+    Route::get('/mis-eventos', App\Livewire\Site\MisEventosController::class)->name('site.mis-eventos');
+    Route::get('/logout', [App\Livewire\Admin\Auth\LoginController::class, 'logout'])->name('logout');
   Route::post('/logout', [App\Livewire\Admin\Auth\LoginController::class, 'logout'])->name('logout');
 
   Route::prefix('admin')->name('admin.')->group(function () {

@@ -23,4 +23,30 @@ class Eventos extends Model
     {
         return $this->imagenes()->where('is_main', true)->first()->url ?? null;
     }
+    
+    /**
+     * Obtiene las sesiones asociadas a este evento.
+     */
+    public function sesiones()
+    {
+        return $this->hasMany('App\Models\SessionesEvento', 'evento_id');
+    }
+    
+    /**
+     * Obtiene las inscripciones asociadas a este evento.
+     */
+    public function inscripciones()
+    {
+        return $this->hasMany('App\Models\InscripcionesEvento', 'evento_id');
+    }
+    
+    /**
+     * Obtiene los usuarios inscritos a este evento.
+     */
+    public function usuariosInscritos()
+    {
+        return $this->belongsToMany('App\Models\User', 'inscripciones_eventos', 'evento_id', 'user_id')
+            ->withPivot('status', 'approved_at')
+            ->withTimestamps();
+    }
 }
