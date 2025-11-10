@@ -17,6 +17,7 @@ Route::get('/certificado/{code}', App\Livewire\Site\VerCertificadosController::c
 /* Rutas que requieren autenticación */
 Route::middleware(['auth'])->group(function () {
     Route::get('/mis-eventos', App\Livewire\Site\MisEventosController::class)->name('site.mis-eventos');
+    Route::get('/mis-pagos', App\Livewire\Site\MisPagosController::class)->name('site.mis-pagos');
     Route::get('/logout', [App\Livewire\Admin\Auth\LoginController::class, 'logout'])->name('logout');
   Route::post('/logout', [App\Livewire\Admin\Auth\LoginController::class, 'logout'])->name('logout');
 
