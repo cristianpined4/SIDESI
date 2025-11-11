@@ -13,78 +13,94 @@ class WompiWebhookController extends Controller
 {
     public function handle(Request $request)
     {
-        // Guarda todo el payload para depuración
-        Log::info('Webhook Wompi recibido:', $request->all());
+        Log::info('Webhook Wompi recibido', ['payload' => $request->all()]);
 
-        $data = $request->all();
+        $headers = $request->headers->all();
+        $rawBody = $request->getContent();
+        $data = json_decode($rawBody, true);
 
-        /**
-         * Ejemplo real del JSON que Wompi envía:
-         * {
-         *   "IdCuenta": "980b36e6-15ab-463f-4444-ada3e396fe48",
-         *   "FechaTransaccion": "2020-07-07T21:27:03.3403497-06:00",
-         *   "Monto": 1,
-         *   "ModuloUtilizado": "BotonPago",
-         *   "FormaPagoUtilizada": "PagoNormal",
-         *   "IdTransaccion": "2bedafea-0924-49f0-927d-8c638e193990",
-         *   "ResultadoTransaccion": "ExitosaAprobada",
-         *   "CodigoAutorizacion": "ba7dbfd3-50d1-403c-bbfd-d3be5dc766f8",
-         *   "EnlacePago": {
-         *       "Id": 66,
-         *       "IdentificadorEnlaceComercio": "OC1234",
-         *       "NombreProducto": "Camisa Azul"
-         *   }
-         * }
-         */
+        if (!$data) {
+            Log::warning('Webhook recibido sin cuerpo JSON válido.');
+            return response()->json(['message' => 'Invalid payload'], 400);
+        }
 
-        // Buscar el pago usando el identificador del enlace (lo que tú mandaste como referencia)
         $identificador = $data['EnlacePago']['IdentificadorEnlaceComercio'] ?? null;
 
         if (!$identificador) {
-            Log::warning('Webhook sin IdentificadorEnlaceComercio recibido.');
+            Log::warning('Webhook sin IdentificadorEnlaceComercio.');
             return response()->json(['message' => 'Identificador faltante'], 400);
         }
 
         $pago = Pago::find($identificador);
 
         if (!$pago) {
-            Log::warning('No se encontró el pago con ID: ' . $identificador);
+            Log::warning("No se encontró el pago con ID {$identificador}");
             return response()->json(['message' => 'Pago no encontrado'], 404);
         }
 
-        // Actualizar el estado del pago según el resultado
-        $resultado = $data['ResultadoTransaccion'] ?? '';
+        $clientSecret = env('WOMPI_APP_SECRET');
+        $wompiHash = $request->header('Wompi-Hash');
 
-        if (strtolower($resultado) === 'exitosaaprobada') {
-            $pago->status = 'pagado';
-        } elseif (strtolower($resultado) === 'rechazada' || strtolower($resultado) === 'fallida' || strtolower($resultado) === 'cancelada' || strtolower($resultado) === 'expirada' || strtolower($resultado) === 'pendiente' || strtolower($resultado) === 'error' || strtolower($resultado) === 'rechazado' || strtolower($resultado) === 'cancelado' || strtolower($resultado) === 'fallido' || strtolower($resultado) === 'expirado') {
-            $pago->status = 'rechazado';
-        } else {
-            $pago->status = 'pendiente';
-        }
+        // Calcula hash local
+        $sig = hash_hmac('sha256', $rawBody, $clientSecret);
 
-        $pago->transaction_id = $data['IdTransaccion'] ?? null;
-        $pago->authorization_code = $data['CodigoAutorizacion'] ?? null;
-        $pago->save();
+        $validoPorEndpoint = false;
 
-        // Si fue aprobado, actualizar inscripción asociada
-        if ($pago->status === 'pagado') {
-            $inscripcion = InscripcionesEvento::where('user_id', $pago->user_id)
-                ->where('evento_id', $pago->evento_id)
-                ->first();
+        if (!$wompiHash) {
+            Log::warning('Webhook sin hash, intentando validación por endpoint...');
 
-            if ($inscripcion) {
-                $inscripcion->status = 'registrado';
-                $inscripcion->save();
+            try {
+                $tokenResponse = Http::asForm()->post('https://id.wompi.sv/connect/token', [
+                    'grant_type' => 'client_credentials',
+                    'client_id' => env('WOMPI_APP_ID'),
+                    'client_secret' => env('WOMPI_APP_SECRET'),
+                    'audience' => 'wompi_api',
+                ]);
+
+                $accessToken = $tokenResponse->json('access_token') ?? null;
+
+                if ($accessToken) {
+                    $response = Http::withToken($accessToken)
+                        ->get("https://api.wompi.sv/TransaccionCompra/{$data['IdTransaccion']}");
+
+                    if ($response->ok()) {
+                        $body = $response->json();
+                        $validoPorEndpoint = $body['esReal'] && $body['esAprobada'];
+                    }
+                }
+            } catch (\Throwable $e) {
+                Log::error('Error validando por endpoint Wompi: ' . $e->getMessage());
             }
         }
 
-        Log::info('Webhook Wompi procesado correctamente.', [
-            'pago_id' => $pago->id,
-            'estado' => $pago->status,
-        ]);
+        $totalComercio = $pago->monto;
+        $totalWompi = $data['Monto'] ?? 0;
 
-        return response()->json(['message' => 'OK'], 200);
+        if ($totalComercio == $totalWompi) {
+            if ($sig === $wompiHash || $validoPorEndpoint) {
+                $pago->update([
+                    'status' => 'pagado',
+                    'transaction_id' => $data['IdTransaccion'] ?? null,
+                    'paid_at' => now(),
+                ]);
+
+                InscripcionesEvento::where('user_id', $pago->user_id)
+                    ->where('evento_id', $pago->evento_id)
+                    ->update(['status' => 'registrado']);
+
+                Log::info("Pago {$pago->id} confirmado por webhook.");
+
+                return response()->json(['message' => 'OK'], 200);
+            } else {
+                Log::warning("Hash no válido para pago {$pago->id}");
+                $pago->update(['status' => 'hash_invalido']);
+            }
+        } else {
+            Log::warning("Montos no coinciden para pago {$pago->id}. Comercio: {$totalComercio}, Wompi: {$totalWompi}");
+            $pago->update(['status' => 'monto_no_coincide']);
+        }
+
+        return response()->json(['message' => 'Processed'], 200);
     }
 
     private function verificarHashWompi($identificadorEnlaceComercio, $idTransaccion, $idEnlace, $monto, $hashRecibido, $secret)
@@ -101,32 +117,30 @@ class WompiWebhookController extends Controller
     {
         $pagoId = $request->query('pago_id');
         $inscripcionId = $request->query('inscripcion_id');
-        $transactionId = $request->query('idTransaccion');
-        $monto = $request->query('monto');
+        $idTransaccion = $request->query('idTransaccion');
         $idEnlace = $request->query('idEnlace');
-        $hash = $request->query('hash');
+        $monto = $request->query('monto');
+        $hashRecibido = $request->query('hash');
 
         $pago = Pago::find($pagoId);
         $inscripcion = InscripcionesEvento::find($inscripcionId);
 
-        // Verificar existencia
         if (!$pago || !$inscripcion) {
             session()->flash('error', 'Datos de pago o inscripción no encontrados.');
             return redirect()->route('site.eventos');
         }
 
-        if (!$hash) {
-            session()->flash('error', 'Verificación de seguridad fallida.');
+        if (!$hashRecibido) {
+            session()->flash('error', 'Falta verificación de seguridad.');
             return redirect()->route('site.eventos');
         }
 
-        // Verificar hash (identificadorEnlaceComercio = $pagoId)
         $hashValido = $this->verificarHashWompi(
             $pagoId,
-            $transactionId,
+            $idTransaccion,
             $idEnlace,
             $monto,
-            $hash,
+            $hashRecibido,
             env('WOMPI_APP_SECRET')
         );
 
@@ -136,9 +150,7 @@ class WompiWebhookController extends Controller
         }
 
         try {
-            /**
-             * Intentar verificar la transacción directamente en Wompi
-             */
+            // Validar en Wompi si realmente está aprobada
             $tokenResponse = Http::asForm()->post('https://id.wompi.sv/connect/token', [
                 'grant_type' => 'client_credentials',
                 'client_id' => env('WOMPI_APP_ID'),
@@ -151,82 +163,50 @@ class WompiWebhookController extends Controller
 
             if ($accessToken) {
                 $response = Http::withToken($accessToken)
-                    ->get("https://api.wompi.sv/v1/transactions/{$transactionId}");
+                    ->get("https://api.wompi.sv/TransaccionCompra/{$idTransaccion}");
 
                 if ($response->ok()) {
                     $data = $response->json();
-                    $estado = strtoupper($data['estado'] ?? 'PENDIENTE');
+                    $estado = $data['esAprobada'] ? 'APROBADA' : 'RECHAZADA';
                 }
             }
 
-            /**
-             * Si el hash es válido, pero la API falla → lo marcamos como aprobado
-             */
-            if (!$estado || $estado === 'PENDIENTE' || $estado === 'FALLIDA') {
-                $estado = 'APROBADA';
+            if (!$estado) {
+                $estado = 'APROBADA'; // fallback igual que WP
             }
 
-            /**
-             * Actualizar registros según el estado
-             */
-            if (in_array($estado, ['APROBADA', 'EXITOSA', 'APROVADA']) || strpos($estado, 'APROBADA') !== false || strpos($estado, 'EXITOSA') !== false || strpos($estado, 'APROVADA') !== false) {
+            if ($estado === 'APROBADA') {
                 $pago->update([
-                    'transaction_id' => $transactionId,
+                    'transaction_id' => $idTransaccion,
                     'status' => 'completado',
                     'paid_at' => now(),
                 ]);
 
                 $inscripcion->update([
                     'status' => 'registrado',
-                    'comprobante_codigo' => 'WOMPI-' . strtoupper(substr($transactionId, 0, 8)),
+                    'comprobante_codigo' => 'WOMPI-' . strtoupper(substr($idTransaccion, 0, 8)),
                 ]);
 
-                session()->flash('success', 'Pago confirmado e inscripción completada correctamente.');
+                session()->flash('success', 'Pago confirmado correctamente e inscripción completada con éxito.');
                 session()->flash('evento_id_inscripto', $inscripcion->evento_id);
             } else {
-                $pago->update(['status' => strtolower($estado)]);
-                session()->flash('error', 'El pago no fue aprobado. Estado: ' . ucfirst(strtolower($estado)));
+                $pago->update(['status' => 'rechazado']);
+                session()->flash('error', 'El pago fue rechazado por Wompi.');
             }
 
             return redirect()->route('site.eventos');
 
         } catch (\Throwable $th) {
-            LogsSistema::create([
-                'action' => 'error al verificar pago wompi',
-                'user_id' => auth()->id() ?? null,
-                'ip_address' => request()->ip() ?? null,
-                'description' => "Verificación de pago fallida para pago ID {$pagoId}: " . $th->getMessage(),
-                'target_table' => (new Pago())->getTable(),
-                'target_id' => $pagoId,
-                'status' => 'error',
-            ]);
+            Log::error('Error en callback Wompi: ' . $th->getMessage());
 
-            // Si la API falla pero el hash era válido, marcamos como aprobado igual
             if ($hashValido) {
                 $pago->update([
-                    'transaction_id' => $transactionId,
-                    'status' => 'completado',
-                    'paid_at' => now(),
+                    'transaction_id' => $idTransaccion,
+                    'status' => 'pendiente_confirmacion',
                 ]);
-
-                $inscripcion->update([
-                    'status' => 'registrado',
-                    'comprobante_codigo' => 'WOMPI-' . strtoupper(substr($transactionId, 0, 8)),
-                ]);
-
-                session()->flash('success', 'Pago aprobado parcialmente a la espera de confirmación.');
-                session()->flash('evento_id_inscripto', $inscripcion->evento_id);
+                session()->flash('warning', 'Pago recibido, pendiente de verificación.');
             } else {
-                LogsSistema::create([
-                    'action' => 'hash inválido en callback wompi',
-                    'user_id' => auth()->id() ?? null,
-                    'ip_address' => request()->ip() ?? null,
-                    'description' => "Hash inválido en callback para pago ID {$pagoId}.",
-                    'target_table' => (new Pago())->getTable(),
-                    'target_id' => $pagoId,
-                    'status' => 'error',
-                ]);
-                session()->flash('error', 'Error al procesar el pago: ' . $th->getMessage());
+                session()->flash('error', 'Error de verificación de pago.');
             }
 
             return redirect()->route('site.eventos');
