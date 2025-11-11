@@ -358,29 +358,28 @@
                 <!-- Búsqueda -->
                 <div class="flex-1 w-full">
                     <div class="relative">
-                        <input type="text" 
-                               wire:model.live.debounce.500ms="search"
-                               class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                               placeholder="Buscar eventos...">
+                        <input type="text" wire:model.live.debounce.500ms="search"
+                            class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            placeholder="Buscar eventos...">
                         <div class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="inline-block w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            <svg xmlns="http://www.w3.org/2000/svg" class="inline-block w-4 h-4" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                             </svg>
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Pestañas -->
                 <div class="flex w-full lg:w-auto">
                     <div class="inline-flex rounded-md shadow-sm" role="group">
-                        <button type="button" 
-                                wire:click="$set('tab', 'proximos')" 
-                                class="px-4 py-2 text-sm font-medium rounded-l-lg border border-gray-200 hover:bg-gray-50 focus:z-10 focus:ring-2 focus:ring-blue-500 focus:bg-blue-50 {{ $tab === 'proximos' ? 'bg-blue-50 text-blue-700 border-blue-300' : 'bg-white text-gray-700' }}">
+                        <button type="button" wire:click="$set('tab', 'proximos')"
+                            class="px-4 py-2 text-sm font-medium rounded-l-lg border border-gray-200 hover:bg-gray-50 focus:z-10 focus:ring-2 focus:ring-blue-500 focus:bg-blue-50 {{ $tab === 'proximos' ? 'bg-blue-50 text-blue-700 border-blue-300' : 'bg-white text-gray-700' }}">
                             Próximos Eventos
                         </button>
-                        <button type="button" 
-                                wire:click="$set('tab', 'pasados')" 
-                                class="px-4 py-2 text-sm font-medium rounded-r-lg border border-gray-200 hover:bg-gray-50 focus:z-10 focus:ring-2 focus:ring-blue-500 focus:bg-blue-50 {{ $tab === 'pasados' ? 'bg-blue-50 text-blue-700 border-blue-300' : 'bg-white text-gray-700' }}">
+                        <button type="button" wire:click="$set('tab', 'pasados')"
+                            class="px-4 py-2 text-sm font-medium rounded-r-lg border border-gray-200 hover:bg-gray-50 focus:z-10 focus:ring-2 focus:ring-blue-500 focus:bg-blue-50 {{ $tab === 'pasados' ? 'bg-blue-50 text-blue-700 border-blue-300' : 'bg-white text-gray-700' }}">
                             Eventos Pasados
                         </button>
                     </div>
@@ -393,129 +392,146 @@
             <div class="loading-search" wire:loading>
                 <div class="loader"></div>
             </div>
-            
+
             <!-- Título de Sección -->
             <div class="mb-8 text-center">
                 <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-2">Mis Eventos</h1>
                 <p class="text-gray-600 max-w-2xl mx-auto">
-                    {{ $tab === 'proximos' ? 'Aquí puedes ver los eventos a los que estás inscrito y que están por venir.' : 'Revisa el historial de eventos en los que has participado.' }}
+                    {{ $tab === 'proximos' ? 'Aquí puedes ver los eventos a los que estás inscrito y que están por
+                    venir.' : 'Revisa el historial de eventos en los que has participado.' }}
                 </p>
             </div>
 
             @if($eventos->count() > 0)
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    @foreach($eventos as $inscripcion)
-                        @php $evento = $inscripcion->evento; @endphp
-                        <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
-                            <!-- Imagen del evento -->
-                            <div class="relative h-48 overflow-hidden">
-                                @if($evento->imagenes->isNotEmpty())
-                                    <img src="{{ $evento->imagenes->first()->url }}" 
-                                         alt="{{ $evento->imagenes->first()->alt_text }}" 
-                                         class="w-full h-full object-cover transition-transform duration-500 hover:scale-105">
-                                @else
-                                    <img src="{{ url('/images/sin-imagen.png') }}" 
-                                         alt="Imagen no disponible" 
-                                         class="w-full h-full object-cover">
-                                @endif
-                                <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-                                
-                                <!-- Badge de estado de inscripción -->
-                                <div class="absolute top-3 right-3">
-                                    @if($inscripcion->status === 'aprobado')
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                                            </svg>
-                                            Inscrito
-                                        </span>
-                                    @elseif($inscripcion->status === 'pendiente')
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                                            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                            </svg>
-                                            Pendiente
-                                        </span>
-                                    @else
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                                            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                                            </svg>
-                                            Rechazado
-                                        </span>
-                                    @endif
-                                </div>
-                            </div>
-                            
-                            <div class="p-6">
-                                <div class="flex justify-between items-start">
-                                    <div>
-                                        @if($evento->start_time)
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                @foreach($eventos as $inscripcion)
+                @php $evento = $inscripcion->evento; @endphp
+                <div
+                    class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                    <!-- Imagen del evento -->
+                    <div class="relative h-48 overflow-hidden">
+                        @if($evento->imagenes->isNotEmpty())
+                        <img src="{{ $evento->imagenes->first()->url }}"
+                            alt="{{ $evento->imagenes->first()->alt_text }}"
+                            class="w-full h-full object-cover transition-transform duration-500 hover:scale-105">
+                        @else
+                        <img src="{{ url('/images/sin-imagen.png') }}" alt="Imagen no disponible"
+                            class="w-full h-full object-cover">
+                        @endif
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+
+                        <!-- Badge de estado de inscripción -->
+                        <div class="absolute top-3 right-3">
+                            @if($inscripcion->status === 'aprobado' || $inscripcion->status === 'registrado')
+                            <span
+                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M5 13l4 4L19 7"></path>
+                                </svg>
+                                Inscrito
+                            </span>
+                            @elseif($inscripcion->status === 'pendiente')
+                            <span
+                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                Pendiente
+                            </span>
+                            @else
+                            <span
+                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
+                                Rechazado
+                            </span>
+                            @endif
+                        </div>
+                    </div>
+
+                    <div class="p-6">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                @if($evento->start_time)
                                 <div class="text-xs text-gray-500 uppercase font-semibold tracking-wider mb-1">
                                     {{ \Carbon\Carbon::parse($evento->start_time)->format('d M, Y') }}
                                 </div>
                                 @endif
-                                <h3 class="text-xl font-bold text-gray-900 mb-2 line-clamp-2" title="{{ $evento->title }}">
+                                <h3 class="text-xl font-bold text-gray-900 mb-2 line-clamp-2"
+                                    title="{{ $evento->title }}">
                                     {{ $evento->title }}
                                 </h3>
-                                    </div>
-                                </div>
-                                
-                                @if(!empty($evento->description))
-                                <div class="text-gray-600 text-sm mb-4 line-clamp-2 prose prose-sm">
-                                    {!! Str::limit(strip_tags($evento->description), 100) !!}
-                                </div>
-                                @endif
-                                
-                                <div class="flex items-center text-sm text-gray-500 mb-4">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                                    </svg>
-                                    <span>{{ $evento->location ?? 'Ubicación no especificada' }}</span>
-                                </div>
-                                
-                                <div class="flex flex-wrap gap-2 mt-4">
-                                    <button wire:click="verDetalles({{ $evento->id }})" 
-                                            class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200">
-                                        Ver Detalles
-                                    </button>
-                                </div>
                             </div>
                         </div>
-                    @endforeach
-                </div>
-                
-                <!-- Paginación -->
-                <div class="mt-8">
-                    {{ $eventos->links() }}
-                </div>
-            @else
-                <div class="text-center py-12">
-                    <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mb-4">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                        </svg>
-                    </div>
-                    <h3 class="text-lg font-medium text-gray-900 mb-1">
-                        {{ $tab === 'proximos' ? 'No tienes eventos próximos' : 'No hay eventos pasados' }}
-                    </h3>
-                    <p class="text-gray-500 max-w-md mx-auto">
-                        {{ $tab === 'proximos' 
-                           ? 'No estás inscrito en ningún evento próximo. Explora nuestros eventos disponibles para inscribirte.' 
-                           : 'Aún no has participado en ningún evento o no ha finalizado ninguno de los eventos en los que estás inscrito.' }}
-                    </p>
-                    @if($tab === 'proximos')
-                        <div class="mt-6">
-                            <a href="{{ route('site.eventos') }}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="-ml-1 mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                                </svg>
-                                Ver todos los eventos
-                            </a>
+
+                        @if(!empty($evento->description))
+                        <div class="text-gray-600 text-sm mb-4 line-clamp-2 prose prose-sm">
+                            {!! Str::limit(strip_tags($evento->description), 100) !!}
                         </div>
-                    @endif
+                        @endif
+
+                        <div class="flex items-center text-sm text-gray-500 mb-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                            <span>{{ $evento->location ?? 'Ubicación no especificada' }}</span>
+                        </div>
+
+                        <div class="flex flex-wrap gap-2 mt-4">
+                            <button wire:click="verDetalles({{ $evento->id }})"
+                                class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200">
+                                Ver Detalles
+                            </button>
+                        </div>
+                    </div>
                 </div>
+                @endforeach
+            </div>
+
+            <!-- Paginación -->
+            <div class="mt-8">
+                {{ $eventos->links() }}
+            </div>
+            @else
+            <div class="text-center py-12">
+                <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-gray-400" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                    </svg>
+                </div>
+                <h3 class="text-lg font-medium text-gray-900 mb-1">
+                    {{ $tab === 'proximos' ? 'No tienes eventos próximos' : 'No hay eventos pasados' }}
+                </h3>
+                <p class="text-gray-500 max-w-md mx-auto">
+                    {{ $tab === 'proximos'
+                    ? 'No estás inscrito en ningún evento próximo. Explora nuestros eventos disponibles para
+                    inscribirte.'
+                    : 'Aún no has participado en ningún evento o no ha finalizado ninguno de los eventos en los que
+                    estás inscrito.' }}
+                </p>
+                @if($tab === 'proximos')
+                <div class="mt-6">
+                    <a href="{{ route('site.eventos') }}"
+                        class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="-ml-1 mr-2 h-5 w-5" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                        </svg>
+                        Ver todos los eventos
+                    </a>
+                </div>
+                @endif
+            </div>
             @endif
         </div>
     </div>
