@@ -131,8 +131,7 @@ return [
             'driver' => 'single',
             'path' => storage_path('logs/wompi.log'),
             'level' => 'debug', // puedes usar info, notice, warning, etc.
+            'replace_placeholders' => true,
         ],
-
     ],
-
 ];

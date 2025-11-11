@@ -257,6 +257,7 @@ class WompiWebhookController extends Controller
                 session()->flash('warning', 'Pago recibido, pendiente de verificación.');
             } else {
                 session()->flash('error', 'Error de verificación de pago.');
+                Log::channel('wompi')->error('Error en callback Wompi: ' . $th->getMessage());
 
                 LogsSistema::create(
                     [
