@@ -79,7 +79,7 @@ class WompiWebhookController extends Controller
         if ($totalComercio == $totalWompi) {
             if ($sig === $wompiHash || $validoPorEndpoint) {
                 $pago->update([
-                    'status' => 'pagado',
+                    'status' => 'completado',
                     'transaction_id' => $data['IdTransaccion'] ?? null,
                     'paid_at' => now(),
                 ]);
@@ -93,11 +93,11 @@ class WompiWebhookController extends Controller
                 return response()->json(['message' => 'OK'], 200);
             } else {
                 Log::warning("Hash no válido para pago {$pago->id}");
-                $pago->update(['status' => 'hash_invalido']);
+                $pago->update(['status' => 'fallido']);
             }
         } else {
             Log::warning("Montos no coinciden para pago {$pago->id}. Comercio: {$totalComercio}, Wompi: {$totalWompi}");
-            $pago->update(['status' => 'monto_no_coincide']);
+            $pago->update(['status' => 'fallido']);
         }
 
         return response()->json(['message' => 'Processed'], 200);

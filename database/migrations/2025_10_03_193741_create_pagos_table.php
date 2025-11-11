@@ -19,7 +19,7 @@ return new class extends Migration {
             $table->decimal('amount', 10, 2);
             $table->string('currency')->default('USD');
             $table->string('payment_method');
-            $table->enum('status', ['pendiente', 'completado', 'fallido', 'reembolsado', 'pendiente_confirmacion'])->default('pendiente');
+            $table->enum('status', ['pendiente', 'completado', 'fallido', 'reembolsado', 'pendiente_confirmacion', 'rechazado'])->default('pendiente');
             $table->string('transaction_id')->nullable();
             $table->dateTime('paid_at')->nullable();
             $table->timestamps();
