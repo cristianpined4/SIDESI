@@ -13,28 +13,28 @@ class WompiWebhookController extends Controller
 {
     public function handle(Request $request)
     {
-        Log::info('Webhook Wompi recibido', ['payload' => $request->all()]);
+        Log::channel('wompi')->info('Webhook Wompi recibido', ['payload' => $request->all()]);
 
         $headers = $request->headers->all();
         $rawBody = $request->getContent();
         $data = json_decode($rawBody, true);
 
         if (!$data) {
-            Log::warning('Webhook recibido sin cuerpo JSON válido.');
+            Log::channel('wompi')->warning('Webhook recibido sin cuerpo JSON válido.');
             return response()->json(['message' => 'Invalid payload'], 400);
         }
 
         $identificador = $data['EnlacePago']['IdentificadorEnlaceComercio'] ?? null;
 
         if (!$identificador) {
-            Log::warning('Webhook sin IdentificadorEnlaceComercio.');
+            Log::channel('wompi')->warning('Webhook sin IdentificadorEnlaceComercio.');
             return response()->json(['message' => 'Identificador faltante'], 400);
         }
 
         $pago = Pago::find($identificador);
 
         if (!$pago) {
-            Log::warning("No se encontró el pago con ID {$identificador}");
+            Log::channel('wompi')->warning("No se encontró el pago con ID {$identificador}");
             return response()->json(['message' => 'Pago no encontrado'], 404);
         }
 
@@ -47,7 +47,7 @@ class WompiWebhookController extends Controller
         $validoPorEndpoint = false;
 
         if (!$wompiHash) {
-            Log::warning('Webhook sin hash, intentando validación por endpoint...');
+            Log::channel('wompi')->warning('Webhook sin hash, intentando validación por endpoint...');
 
             try {
                 $tokenResponse = Http::asForm()->post('https://id.wompi.sv/connect/token', [
@@ -69,7 +69,19 @@ class WompiWebhookController extends Controller
                     }
                 }
             } catch (\Throwable $e) {
-                Log::error('Error validando por endpoint Wompi: ' . $e->getMessage());
+                Log::channel('wompi')->error('Error validando por endpoint Wompi: ' . $e->getMessage());
+
+                LogsSistema::create(
+                    [
+                        'action' => 'Error al validar pago wompi por endpoint',
+                        'user_id' => $pago->user_id,
+                        'ip_address' => request()->ip() ?? null,
+                        'description' => "Error al validar pago por endpoint para pago ID {$pago->id}: " . $e->getMessage(),
+                        'target_table' => (new Pago())->getTable(),
+                        'target_id' => $pago->id,
+                        'status' => 'error',
+                    ]
+                );
             }
         }
 
@@ -88,15 +100,41 @@ class WompiWebhookController extends Controller
                     ->where('evento_id', $pago->evento_id)
                     ->update(['status' => 'registrado']);
 
-                Log::info("Pago {$pago->id} confirmado por webhook.");
+                Log::channel('wompi')->info("Pago {$pago->id} confirmado por webhook.");
 
                 return response()->json(['message' => 'OK'], 200);
             } else {
-                Log::warning("Hash no válido para pago {$pago->id}");
+                Log::channel('wompi')->warning("Hash no válido para pago {$pago->id}");
+
+                LogsSistema::create(
+                    [
+                        'action' => 'Error al verificar pago wompi',
+                        'user_id' => $pago->user_id,
+                        'ip_address' => request()->ip() ?? null,
+                        'description' => "Verificación de pago fallida para pago ID {$pago->id}: Hash no válido.",
+                        'target_table' => (new Pago())->getTable(),
+                        'target_id' => $pago->id,
+                        'status' => 'error',
+                    ]
+                );
+
                 $pago->update(['status' => 'fallido']);
             }
         } else {
-            Log::warning("Montos no coinciden para pago {$pago->id}. Comercio: {$totalComercio}, Wompi: {$totalWompi}");
+            Log::channel('wompi')->warning("Montos no coinciden para pago {$pago->id}. Comercio: {$totalComercio}, Wompi: {$totalWompi}");
+
+            LogsSistema::create(
+                [
+                    'action' => 'Error al verificar pago wompi',
+                    'user_id' => $pago->user_id,
+                    'ip_address' => request()->ip() ?? null,
+                    'description' => "Verificación de pago fallida para pago ID {$pago->id}: Montos no coinciden. Comercio: {$totalComercio}, Wompi: {$totalWompi}",
+                    'target_table' => (new Pago())->getTable(),
+                    'target_id' => $pago->id,
+                    'status' => 'error',
+                ]
+            );
+
             $pago->update(['status' => 'fallido']);
         }
 
@@ -197,7 +235,19 @@ class WompiWebhookController extends Controller
             return redirect()->route('site.eventos');
 
         } catch (\Throwable $th) {
-            Log::error('Error en callback Wompi: ' . $th->getMessage());
+            Log::channel('wompi')->error('Error en callback Wompi: ' . $th->getMessage());
+
+            LogsSistema::create(
+                [
+                    'action' => 'Error al verificar pago wompi',
+                    'user_id' => auth()->id() ?? null,
+                    'ip_address' => request()->ip() ?? null,
+                    'description' => "Verificación de pago fallida para pago ID {$pagoId}: " . $th->getMessage(),
+                    'target_table' => (new Pago())->getTable(),
+                    'target_id' => $pagoId,
+                    'status' => 'error',
+                ]
+            );
 
             if ($hashValido) {
                 $pago->update([
@@ -207,6 +257,18 @@ class WompiWebhookController extends Controller
                 session()->flash('warning', 'Pago recibido, pendiente de verificación.');
             } else {
                 session()->flash('error', 'Error de verificación de pago.');
+
+                LogsSistema::create(
+                    [
+                        'action' => 'Verificación de pago fallida',
+                        'user_id' => auth()->id() ?? null,
+                        'ip_address' => request()->ip() ?? null,
+                        'description' => "Verificación de pago fallida para pago ID {$pagoId}: " . $th->getMessage(),
+                        'target_table' => (new Pago())->getTable(),
+                        'target_id' => $pagoId,
+                        'status' => 'error',
+                    ]
+                );
             }
 
             return redirect()->route('site.eventos');
