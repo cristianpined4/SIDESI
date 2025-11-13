@@ -144,12 +144,10 @@
           </div>
 
           <div>
+            {{-- Numero de documento --}}
             <label for="document_number" class="block text-sm font-medium text-zinc-700 mb-2">Número de
               documento</label>
-            <input id="document_number" type="text" placeholder="Número de documento"
-              wire:model="fields.document_number" class="w-full h-12 rounded-xl border border-zinc-200 bg-white px-4 text-zinc-900 text-base placeholder-zinc-400
-                          transition-colors focus:outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-100
-                          @error('fields.document_number') border-red-300 @enderror">
+              <div id="document_number_container"></div>
             @error('fields.document_number') <p class="mt-2 text-sm text-red-600">{{ $message }}</p> @enderror
           </div>
         </div>
@@ -227,4 +225,52 @@
     toggleInstitution();
     roleSelect.addEventListener('change', toggleInstitution);
   });
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const tipoSelect = document.getElementById('document_type');
+  const container = document.getElementById('document_number_container');
+
+  // Función para renderizar el input adecuado
+  function renderInput(tipo) {
+    if (tipo === 'DUI') {
+      container.innerHTML = `
+        <input id="document_number" type="text" placeholder="ej: 00000000-0"
+          wire:model="fields.document_number"
+          class="w-full h-12 rounded-xl border border-zinc-200 bg-white px-4 text-zinc-900 text-base placeholder-zinc-400
+                 transition-colors focus:outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-100
+                 @error('fields.document_number') border-red-300 @enderror"
+          oninput="
+            this.value = this.value.replace(/[^0-9]/g, '');
+            if (this.value.length > 8) {
+              this.value = this.value.slice(0, 8) + '-' + this.value.slice(8, 9);
+            }
+          ">
+        @error('fields.document_number')
+          <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+        @enderror
+      `;
+    } else {
+      container.innerHTML = `
+        <input id="document_number" type="text" placeholder="Número de documento"
+          wire:model="fields.document_number"
+          class="w-full h-12 rounded-xl border border-zinc-200 bg-white px-4 text-zinc-900 text-base placeholder-zinc-400
+                 transition-colors focus:outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-100
+                 @error('fields.document_number') border-red-300 @enderror">
+        @error('fields.document_number')
+          <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+        @enderror
+      `;
+    }
+  }
+
+  // Detectar cambios
+  tipoSelect.addEventListener('change', function() {
+    renderInput(this.value);
+  });
+
+  // Render inicial si ya hay valor (por ejemplo, al editar)
+  renderInput(tipoSelect.value);
+});
 </script>
