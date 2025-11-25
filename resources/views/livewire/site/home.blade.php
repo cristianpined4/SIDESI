@@ -1,4 +1,4 @@
-@section('title', "SIDESI - Sistema de Desarrollo de Estudiantes de Ingeniería")
+@section('title', "SIDESI - Sección de Ingeniería de Sistemas Informáticos")
 
 <main style="width: 100%;">
     <div class="loading" wire:loading.attr="show" show="false">
@@ -153,9 +153,7 @@
                     diseñadas para potenciar tu experiencia educativa y desarrollo profesional.</p>
             </div>
             <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <div data-slot="card"
-                    onclick="redirectCard('/eventos', this)"
-                    class="bg-card text-card-foreground flex flex-col gap-6 rounded-xl py-6 border-0 shadow-sm hover:shadow-md transition-shadow cursor-pointer select-none hover:shadow-md hover:border-primary/20 active:scale-[0.98] transition-all
+                <div data-slot="card" onclick="redirectCard('/eventos', this)" class="bg-card text-card-foreground flex flex-col gap-6 rounded-xl py-6 border-0 shadow-sm hover:shadow-md transition-shadow cursor-pointer select-none hover:shadow-md hover:border-primary/20 active:scale-[0.98] transition-all
 ">
                     <div data-slot="card-header"
                         class="@container/card-header grid auto-rows-min grid-rows-[auto_auto] items-start gap-1.5 px-6 has-data-[slot=card-action]:grid-cols-[1fr_auto] [.border-b]:pb-6">
@@ -171,8 +169,7 @@
                         </div>
                         <div data-slot="card-title" class="font-semibold text-xl">Gestión de Eventos</div>
                     </div>
-                    <div onclick="window.location.href='/eventos'"
-                        data-slot="card-content" class="px-6">
+                    <div onclick="window.location.href='/eventos'" data-slot="card-content" class="px-6">
                         <div data-slot="card-description" class="text-muted-foreground text-base leading-relaxed">
                             Organiza y
                             participa en talleres, conferencias y actividades académicas con inscripción automática.
@@ -198,14 +195,14 @@
                     }
                 </script>
 
-                <div data-slot="card"
-                    onclick="redirectCard('/documentos', this)"
+                <div data-slot="card" onclick="redirectCard('/documentos', this)"
                     class="bg-card text-card-foreground flex flex-col gap-6 rounded-xl py-6 border-0 shadow-sm hover:shadow-md hover:border-primary/20 transition-shadow cursor-pointer select-none active:scale-[0.98] transition-all">
 
                     <div data-slot="card-header"
                         class="@container/card-header grid auto-rows-min grid-rows-[auto_auto] items-start gap-1.5 px-6 has-data-[slot=card-action]:grid-cols-[1fr_auto] [.border-b]:pb-6">
 
-                        <div class="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4 transition-colors group-hover:bg-primary/20">
+                        <div
+                            class="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4 transition-colors group-hover:bg-primary/20">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                 stroke-linejoin="round" class="lucide lucide-file-text h-6 w-6 text-primary">
@@ -243,18 +240,17 @@
                     }
                 </script>
 
-                <div data-slot="card"
-                    onclick="redirectCard('/eventos', this)"
+                <div data-slot="card" onclick="redirectCard('/eventos', this)"
                     class="bg-card text-card-foreground flex flex-col gap-6 rounded-xl py-6 border-0 shadow-sm hover:shadow-md hover:border-primary/20 transition-shadow cursor-pointer select-none active:scale-[0.98] transition-all">
 
                     <div data-slot="card-header"
                         class="@container/card-header grid auto-rows-min grid-rows-[auto_auto] items-start gap-1.5 px-6 has-data-[slot=card-action]:grid-cols-[1fr_auto] [.border-b]:pb-6">
 
-                        <div class="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4 transition-colors group-hover:bg-primary/20">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                class="lucide lucide-users h-6 w-6 text-primary">
+                        <div
+                            class="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4 transition-colors group-hover:bg-primary/20">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" class="lucide lucide-users h-6 w-6 text-primary">
                                 <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
                                 <circle cx="9" cy="7" r="4"></circle>
                                 <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
@@ -289,18 +285,17 @@
                     }
                 </script>
 
-                <div data-slot="card"
-                    onclick="redirectCard('/eventos', this)"
+                <div data-slot="card" onclick="redirectCard('/eventos', this)"
                     class="bg-card text-card-foreground flex flex-col gap-6 rounded-xl py-6 border-0 shadow-sm hover:shadow-md hover:border-primary/20 transition-shadow cursor-pointer select-none active:scale-[0.98] transition-all">
 
                     <div data-slot="card-header"
                         class="@container/card-header grid auto-rows-min grid-rows-[auto_auto] items-start gap-1.5 px-6 has-data-[slot=card-action]:grid-cols-[1fr_auto] [.border-b]:pb-6">
 
-                        <div class="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4 transition-colors group-hover:bg-primary/20">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                class="lucide lucide-credit-card h-6 w-6 text-primary">
+                        <div
+                            class="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4 transition-colors group-hover:bg-primary/20">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" class="lucide lucide-credit-card h-6 w-6 text-primary">
                                 <rect width="20" height="14" x="2" y="5" rx="2"></rect>
                                 <line x1="2" x2="22" y1="10" y2="10"></line>
                             </svg>
@@ -331,18 +326,17 @@
                         }, 400);
                     }
                 </script>
-                <div data-slot="card"
-                    onclick="redirectCard('/eventos', this)"
+                <div data-slot="card" onclick="redirectCard('/eventos', this)"
                     class="bg-card text-card-foreground flex flex-col gap-6 rounded-xl py-6 border-0 shadow-sm hover:shadow-md hover:border-primary/20 transition-shadow cursor-pointer select-none active:scale-[0.98] transition-all">
 
                     <div data-slot="card-header"
                         class="@container/card-header grid auto-rows-min grid-rows-[auto_auto] items-start gap-1.5 px-6 has-data-[slot=card-action]:grid-cols-[1fr_auto] [.border-b]:pb-6">
 
-                        <div class="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4 transition-colors group-hover:bg-primary/20">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                class="lucide lucide-award h-6 w-6 text-primary">
+                        <div
+                            class="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4 transition-colors group-hover:bg-primary/20">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" class="lucide lucide-award h-6 w-6 text-primary">
                                 <path
                                     d="m15.477 12.89 1.515 8.526a.5.5 0 0 1-.81.47l-3.58-2.687a1 1 0 0 0-1.197 0l-3.586 2.686a.5.5 0 0 1-.81-.469l1.514-8.526">
                                 </path>
@@ -378,18 +372,17 @@
                     }
                 </script>
 
-                <div data-slot="card"
-                    onclick="redirectCard('/noticias', this)"
+                <div data-slot="card" onclick="redirectCard('/noticias', this)"
                     class="bg-card text-card-foreground flex flex-col gap-6 rounded-xl py-6 border-0 shadow-sm hover:shadow-md hover:border-primary/20 transition-shadow cursor-pointer select-none active:scale-[0.98] transition-all">
 
                     <div data-slot="card-header"
                         class="@container/card-header grid auto-rows-min grid-rows-[auto_auto] items-start gap-1.5 px-6 has-data-[slot=card-action]:grid-cols-[1fr_auto] [.border-b]:pb-6">
 
-                        <div class="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4 transition-colors group-hover:bg-primary/20">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                class="lucide lucide-search h-6 w-6 text-primary">
+                        <div
+                            class="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4 transition-colors group-hover:bg-primary/20">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" class="lucide lucide-search h-6 w-6 text-primary">
                                 <circle cx="11" cy="11" r="8"></circle>
                                 <path d="m21 21-4.3-4.3"></path>
                             </svg>
@@ -449,14 +442,15 @@
             </div>
             <div class="grid lg:grid-cols-3 gap-8">
                 @foreach ($recordsNoticias as $noticia)
-    
+
                 <div data-slot="card"
                     class="bg-card text-card-foreground flex flex-col gap-6 rounded-xl py-6 border-0 shadow-sm hover:shadow-md transition-all cursor-pointer">
                     <div data-slot="card-header"
                         class="@container/card-header grid auto-rows-min grid-rows-[auto_auto] items-start gap-1.5 px-6 has-data-[slot=card-action]:grid-cols-[1fr_auto] [.border-b]:pb-6">
                         <div class="flex items-center justify-between mb-2">
                             <span data-slot="badge"
-                                class="inline-flex items-center justify-center rounded-md border px-2 py-0.5 text-xs font-medium w-fit whitespace-nowrap shrink-0 [&amp;&gt;svg]:size-3 gap-1 [&amp;&gt;svg]:pointer-events-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive transition-[color,box-shadow] overflow-hidden border-transparent bg-secondary text-secondary-foreground [a&amp;]:hover:bg-secondary/90">{{ $noticia->getCategoryLabelAttribute() }}</span>
+                                class="inline-flex items-center justify-center rounded-md border px-2 py-0.5 text-xs font-medium w-fit whitespace-nowrap shrink-0 [&amp;&gt;svg]:size-3 gap-1 [&amp;&gt;svg]:pointer-events-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive transition-[color,box-shadow] overflow-hidden border-transparent bg-secondary text-secondary-foreground [a&amp;]:hover:bg-secondary/90">{{
+                                $noticia->getCategoryLabelAttribute() }}</span>
                             <div class="flex items-center text-sm text-muted-foreground">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -465,18 +459,20 @@
                                     <path d="M16 2v4"></path>
                                     <rect width="18" height="18" x="3" y="4" rx="2"></rect>
                                     <path d="M3 10h18"></path>
-                                </svg>{{ $noticia->getDateAttribute()   }}
+                                </svg>{{ $noticia->getDateAttribute() }}
                             </div>
                         </div>
-                        <div data-slot="card-title" class="font-semibold text-xl text-balance">{{ $noticia->title }}</div>
+                        <div data-slot="card-title" class="font-semibold text-xl text-balance">{{ $noticia->title }}
+                        </div>
                     </div>
                     <div data-slot="card-content" class="px-6">
-                        <div data-slot="card-description" class="text-muted-foreground text-base leading-relaxed">{{ $noticia->description }}</div>
+                        <div data-slot="card-description" class="text-muted-foreground text-base leading-relaxed">{{
+                            $noticia->description }}</div>
                     </div>
                 </div>
-                
+
                 @endforeach
-        </div>
+            </div>
     </section>
     <!-- Contenido - fin -->
 </main>
